@@ -2,7 +2,10 @@ package main
 
 import (
 	controller "controller"
+	"io"
+	"model"
 	"net/http"
+	"strings"
 	"view"
 )
 
@@ -11,6 +14,34 @@ func main() {
 		flashcards := controller.GetAllFlashCards()
 
 		view.RenderAllFlashcards(w, flashcards)
+	})
+
+	http.HandleFunc("/add", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != "POST" {
+			return
+		}
+
+		body, _ := io.ReadAll(r.Body)
+		entries := strings.Split(string(body), "&")
+
+		card := model.Flashcard{}
+
+		for _, entry := range entries {
+			kvPair := strings.Split(entry, "=")
+
+			if kvPair[0] == "Front" {
+				card.Front = kvPair[1]
+			}
+
+			if kvPair[0] == "Back" {
+				card.Back = kvPair[1]
+			}
+		}
+
+		controller.AddCard(&card)
+
+		w.Header().Add("Location", "/")
+		w.WriteHeader(303)
 	})
 
 	http.ListenAndServe(":3000", nil)

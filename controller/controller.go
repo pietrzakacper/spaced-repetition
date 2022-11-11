@@ -6,12 +6,10 @@ import (
 	p "persistance"
 )
 
-var store = "flashcards.csv"
+var store = p.Create("flashcards.csv")
 
 func GetAllFlashCards() []model.Flashcard {
-	persistance := p.Create(store)
-
-	lines := persistance.Read()
+	lines := store.Read()
 
 	csvEntries := parser.ParseCSVLines(lines)
 
@@ -22,4 +20,9 @@ func GetAllFlashCards() []model.Flashcard {
 	}
 
 	return flashcards
+}
+
+func AddCard(card *model.Flashcard) {
+	line := card.Front + "," + card.Back
+	store.Add(line)
 }
