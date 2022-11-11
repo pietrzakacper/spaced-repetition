@@ -1,6 +1,10 @@
 go 1.19
 
 use (
+	./controller
 	./main
+	./model
 	./parser
+	./persistance
+	./view
 )

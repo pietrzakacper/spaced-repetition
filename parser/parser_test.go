@@ -3,6 +3,8 @@ package parser
 import (
 	"reflect"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestTextToLines(t *testing.T) {
@@ -26,4 +28,12 @@ func TestTextToLines(t *testing.T) {
 	if !equal {
 		t.Fatalf("lines %v are not equal to expected result", lines)
 	}
+}
+
+func TestParseLine(t *testing.T) {
+	front, back, err := ParseLine("hello, hola")
+
+	assert.Equal(t, "hello", front)
+	assert.Equal(t, "hola", back)
+	assert.Nil(t, err)
 }
