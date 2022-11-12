@@ -1,9 +1,8 @@
 package main
 
 import (
-	controller "controller"
+	"controller"
 	"io"
-	"model"
 	"net/http"
 	"strings"
 	"view"
@@ -11,9 +10,9 @@ import (
 
 func main() {
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		flashcards := controller.GetAllFlashCards()
+		flashcards, newCardsCount := controller.GetAllFlashCards()
 
-		view.RenderAllFlashcards(w, flashcards)
+		view.RenderAllFlashcards(w, flashcards, newCardsCount)
 	})
 
 	http.HandleFunc("/add", func(w http.ResponseWriter, r *http.Request) {
@@ -24,21 +23,25 @@ func main() {
 		body, _ := io.ReadAll(r.Body)
 		entries := strings.Split(string(body), "&")
 
-		card := model.Flashcard{}
+		var (
+			front string
+			back  string
+		)
 
+		// @TODO use form parsing
 		for _, entry := range entries {
 			kvPair := strings.Split(entry, "=")
 
 			if kvPair[0] == "Front" {
-				card.Front = kvPair[1]
+				front = kvPair[1]
 			}
 
 			if kvPair[0] == "Back" {
-				card.Back = kvPair[1]
+				back = kvPair[1]
 			}
 		}
 
-		controller.AddCard(&card)
+		controller.AddCard(front, back)
 
 		w.Header().Add("Location", "/")
 		w.WriteHeader(303)
@@ -57,6 +60,41 @@ func main() {
 		w.WriteHeader(303)
 
 		controller.ImportCards(file)
+	})
+
+	var session *controller.MemorizingSession
+
+	http.HandleFunc("/startSession", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != "POST" {
+			return
+		}
+
+		session = controller.CreateMemorizingSession(10)
+		w.Header().Add("Location", "/quest")
+		w.WriteHeader(303)
+	})
+
+	http.HandleFunc("/quest", func(w http.ResponseWriter, r *http.Request) {
+		cardNumber, totalCardsCount, card := session.GetCurrentQuest()
+
+		// @TODO move views to controllers
+		view.RenderCardQuestion(w, card, cardNumber, totalCardsCount)
+	})
+
+	http.HandleFunc("/answer", func(w http.ResponseWriter, r *http.Request) {
+		cardNumber, totalCardsCount, card := session.GetCurrentQuest()
+
+		view.RenderCardAnswer(w, card, cardNumber, totalCardsCount, session.GetAnswerFeedbackOptions())
+	})
+
+	http.HandleFunc("/submitAnswer/", func(w http.ResponseWriter, r *http.Request) {
+		r.ParseForm()
+		answer := r.Form.Get("answerFeedback")
+
+		session.SubmitAnswer(answer)
+
+		w.Header().Add("Location", "/quest")
+		w.WriteHeader(303)
 	})
 
 	http.ListenAndServe(":3000", nil)

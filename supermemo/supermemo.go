@@ -21,6 +21,10 @@ func Create() *Memorizable {
 	return &Memorizable{ef: 2.5, nextRepetitionOffset: 0, repetitionCount: 0}
 }
 
+func (m *Memorizable) IsNew() bool {
+	return m.repetitionCount == 0
+}
+
 func (m *Memorizable) SubmitRepetition(qualityOfResponse QualityOfResponse) {
 	m.repetitionCount += 1
 

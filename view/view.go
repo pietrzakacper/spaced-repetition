@@ -1,17 +1,22 @@
 package view
 
 import (
+	"fmt"
 	"io"
 	"model"
 	"net/http"
+	"strconv"
 )
 
-func RenderAllFlashcards(w http.ResponseWriter, cards []model.Flashcard) {
+func RenderAllFlashcards(w http.ResponseWriter, cards []model.Flashcard, newCardsCount uint) {
 	w.Header().Add("Content-Type", "text/html")
 
 	html := "<html><body>"
 
 	html += `
+		<form action="/startSession" method="POST">
+			<input type="submit" value="Memorize 10 new cards"/>
+		</form>
 		<label>Add single card</label>
 		<form action="/add" method="POST">
 			<input type="text" name="Front"/>
@@ -26,9 +31,71 @@ func RenderAllFlashcards(w http.ResponseWriter, cards []model.Flashcard) {
 		</form>
 	`
 
+	html += "<b>All cards:</b> " +
+		strconv.FormatInt(int64(len(cards)), 10) +
+		", <b>New cards</b>: " +
+		strconv.FormatInt(int64(newCardsCount), 10)
+
 	for _, card := range cards {
 		html += "<p>Front: " + card.Front + ", Back: " + card.Back + "</p>\n"
 	}
+
+	html += "</body></html>"
+
+	io.WriteString(w, html)
+}
+
+func RenderCardQuestion(w http.ResponseWriter, card *model.Flashcard, cardNumber int, totalCardsInSession int) {
+	w.Header().Add("Content-Type", "text/html")
+
+	html := "<html><body>"
+
+	html += "<b>Card: </b>" +
+		strconv.FormatInt(int64(cardNumber), 10) +
+		"/" + strconv.FormatInt(int64(totalCardsInSession), 10)
+
+	html += "<br/>"
+
+	html += "<h2>" + card.Front + "</h2>"
+
+	html += `
+		<form action="/answer" method="POST">
+			<label>Show Answer</label>
+			<input type="submit"/>
+		</form>
+	`
+
+	html += "</body></html>"
+
+	io.WriteString(w, html)
+}
+
+// @TODO use HTML templates
+func RenderCardAnswer(w http.ResponseWriter, card *model.Flashcard, cardNumber int, totalCardsInSession int, answerOptions []string) {
+	w.Header().Add("Content-Type", "text/html")
+
+	html := "<html><body>"
+
+	html += "<b>Card: </b>" +
+		strconv.FormatInt(int64(cardNumber), 10) +
+		"/" + strconv.FormatInt(int64(totalCardsInSession), 10)
+
+	html += "<br/>"
+
+	html += "<h2>" + card.Back + "</h2>"
+
+	html += `
+		<form action="/submitAnswer" method="POST">
+			<label>How's your memory?</label><br/>`
+
+	for _, option := range answerOptions {
+		html += fmt.Sprintf(
+			`<input type="submit" value="%s" name="answerFeedback"/>`,
+			option,
+		)
+	}
+
+	html += "</form>"
 
 	html += "</body></html>"
 

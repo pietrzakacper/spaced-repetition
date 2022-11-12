@@ -43,6 +43,10 @@ func ParseLine(line string) []string {
 	return splitArr
 }
 
+func MakeLine(entries []string) string {
+	return strings.Join(entries, ",")
+}
+
 func ParseCSVStream(textStream io.Reader) <-chan []string {
 	linesChannel := TextToLines(FileToChannel(textStream))
 
