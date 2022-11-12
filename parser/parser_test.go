@@ -31,9 +31,8 @@ func TestTextToLines(t *testing.T) {
 }
 
 func TestParseLine(t *testing.T) {
-	front, back, err := ParseLine("hello, hola")
+	line := ParseLine("hello, hola")
 
-	assert.Equal(t, "hello", front)
-	assert.Equal(t, "hola", back)
-	assert.Nil(t, err)
+	assert.Equal(t, "hello", line[0])
+	assert.Equal(t, "hola", line[1])
 }

@@ -7,11 +7,9 @@ import (
 )
 
 func RenderAllFlashcards(w http.ResponseWriter, cards []model.Flashcard) {
-	html := ""
+	w.Header().Add("Content-Type", "text/html")
 
-	for _, card := range cards {
-		html += "<p>Front: " + card.Front + ", Back: " + card.Back + "</p>\n"
-	}
+	html := "<html><body>"
 
 	html += `
 		<label>Add single card</label>
@@ -27,6 +25,12 @@ func RenderAllFlashcards(w http.ResponseWriter, cards []model.Flashcard) {
 			<input type="submit"/>
 		</form>
 	`
+
+	for _, card := range cards {
+		html += "<p>Front: " + card.Front + ", Back: " + card.Back + "</p>\n"
+	}
+
+	html += "</body></html>"
 
 	io.WriteString(w, html)
 }

@@ -6,5 +6,6 @@ use (
 	./model
 	./parser
 	./persistance
+	./supermemo
 	./view
 )

@@ -1,7 +1,6 @@
 package parser
 
 import (
-	"errors"
 	"fmt"
 	"io"
 	"strings"
@@ -34,44 +33,28 @@ func TextToLines(textChan <-chan string) <-chan string {
 	return linesChan
 }
 
-func ParseLine(line string) (front string, back string, err error) {
+func ParseLine(line string) []string {
 	splitArr := strings.Split(line, ",")
-
-	if len(splitArr) != 2 {
-		return "", "", errors.New("Incorrect number of elements in line")
-	}
 
 	for i, el := range splitArr {
 		splitArr[i] = strings.Trim(el, " ")
 	}
 
-	return splitArr[0], splitArr[1], nil
+	return splitArr
 }
 
-type TwoColumnEntry struct {
-	First  string
-	Second string
-}
-
-func ParseCSVStream(textStream io.Reader) <-chan TwoColumnEntry {
+func ParseCSVStream(textStream io.Reader) <-chan []string {
 	linesChannel := TextToLines(FileToChannel(textStream))
 
-	entryChan := make(chan TwoColumnEntry)
+	entryChan := make(chan []string)
 
-	columnA, columnB, _ := ParseLine(<-linesChannel)
+	columnLine := ParseLine(<-linesChannel)
 
-	fmt.Printf("Column names are: %s %s\n", columnA, columnB)
+	fmt.Printf("Column names are: %s %s\n", columnLine[0], columnLine[1])
 
 	go func() {
 		for line := range linesChannel {
-			first, back, err := ParseLine(line)
-
-			if err != nil {
-				fmt.Printf("Couldn't parse line: %s \nError: %v", line, err)
-				continue
-			}
-
-			entryChan <- TwoColumnEntry{first, back}
+			entryChan <- ParseLine(line)
 		}
 
 		close(entryChan)
@@ -80,17 +63,11 @@ func ParseCSVStream(textStream io.Reader) <-chan TwoColumnEntry {
 	return entryChan
 }
 
-func ParseCSVLines(lines []string) []TwoColumnEntry {
-	entries := make([]TwoColumnEntry, len(lines))
+func ParseCSVLines(lines []string) [][]string {
+	entries := make([][]string, len(lines))
 
 	for lineIndex, line := range lines {
-		first, back, err := ParseLine(line)
-
-		if err != nil {
-			fmt.Printf("Couldn't parse line: %s \nError: %v", line, err)
-		}
-
-		entries[lineIndex] = TwoColumnEntry{first, back}
+		entries[lineIndex] = ParseLine(line)
 	}
 
 	return entries

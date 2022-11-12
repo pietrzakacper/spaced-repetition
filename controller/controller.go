@@ -4,10 +4,11 @@ import (
 	"io"
 	"model"
 	"parser"
-	p "persistance"
+	"persistance"
+	"supermemo"
 )
 
-var store = p.Create("db.csv")
+var store = persistance.Create("db")
 
 func GetAllFlashCards() []model.Flashcard {
 	lines := store.Read()
@@ -17,14 +18,14 @@ func GetAllFlashCards() []model.Flashcard {
 	flashcards := make([]model.Flashcard, len(csvEntries))
 
 	for i, entry := range csvEntries {
-		flashcards[i] = model.Flashcard{Front: entry.First, Back: entry.Second}
+		flashcards[i] = model.Flashcard{Front: entry[0], Back: entry[1]}
 	}
 
 	return flashcards
 }
 
 func AddCard(card *model.Flashcard) {
-	line := card.Front + "," + card.Back
+	line := card.Front + "," + card.Back + "," + supermemo.Create().Serialize()
 	store.Add(line)
 }
 
@@ -32,6 +33,6 @@ func ImportCards(csvStream io.Reader) {
 	entriesChan := parser.ParseCSVStream(csvStream)
 
 	for entry := range entriesChan {
-		AddCard(&model.Flashcard{Front: entry.First, Back: entry.Second})
+		AddCard(&model.Flashcard{Front: entry[0], Back: entry[1]})
 	}
 }

@@ -17,7 +17,7 @@ func Create(store string) Persistance {
 
 func (p *Persistance) Read() []string {
 	cwd, _ := os.Getwd()
-	storePath := filepath.Join(cwd, "../", p.store)
+	storePath := filepath.Join(cwd, "../", p.store+".csv")
 
 	f, _ := os.Open(storePath)
 
@@ -36,7 +36,7 @@ func (p *Persistance) Read() []string {
 
 func (p *Persistance) Add(line string) {
 	cwd, _ := os.Getwd()
-	storePath := filepath.Join(cwd, "../", p.store)
+	storePath := filepath.Join(cwd, "../", p.store+".csv")
 	f, _ := os.OpenFile(storePath, os.O_APPEND|os.O_CREATE|os.O_RDWR, 0644)
 
 	defer f.Close()
