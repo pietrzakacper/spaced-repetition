@@ -44,5 +44,20 @@ func main() {
 		w.WriteHeader(303)
 	})
 
+	http.HandleFunc("/import", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != "POST" {
+			return
+		}
+
+		r.ParseMultipartForm(10 << 20)
+
+		file, _, _ := r.FormFile("fileToUpload")
+
+		w.Header().Add("Location", "/")
+		w.WriteHeader(303)
+
+		controller.ImportCards(file)
+	})
+
 	http.ListenAndServe(":3000", nil)
 }

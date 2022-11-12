@@ -19,7 +19,11 @@ func (p *Persistance) Read() []string {
 	cwd, _ := os.Getwd()
 	storePath := filepath.Join(cwd, "../", p.store)
 
-	stream := parser.TextToLines(parser.FileToStream(storePath))
+	f, _ := os.Open(storePath)
+
+	defer f.Close()
+
+	stream := parser.TextToLines(parser.FileToChannel(f))
 
 	lines := make([]string, 0)
 
@@ -33,12 +37,13 @@ func (p *Persistance) Read() []string {
 func (p *Persistance) Add(line string) {
 	cwd, _ := os.Getwd()
 	storePath := filepath.Join(cwd, "../", p.store)
-
-	f, _ := os.OpenFile(storePath, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0644)
+	f, _ := os.OpenFile(storePath, os.O_APPEND|os.O_CREATE|os.O_RDWR, 0644)
 
 	defer f.Close()
 
-	w, err := f.WriteString(line + "\n")
+	_, err := f.WriteString(line + "\n")
 
-	fmt.Println(w, err)
+	if err != nil {
+		fmt.Println("Error writing to file: ", err)
+	}
 }

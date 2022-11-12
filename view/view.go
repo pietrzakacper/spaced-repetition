@@ -14,13 +14,18 @@ func RenderAllFlashcards(w http.ResponseWriter, cards []model.Flashcard) {
 	}
 
 	html += `
+		<label>Add single card</label>
 		<form action="/add" method="POST">
 			<input type="text" name="Front"/>
 			<input type="text" name="Back"/>
-			<br/>
-			<input type="submit"/>
+			<input type="submit" value="Add"/>
 		</form>
 	
+		<label>Import cards from CSV</label>
+		<form action="/import" method="POST" enctype="multipart/form-data">
+			<input type="file" name="fileToUpload" id="fileToUpload"/>
+			<input type="submit"/>
+		</form>
 	`
 
 	io.WriteString(w, html)

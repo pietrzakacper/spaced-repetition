@@ -1,12 +1,13 @@
 package controller
 
 import (
+	"io"
 	"model"
 	"parser"
 	p "persistance"
 )
 
-var store = p.Create("flashcards.csv")
+var store = p.Create("db.csv")
 
 func GetAllFlashCards() []model.Flashcard {
 	lines := store.Read()
@@ -25,4 +26,12 @@ func GetAllFlashCards() []model.Flashcard {
 func AddCard(card *model.Flashcard) {
 	line := card.Front + "," + card.Back
 	store.Add(line)
+}
+
+func ImportCards(csvStream io.Reader) {
+	entriesChan := parser.ParseCSVStream(csvStream)
+
+	for entry := range entriesChan {
+		AddCard(&model.Flashcard{Front: entry.First, Back: entry.Second})
+	}
 }

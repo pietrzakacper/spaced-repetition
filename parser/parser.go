@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"os"
 	"strings"
 )
 
@@ -54,22 +53,31 @@ type TwoColumnEntry struct {
 	Second string
 }
 
-func ParseCSVStream(textChannel <-chan string) []TwoColumnEntry {
-	linesChannel := TextToLines(textChannel)
+func ParseCSVStream(textStream io.Reader) <-chan TwoColumnEntry {
+	linesChannel := TextToLines(FileToChannel(textStream))
 
-	entries := []TwoColumnEntry{}
+	entryChan := make(chan TwoColumnEntry)
 
-	for line := range linesChannel {
-		first, back, err := ParseLine(line)
+	columnA, columnB, _ := ParseLine(<-linesChannel)
 
-		if err != nil {
-			fmt.Printf("Couldn't parse line: %s \nError: %v", line, err)
+	fmt.Printf("Column names are: %s %s\n", columnA, columnB)
+
+	go func() {
+		for line := range linesChannel {
+			first, back, err := ParseLine(line)
+
+			if err != nil {
+				fmt.Printf("Couldn't parse line: %s \nError: %v", line, err)
+				continue
+			}
+
+			entryChan <- TwoColumnEntry{first, back}
 		}
 
-		entries = append(entries, TwoColumnEntry{first, back})
-	}
+		close(entryChan)
+	}()
 
-	return entries
+	return entryChan
 }
 
 func ParseCSVLines(lines []string) []TwoColumnEntry {
@@ -88,12 +96,7 @@ func ParseCSVLines(lines []string) []TwoColumnEntry {
 	return entries
 }
 
-func FileToStream(filename string) chan string {
-	file, err := os.Open(filename)
-	if err != nil {
-		fmt.Printf("Could not open the file due to this %s error \n", err)
-	}
-
+func FileToChannel(file io.Reader) chan string {
 	buff := make([]byte, 100)
 
 	textChannel := make(chan string)
@@ -114,8 +117,6 @@ func FileToStream(filename string) chan string {
 		}
 
 		close(textChannel)
-
-		file.Close()
 	}()
 
 	return textChannel
