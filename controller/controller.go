@@ -2,6 +2,7 @@ package controller
 
 import (
 	"io"
+	"supermemo"
 	"time"
 )
 
@@ -49,4 +50,12 @@ type Store interface {
 	ReadAll() []FlashcardRecord
 	Add(record *FlashcardRecord)
 	Update(record *FlashcardRecord)
+}
+
+type flashcard struct {
+	id           string
+	front        string
+	back         string
+	creationDate time.Time
+	memorizable  *supermemo.Memorizable
 }

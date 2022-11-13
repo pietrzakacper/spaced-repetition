@@ -2,7 +2,6 @@ package controller
 
 import (
 	"io"
-	"model"
 	"parser"
 	"supermemo"
 	"time"
@@ -30,66 +29,51 @@ func (c *FlashcardsController) ShowHome() {
 	dueToReviewCount := 0
 
 	for i, r := range records {
-		flashcard := &model.Flashcard{
-			Id:    r.Id,
-			Front: r.Front,
-			Back:  r.Back,
-			Metadata: &model.Metadata{
-				CreationDate:   r.CreationDate,
-				LastReviewDate: r.LastReviewDate,
-				Memorizable: &supermemo.Memorizable{
-					RepetitionCount:  r.RepetitionCount,
-					NextReviewOffset: r.NextReviewOffset,
-					EF:               r.EF,
-				},
+		flashcard := &flashcard{
+			id:           r.Id,
+			front:        r.Front,
+			back:         r.Back,
+			creationDate: r.CreationDate,
+			memorizable: &supermemo.Memorizable{
+				RepetitionCount:  r.RepetitionCount,
+				LastReviewDate:   r.LastReviewDate,
+				NextReviewOffset: r.NextReviewOffset,
+				EF:               r.EF,
 			},
 		}
 
-		if flashcard.Metadata.Memorizable.IsNew() {
+		if flashcard.memorizable.IsNew() {
 			newCardsCount++
 		}
 
-		if dueToReview(flashcard) {
+		if flashcard.memorizable.IsDueToReview() {
 			dueToReviewCount++
 		}
 
-		flashcardDTOs[i] = FlashcardDTO{Front: flashcard.Front, Back: flashcard.Back}
+		flashcardDTOs[i] = FlashcardDTO{Front: flashcard.front, Back: flashcard.back}
 	}
 
 	c.view.RenderHome(flashcardDTOs, newCardsCount, dueToReviewCount)
 }
 
-func dueToReview(card *model.Flashcard) bool {
-	if card.Metadata.Memorizable.IsNew() {
-		return false
+func (c *FlashcardsController) AddCard(front string, back string) {
+	card := flashcard{
+		id:           "",
+		front:        front,
+		back:         back,
+		creationDate: time.Now(),
+		memorizable:  supermemo.Create(),
 	}
 
-	nowInSeconds := time.Now().Unix()
-
-	lastRepInSeconds := card.Metadata.LastReviewDate.Unix()
-
-	// convert to seconds
-	offsetInSeconds := int64(card.Metadata.Memorizable.NextReviewOffset * 24 * 60 * 60)
-
-	return (lastRepInSeconds + offsetInSeconds) <= nowInSeconds
-}
-
-func (c *FlashcardsController) AddCard(front string, back string) {
-	card := model.Flashcard{Id: "", Front: front, Back: back, Metadata: &model.Metadata{
-		CreationDate:   time.Now(),
-		LastReviewDate: time.Now(),
-		Memorizable:    supermemo.Create(),
-	}}
-
 	record := &FlashcardRecord{
-		Id:               card.Id,
-		Front:            card.Front,
-		Back:             card.Back,
-		CreationDate:     card.Metadata.CreationDate,
-		LastReviewDate:   card.Metadata.LastReviewDate,
-		NextReviewOffset: card.Metadata.Memorizable.NextReviewOffset,
-		RepetitionCount:  card.Metadata.Memorizable.RepetitionCount,
-		EF:               card.Metadata.Memorizable.EF,
+		Id:               card.id,
+		Front:            card.front,
+		Back:             card.back,
+		CreationDate:     card.creationDate,
+		LastReviewDate:   card.memorizable.LastReviewDate,
+		NextReviewOffset: card.memorizable.NextReviewOffset,
+		RepetitionCount:  card.memorizable.RepetitionCount,
+		EF:               card.memorizable.EF,
 	}
 
 	c.store.Add(record)
@@ -101,21 +85,23 @@ func (c *FlashcardsController) ImportCards(csvStream io.Reader) {
 	entriesChan := parser.ParseCSVStream(csvStream)
 
 	for entry := range entriesChan {
-		card := model.Flashcard{Id: "", Front: entry[0], Back: entry[1], Metadata: &model.Metadata{
-			CreationDate:   time.Now(),
-			LastReviewDate: time.Now(),
-			Memorizable:    supermemo.Create(),
-		}}
+		card := flashcard{
+			id:           "",
+			front:        entry[0],
+			back:         entry[1],
+			creationDate: time.Now(),
+			memorizable:  supermemo.Create(),
+		}
 
 		record := &FlashcardRecord{
-			Id:               card.Id,
-			Front:            card.Front,
-			Back:             card.Back,
-			CreationDate:     card.Metadata.CreationDate,
-			LastReviewDate:   card.Metadata.LastReviewDate,
-			NextReviewOffset: card.Metadata.Memorizable.NextReviewOffset,
-			RepetitionCount:  card.Metadata.Memorizable.RepetitionCount,
-			EF:               card.Metadata.Memorizable.EF,
+			Id:               card.id,
+			Front:            card.front,
+			Back:             card.back,
+			CreationDate:     card.creationDate,
+			LastReviewDate:   card.memorizable.LastReviewDate,
+			NextReviewOffset: card.memorizable.NextReviewOffset,
+			RepetitionCount:  card.memorizable.RepetitionCount,
+			EF:               card.memorizable.EF,
 		}
 
 		c.store.Add(record)
@@ -139,22 +125,14 @@ func (c *FlashcardsController) CreateMemorizingSession(count int) {
 			break
 		}
 
-		card := &model.Flashcard{
-			Id:    r.Id,
-			Front: r.Front,
-			Back:  r.Back,
-			Metadata: &model.Metadata{
-				CreationDate:   r.CreationDate,
-				LastReviewDate: r.LastReviewDate,
-				Memorizable: &supermemo.Memorizable{
-					RepetitionCount:  r.RepetitionCount,
-					NextReviewOffset: r.NextReviewOffset,
-					EF:               r.EF,
-				},
-			},
+		memorizable := &supermemo.Memorizable{
+			RepetitionCount:  r.RepetitionCount,
+			LastReviewDate:   r.LastReviewDate,
+			NextReviewOffset: r.NextReviewOffset,
+			EF:               r.EF,
 		}
 
-		if card.Metadata.Memorizable.IsNew() {
+		if memorizable.IsNew() {
 			flashcardsInSession = append(flashcardsInSession, r)
 		}
 	}
@@ -174,23 +152,14 @@ func (c *FlashcardsController) CreateReviewSession(count int) {
 			break
 		}
 
-		// @TODO create only memorizable here
-		card := &model.Flashcard{
-			Id:    r.Id,
-			Front: r.Front,
-			Back:  r.Back,
-			Metadata: &model.Metadata{
-				CreationDate:   r.CreationDate,
-				LastReviewDate: r.LastReviewDate,
-				Memorizable: &supermemo.Memorizable{
-					RepetitionCount:  r.RepetitionCount,
-					NextReviewOffset: r.NextReviewOffset,
-					EF:               r.EF,
-				},
-			},
+		memorizable := &supermemo.Memorizable{
+			RepetitionCount:  r.RepetitionCount,
+			LastReviewDate:   r.LastReviewDate,
+			NextReviewOffset: r.NextReviewOffset,
+			EF:               r.EF,
 		}
 
-		if dueToReview(card) {
+		if memorizable.IsDueToReview() {
 			flashcardsInSession = append(flashcardsInSession, r)
 		}
 	}
@@ -258,33 +227,30 @@ func (c *FlashcardsController) SubmitAnswer(answer string) {
 
 	qualityOfResponse := supermemo.QualityOfResponse(answerFeedback[answer])
 
-	card := &model.Flashcard{
-		Id:    record.Id,
-		Front: record.Front,
-		Back:  record.Back,
-		Metadata: &model.Metadata{
-			CreationDate:   record.CreationDate,
-			LastReviewDate: record.LastReviewDate,
-			Memorizable: &supermemo.Memorizable{
-				RepetitionCount:  record.RepetitionCount,
-				NextReviewOffset: record.NextReviewOffset,
-				EF:               record.EF,
-			},
+	card := &flashcard{
+		id:           record.Id,
+		front:        record.Front,
+		back:         record.Back,
+		creationDate: record.CreationDate,
+		memorizable: &supermemo.Memorizable{
+			RepetitionCount:  record.RepetitionCount,
+			LastReviewDate:   record.LastReviewDate,
+			NextReviewOffset: record.NextReviewOffset,
+			EF:               record.EF,
 		},
 	}
 
-	card.Metadata.Memorizable.SubmitRepetition(qualityOfResponse)
-	card.Metadata.LastReviewDate = time.Now()
+	card.memorizable.SubmitRepetition(qualityOfResponse)
 
 	newRecord := &FlashcardRecord{
 		Id:               record.Id,
-		Front:            card.Front,
-		Back:             card.Back,
-		CreationDate:     card.Metadata.CreationDate,
-		LastReviewDate:   card.Metadata.LastReviewDate,
-		NextReviewOffset: card.Metadata.Memorizable.NextReviewOffset,
-		RepetitionCount:  card.Metadata.Memorizable.RepetitionCount,
-		EF:               card.Metadata.Memorizable.EF,
+		Front:            card.front,
+		Back:             card.back,
+		CreationDate:     card.creationDate,
+		LastReviewDate:   card.memorizable.LastReviewDate,
+		NextReviewOffset: card.memorizable.NextReviewOffset,
+		RepetitionCount:  card.memorizable.RepetitionCount,
+		EF:               card.memorizable.EF,
 	}
 
 	c.store.Update(newRecord)

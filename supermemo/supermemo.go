@@ -3,10 +3,12 @@ package supermemo
 import (
 	"fmt"
 	"math"
+	"time"
 )
 
 type Memorizable struct {
 	RepetitionCount  int
+	LastReviewDate   time.Time
 	NextReviewOffset int
 	EF               float64
 }
@@ -15,7 +17,7 @@ type Memorizable struct {
 type QualityOfResponse byte
 
 func Create() *Memorizable {
-	return &Memorizable{EF: 2.5, NextReviewOffset: 0, RepetitionCount: 0}
+	return &Memorizable{EF: 2.5, NextReviewOffset: 0, RepetitionCount: 0, LastReviewDate: time.Now()}
 }
 
 func (m *Memorizable) IsNew() bool {
@@ -24,11 +26,27 @@ func (m *Memorizable) IsNew() bool {
 
 func (m *Memorizable) SubmitRepetition(qualityOfResponse QualityOfResponse) {
 	m.RepetitionCount += 1
+	m.LastReviewDate = time.Now()
 
 	nextOffset := calculateNextReviewOffset(m.RepetitionCount, m.EF)
 	m.NextReviewOffset = int(math.Round(nextOffset))
 
 	m.EF = calculateNextEF(m.EF, qualityOfResponse)
+}
+
+func (m *Memorizable) IsDueToReview() bool {
+	if m.IsNew() {
+		return false
+	}
+
+	nowInSeconds := time.Now().Unix()
+
+	lastRepInSeconds := m.LastReviewDate.Unix()
+
+	// convert to seconds
+	offsetInSeconds := int64(m.NextReviewOffset * 24 * 60 * 60)
+
+	return (lastRepInSeconds + offsetInSeconds) <= nowInSeconds
 }
 
 func calculateNextReviewOffset(repetitionCount int, EF float64) float64 {
