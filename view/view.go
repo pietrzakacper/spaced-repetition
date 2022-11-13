@@ -8,14 +8,19 @@ import (
 	"strconv"
 )
 
-func RenderAllFlashcards(w http.ResponseWriter, cards []model.Flashcard, newCardsCount uint) {
+func RenderAllFlashcards(w http.ResponseWriter, cards []model.Flashcard, newCardsCount uint, dueToReviewCount uint) {
 	w.Header().Add("Content-Type", "text/html")
 
 	html := "<html><body>"
 
-	html += `
-		<form action="/startSession" method="POST">
-			<input type="submit" value="Memorize 10 new cards"/>
+	html += fmt.Sprintf(`
+		<form action="/review" method="POST">
+			<b>Cards to review</b>: %d
+			<input type="submit" value="Review"/>
+		</form>
+		<form action="/learnNew" method="POST">
+			<b>New cards</b>: %d
+			<input type="submit" value="Memorize"/>
 		</form>
 		<label>Add single card</label>
 		<form action="/add" method="POST">
@@ -29,12 +34,9 @@ func RenderAllFlashcards(w http.ResponseWriter, cards []model.Flashcard, newCard
 			<input type="file" name="fileToUpload" id="fileToUpload"/>
 			<input type="submit"/>
 		</form>
-	`
+	`, dueToReviewCount, newCardsCount)
 
-	html += "<b>All cards:</b> " +
-		strconv.FormatInt(int64(len(cards)), 10) +
-		", <b>New cards</b>: " +
-		strconv.FormatInt(int64(newCardsCount), 10)
+	html += "<b>All cards:</b> " + strconv.FormatInt(int64(len(cards)), 10)
 
 	for _, card := range cards {
 		html += "<p>Front: " + card.Front + ", Back: " + card.Back + "</p>\n"

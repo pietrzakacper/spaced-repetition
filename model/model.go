@@ -25,7 +25,7 @@ func (f *Flashcard) Serialize() *[]string {
 		f.Back,
 		f.Metadata.CreationDate.Format(timeLayout),
 		f.Metadata.LastRepetitionDate.Format(timeLayout),
-		supermemo.Create().Serialize(),
+		f.Metadata.Memorizable.Serialize(),
 	}
 }
 

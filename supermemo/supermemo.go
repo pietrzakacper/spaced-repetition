@@ -25,6 +25,10 @@ func (m *Memorizable) IsNew() bool {
 	return m.repetitionCount == 0
 }
 
+func (m *Memorizable) GetNextRepetitionDaysOffset() Days {
+	return m.nextRepetitionOffset
+}
+
 func (m *Memorizable) SubmitRepetition(qualityOfResponse QualityOfResponse) {
 	m.repetitionCount += 1
 

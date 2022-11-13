@@ -11,24 +11,43 @@ import (
 
 var store = persistance.Create("db")
 
-func GetAllFlashCards() ([]model.Flashcard, uint) {
-	lines := store.Read()
+func GetAllFlashCards() ([]model.Flashcard, uint, uint) {
+	records := store.Read()
 
-	csvEntries := parser.ParseCSVLines(lines)
-
-	flashcards := make([]model.Flashcard, len(csvEntries))
+	flashcards := make([]model.Flashcard, len(records))
 
 	newCardsCount := uint(0)
+	dueToReviewCount := uint(0)
 
-	for i, entry := range csvEntries {
+	for i, r := range records {
+		entry := parser.ParseLine(r.Data)
 		flashcards[i] = *model.Deserialize(entry)
 
 		if flashcards[i].Metadata.Memorizable.IsNew() {
 			newCardsCount++
 		}
+
+		if dueToReview(&flashcards[i]) {
+			dueToReviewCount++
+		}
 	}
 
-	return flashcards, newCardsCount
+	return flashcards, newCardsCount, dueToReviewCount
+}
+
+func dueToReview(card *model.Flashcard) bool {
+	if card.Metadata.Memorizable.IsNew() {
+		return false
+	}
+
+	nowInSeconds := time.Now().Unix()
+
+	lastRepInSeconds := card.Metadata.LastRepetitionDate.Unix()
+
+	// convert to seconds
+	offsetInSeconds := int64(card.Metadata.Memorizable.GetNextRepetitionDaysOffset() * 24 * 60 * 60)
+
+	return (lastRepInSeconds + offsetInSeconds) <= nowInSeconds
 }
 
 func AddCard(front string, back string) {
@@ -53,25 +72,59 @@ func ImportCards(csvStream io.Reader) {
 
 type MemorizingSession struct {
 	memorizedCount  int
-	cardsToMemorize *[]model.Flashcard
+	cardsToMemorize *[]FlashcardRecord
+}
+
+type FlashcardRecord struct {
+	flashcard *model.Flashcard
+	record    *persistance.Record
 }
 
 func CreateMemorizingSession(count uint) *MemorizingSession {
-	lines := store.Read()
+	records := store.Read()
 
-	csvEntries := parser.ParseCSVLines(lines)
+	flashcards := make([]FlashcardRecord, 0)
 
-	flashcards := make([]model.Flashcard, 0)
-
-	for _, entry := range csvEntries {
+	for _, record := range records {
 		if uint(len(flashcards)) == count {
 			break
 		}
 
+		entry := parser.ParseLine(record.Data)
+
 		card := *model.Deserialize(entry)
 
 		if card.Metadata.Memorizable.IsNew() {
-			flashcards = append(flashcards, card)
+			flashcards = append(flashcards, FlashcardRecord{
+				flashcard: &card,
+				record:    record,
+			})
+		}
+	}
+
+	return &MemorizingSession{memorizedCount: 0, cardsToMemorize: &flashcards}
+}
+
+func CreateReviewSession(count uint) *MemorizingSession {
+	// @TODO handle failed answers
+	records := store.Read()
+
+	flashcards := make([]FlashcardRecord, 0)
+
+	for _, record := range records {
+		if uint(len(flashcards)) == count {
+			break
+		}
+
+		entry := parser.ParseLine(record.Data)
+
+		card := *model.Deserialize(entry)
+
+		if dueToReview(&card) {
+			flashcards = append(flashcards, FlashcardRecord{
+				flashcard: &card,
+				record:    record,
+			})
 		}
 	}
 
@@ -79,7 +132,11 @@ func CreateMemorizingSession(count uint) *MemorizingSession {
 }
 
 func (m *MemorizingSession) GetCurrentQuest() (int, int, *model.Flashcard) {
-	return m.memorizedCount + 1, len(*m.cardsToMemorize), &(*m.cardsToMemorize)[m.memorizedCount]
+	if m.memorizedCount == len(*m.cardsToMemorize) {
+		return 0, 0, nil
+	}
+
+	return m.memorizedCount + 1, len(*m.cardsToMemorize), (*m.cardsToMemorize)[m.memorizedCount].flashcard
 }
 
 var answerFeedback = map[string]int{
@@ -101,13 +158,15 @@ func (m *MemorizingSession) GetAnswerFeedbackOptions() []string {
 }
 
 func (m *MemorizingSession) SubmitAnswer(answer string) {
-	_, _, card := m.GetCurrentQuest()
+	card := (*m.cardsToMemorize)[m.memorizedCount]
 
 	qualityOfResponse := supermemo.QualityOfResponse(answerFeedback[answer])
 
-	card.Metadata.Memorizable.SubmitRepetition(qualityOfResponse)
+	card.flashcard.Metadata.Memorizable.SubmitRepetition(qualityOfResponse)
+	card.flashcard.Metadata.LastRepetitionDate = time.Now()
 
-	// @TODO persist card
+	card.record.Data = parser.MakeLine(*card.flashcard.Serialize())
+	card.record.Save()
 
 	m.memorizedCount++
 }

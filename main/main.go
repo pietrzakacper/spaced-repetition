@@ -10,9 +10,9 @@ import (
 
 func main() {
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		flashcards, newCardsCount := controller.GetAllFlashCards()
+		flashcards, newCardsCount, dueToReviewCount := controller.GetAllFlashCards()
 
-		view.RenderAllFlashcards(w, flashcards, newCardsCount)
+		view.RenderAllFlashcards(w, flashcards, newCardsCount, dueToReviewCount)
 	})
 
 	http.HandleFunc("/add", func(w http.ResponseWriter, r *http.Request) {
@@ -64,7 +64,7 @@ func main() {
 
 	var session *controller.MemorizingSession
 
-	http.HandleFunc("/startSession", func(w http.ResponseWriter, r *http.Request) {
+	http.HandleFunc("/learnNew", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "POST" {
 			return
 		}
@@ -74,8 +74,24 @@ func main() {
 		w.WriteHeader(303)
 	})
 
+	http.HandleFunc("/review", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != "POST" {
+			return
+		}
+
+		session = controller.CreateReviewSession(10)
+		w.Header().Add("Location", "/quest")
+		w.WriteHeader(303)
+	})
+
 	http.HandleFunc("/quest", func(w http.ResponseWriter, r *http.Request) {
 		cardNumber, totalCardsCount, card := session.GetCurrentQuest()
+
+		if card == nil {
+			w.Header().Add("Location", "/")
+			w.WriteHeader(303)
+			return
+		}
 
 		// @TODO move views to controllers
 		view.RenderCardQuestion(w, card, cardNumber, totalCardsCount)
@@ -87,7 +103,7 @@ func main() {
 		view.RenderCardAnswer(w, card, cardNumber, totalCardsCount, session.GetAnswerFeedbackOptions())
 	})
 
-	http.HandleFunc("/submitAnswer/", func(w http.ResponseWriter, r *http.Request) {
+	http.HandleFunc("/submitAnswer", func(w http.ResponseWriter, r *http.Request) {
 		r.ParseForm()
 		answer := r.Form.Get("answerFeedback")
 
