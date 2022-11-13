@@ -1,0 +1,19 @@
+<html>
+  <head>
+    <link rel="stylesheet" href="/static/main.css" />
+  </head>
+  <body>
+    <b>Card: </b> {{ .CardNumber }} / {{ .TotalCardsInSession }}
+    <br />
+    <h2>{{ .Back }}</h2>
+
+		<form action="/submitAnswer" method="POST">
+			<label>How's your memory?</label><br/>
+
+      {{ range .Answers }}
+        <label for="{{ .Value }}">{{ .Label }}</label>
+        <input type="submit" id="{{ .Value }}" value="{{ .Value }}" name="answerFeedback"/>
+      {{ end }}
+    </form>
+  </body>
+</html>

@@ -1,0 +1,15 @@
+<html>
+  <head>
+    <link rel="stylesheet" href="/static/main.css" />
+  </head>
+  <body>
+    <b>Card: </b> {{ .CardNumber }} / {{ .TotalCardsInSession }}
+    <br />
+    <h2>{{ .Front }}</h2>
+
+    <form action="/answer" method="POST">
+      <label>Show Answer</label>
+      <input type="submit" />
+    </form>
+  </body>
+</html>

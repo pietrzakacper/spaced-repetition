@@ -2,10 +2,8 @@ package view
 
 import (
 	"flashcard"
-	"fmt"
-	"io"
+	t "html/template"
 	"net/http"
-	"strconv"
 )
 
 type HttpView struct {
@@ -31,71 +29,45 @@ func (v *HttpView) GoToAnswer() {
 	v.w.WriteHeader(303)
 }
 
+type HomeData struct {
+	DueToReviewCount int
+	NewCardsCount    int
+	AllCardsCount    int
+	Cards            []flashcard.DTO
+}
+
 func (v *HttpView) RenderHome(cards []flashcard.DTO, newCardsCount int, dueToReviewCount int) {
-	v.w.Header().Add("Content-Type", "text/html")
+	template := t.Must(t.ParseFiles("templates/home.html"))
 
-	html := "<html><body>"
-
-	html += fmt.Sprintf(`
-		<form action="/review" method="POST">
-			<b>Cards to review</b>: %d
-			<input type="submit" value="Review"/>
-		</form>
-		<form action="/learnNew" method="POST">
-			<b>New cards</b>: %d
-			<input type="submit" value="Memorize"/>
-		</form>
-		<label>Add single card</label>
-		<form action="/add" method="POST">
-			<input type="text" name="Front"/>
-			<input type="text" name="Back"/>
-			<input type="submit" value="Add"/>
-		</form>
-	
-		<label>Import cards from CSV</label>
-		<form action="/import" method="POST" enctype="multipart/form-data">
-			<input type="file" name="fileToUpload" id="fileToUpload"/>
-			<input type="submit"/>
-		</form>
-	`, dueToReviewCount, newCardsCount)
-
-	html += "<b>All cards:</b> " + strconv.FormatInt(int64(len(cards)), 10)
-
-	for _, card := range cards {
-		html += "<p>Front: " + card.Front + ", Back: " + card.Back + "</p>\n"
+	data := HomeData{
+		DueToReviewCount: dueToReviewCount,
+		NewCardsCount:    newCardsCount,
+		AllCardsCount:    len(cards),
+		Cards:            cards,
 	}
 
-	html += "</body></html>"
+	template.Execute(v.w, data)
+}
 
-	io.WriteString(v.w, html)
+type QuestData struct {
+	CardNumber          int
+	TotalCardsInSession int
+	Front               string
 }
 
 func (v *HttpView) RenderCardQuestion(card *flashcard.DTO, cardNumber int, totalCardsInSession int) {
-	v.w.Header().Add("Content-Type", "text/html")
+	template := t.Must(t.ParseFiles("templates/quest.html"))
 
-	html := "<html><body>"
+	data := QuestData{
+		CardNumber:          cardNumber,
+		TotalCardsInSession: totalCardsInSession,
+		Front:               card.Front,
+	}
 
-	html += "<b>Card: </b>" +
-		strconv.FormatInt(int64(cardNumber), 10) +
-		"/" + strconv.FormatInt(int64(totalCardsInSession), 10)
-
-	html += "<br/>"
-
-	html += "<h2>" + card.Front + "</h2>"
-
-	html += `
-		<form action="/answer" method="POST">
-			<label>Show Answer</label>
-			<input type="submit"/>
-		</form>
-	`
-
-	html += "</body></html>"
-
-	io.WriteString(v.w, html)
+	template.Execute(v.w, data)
 }
 
-var answerFeedback = map[int]string{
+var answerLabels = map[int]string{
 	0: "Complete Blackout",
 	1: "Slipped my mind",
 	2: "Ah shit, I knew it!",
@@ -104,37 +76,32 @@ var answerFeedback = map[int]string{
 	5: "Too easy!",
 }
 
+type Answer struct {
+	Value int
+	Label string
+}
+type AnswerData struct {
+	CardNumber          int
+	TotalCardsInSession int
+	Back                string
+	Answers             []Answer
+}
+
 func (v *HttpView) RenderCardAnswer(card *flashcard.DTO, cardNumber int, totalCardsInSession int, answerOptions []int) {
-	v.w.Header().Add("Content-Type", "text/html")
+	template := t.Must(t.ParseFiles("templates/answer.html"))
 
-	html := "<html><body>"
+	Answers := make([]Answer, len(answerOptions))
 
-	html += "<b>Card: </b>" +
-		strconv.FormatInt(int64(cardNumber), 10) +
-		"/" + strconv.FormatInt(int64(totalCardsInSession), 10)
-
-	html += "<br/>"
-
-	html += "<h2>" + card.Back + "</h2>"
-
-	html += `
-		<form action="/submitAnswer" method="POST">
-			<label>How's your memory?</label><br/>`
-
-	for _, option := range answerOptions {
-		html += fmt.Sprintf(
-			`<label for="%d">%s</label>
-			<input type="submit" id="%d" value="%d" name="answerFeedback"/>`,
-			option,
-			answerFeedback[option],
-			option,
-			option,
-		)
+	for i, value := range answerOptions {
+		Answers[i] = Answer{Value: value, Label: answerLabels[value]}
 	}
 
-	html += "</form>"
+	data := AnswerData{
+		CardNumber:          cardNumber,
+		TotalCardsInSession: totalCardsInSession,
+		Back:                card.Back,
+		Answers:             Answers,
+	}
 
-	html += "</body></html>"
-
-	io.WriteString(v.w, html)
+	template.Execute(v.w, data)
 }

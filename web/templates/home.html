@@ -1,0 +1,33 @@
+<html>
+<head>
+    <link rel="stylesheet" href="/static/main.css">
+</head>
+<body>
+    <form action="/review" method="POST">
+			<b>Cards to review</b>: {{ .DueToReviewCount }}
+			<input type="submit" value="Review"/>
+		</form>
+		<form action="/learnNew" method="POST">
+			<b>New cards</b>: {{ .NewCardsCount }}
+			<input type="submit" value="Memorize"/>
+		</form>
+		<label>Add single card</label>
+		<form action="/add" method="POST">
+			<input type="text" name="Front"/>
+			<input type="text" name="Back"/>
+			<input type="submit" value="Add"/>
+		</form>
+	
+		<label>Import cards from CSV</label>
+		<form action="/import" method="POST" enctype="multipart/form-data">
+			<input type="file" name="fileToUpload" id="fileToUpload"/>
+			<input type="submit"/>
+		</form>
+
+        <b>All cards:</b> {{ .AllCardsCount }}
+
+        {{ range .Cards }}
+            <p>Front: {{ .Front }}, Back: {{ .Back }}</p>
+        {{ end }}
+</body>
+</html>
