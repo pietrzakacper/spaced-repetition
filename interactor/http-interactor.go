@@ -3,6 +3,7 @@ package interactor
 import (
 	"controller"
 	"net/http"
+	"strconv"
 	"view"
 )
 
@@ -54,7 +55,7 @@ func (i HttpInteractor) Start(c controller.Controller) {
 			return
 		}
 
-		c.CreateMemorizingSession(10)
+		c.CreateMemorizingSession()
 	})
 
 	http.HandleFunc("/review", func(w http.ResponseWriter, r *http.Request) {
@@ -64,7 +65,7 @@ func (i HttpInteractor) Start(c controller.Controller) {
 			return
 		}
 
-		c.CreateReviewSession(10)
+		c.CreateReviewSession()
 	})
 
 	http.HandleFunc("/quest", func(w http.ResponseWriter, r *http.Request) {
@@ -83,9 +84,11 @@ func (i HttpInteractor) Start(c controller.Controller) {
 		i.view.SetRequestContext(w)
 
 		r.ParseForm()
-		answer := r.Form.Get("answerFeedback")
+		answerStr := r.Form.Get("answerFeedback")
 
-		c.SubmitAnswer(answer)
+		answer, _ := strconv.ParseInt(answerStr, 10, 32)
+
+		c.SubmitAnswer(int(answer))
 	})
 
 	http.ListenAndServe(":3000", nil)

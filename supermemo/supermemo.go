@@ -13,9 +13,6 @@ type Memorizable struct {
 	EF               float64
 }
 
-// integer between 0-5
-type QualityOfResponse byte
-
 func Create() *Memorizable {
 	return &Memorizable{EF: 2.5, NextReviewOffset: 0, RepetitionCount: 0, LastReviewDate: time.Now()}
 }
@@ -24,7 +21,7 @@ func (m *Memorizable) IsNew() bool {
 	return m.RepetitionCount == 0
 }
 
-func (m *Memorizable) SubmitRepetition(qualityOfResponse QualityOfResponse) {
+func (m *Memorizable) SubmitRepetition(qualityOfResponse int) {
 	m.RepetitionCount += 1
 	m.LastReviewDate = time.Now()
 
@@ -66,7 +63,7 @@ func calculateNextReviewOffset(repetitionCount int, EF float64) float64 {
 	return calculateNextReviewOffset(repetitionCount-1, EF) * EF
 }
 
-func calculateNextEF(oldEF float64, qualityOfResponse QualityOfResponse) float64 {
+func calculateNextEF(oldEF float64, qualityOfResponse int) float64 {
 	if qualityOfResponse > 5 {
 		fmt.Println("Error: qualityOfResponse cannot be more than 5")
 		return 0

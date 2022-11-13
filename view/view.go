@@ -95,7 +95,16 @@ func (v *HttpView) RenderCardQuestion(card *controller.FlashcardDTO, cardNumber 
 	io.WriteString(v.w, html)
 }
 
-func (v *HttpView) RenderCardAnswer(card *controller.FlashcardDTO, cardNumber int, totalCardsInSession int, answerOptions []string) {
+var answerFeedback = map[int]string{
+	0: "Complete Blackout",
+	1: "Slipped my mind",
+	2: "Ah shit, I knew it!",
+	3: "Barely correct bro",
+	4: "I remembered correctly:)",
+	5: "Too easy!",
+}
+
+func (v *HttpView) RenderCardAnswer(card *controller.FlashcardDTO, cardNumber int, totalCardsInSession int, answerOptions []int) {
 	v.w.Header().Add("Content-Type", "text/html")
 
 	html := "<html><body>"
@@ -114,7 +123,11 @@ func (v *HttpView) RenderCardAnswer(card *controller.FlashcardDTO, cardNumber in
 
 	for _, option := range answerOptions {
 		html += fmt.Sprintf(
-			`<input type="submit" value="%s" name="answerFeedback"/>`,
+			`<label for="%d">%s</label>
+			<input type="submit" id="%d" value="%d" name="answerFeedback"/>`,
+			option,
+			answerFeedback[option],
+			option,
 			option,
 		)
 	}

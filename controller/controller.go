@@ -2,7 +2,6 @@ package controller
 
 import (
 	"io"
-	"supermemo"
 	"time"
 )
 
@@ -12,9 +11,9 @@ type Controller interface {
 	ShowAnswer()
 	AddCard(front string, back string)
 	ImportCards(csvStream io.Reader)
-	CreateMemorizingSession(count int)
-	CreateReviewSession(count int)
-	SubmitAnswer(answer string)
+	CreateMemorizingSession()
+	CreateReviewSession()
+	SubmitAnswer(answer int)
 }
 
 type FlashcardDTO struct {
@@ -28,7 +27,7 @@ type View interface {
 	GoToQuest()
 	RenderHome(cards []FlashcardDTO, newCardsCount int, dueToReviewCount int)
 	RenderCardQuestion(card *FlashcardDTO, cardNumber int, totalCardsInSession int)
-	RenderCardAnswer(card *FlashcardDTO, cardNumber int, totalCardsInSession int, answerOptions []string)
+	RenderCardAnswer(card *FlashcardDTO, cardNumber int, totalCardsInSession int, answerOptions []int)
 }
 
 type Persistance interface {
@@ -50,12 +49,4 @@ type Store interface {
 	ReadAll() []FlashcardRecord
 	Add(record *FlashcardRecord)
 	Update(record *FlashcardRecord)
-}
-
-type flashcard struct {
-	id           string
-	front        string
-	back         string
-	creationDate time.Time
-	memorizable  *supermemo.Memorizable
 }

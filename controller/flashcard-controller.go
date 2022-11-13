@@ -29,28 +29,17 @@ func (c *FlashcardsController) ShowHome() {
 	dueToReviewCount := 0
 
 	for i, r := range records {
-		flashcard := &flashcard{
-			id:           r.Id,
-			front:        r.Front,
-			back:         r.Back,
-			creationDate: r.CreationDate,
-			memorizable: &supermemo.Memorizable{
-				RepetitionCount:  r.RepetitionCount,
-				LastReviewDate:   r.LastReviewDate,
-				NextReviewOffset: r.NextReviewOffset,
-				EF:               r.EF,
-			},
-		}
+		card := (&flashcard{}).fromRecord(&r)
 
-		if flashcard.memorizable.IsNew() {
+		if card.memorizable.IsNew() {
 			newCardsCount++
 		}
 
-		if flashcard.memorizable.IsDueToReview() {
+		if card.memorizable.IsDueToReview() {
 			dueToReviewCount++
 		}
 
-		flashcardDTOs[i] = FlashcardDTO{Front: flashcard.front, Back: flashcard.back}
+		flashcardDTOs[i] = *card.toDTO()
 	}
 
 	c.view.RenderHome(flashcardDTOs, newCardsCount, dueToReviewCount)
@@ -58,23 +47,13 @@ func (c *FlashcardsController) ShowHome() {
 
 func (c *FlashcardsController) AddCard(front string, back string) {
 	card := flashcard{
-		id:           "",
 		front:        front,
 		back:         back,
 		creationDate: time.Now(),
 		memorizable:  supermemo.Create(),
 	}
 
-	record := &FlashcardRecord{
-		Id:               card.id,
-		Front:            card.front,
-		Back:             card.back,
-		CreationDate:     card.creationDate,
-		LastReviewDate:   card.memorizable.LastReviewDate,
-		NextReviewOffset: card.memorizable.NextReviewOffset,
-		RepetitionCount:  card.memorizable.RepetitionCount,
-		EF:               card.memorizable.EF,
-	}
+	record := card.toRecord()
 
 	c.store.Add(record)
 
@@ -86,23 +65,13 @@ func (c *FlashcardsController) ImportCards(csvStream io.Reader) {
 
 	for entry := range entriesChan {
 		card := flashcard{
-			id:           "",
 			front:        entry[0],
 			back:         entry[1],
 			creationDate: time.Now(),
 			memorizable:  supermemo.Create(),
 		}
 
-		record := &FlashcardRecord{
-			Id:               card.id,
-			Front:            card.front,
-			Back:             card.back,
-			CreationDate:     card.creationDate,
-			LastReviewDate:   card.memorizable.LastReviewDate,
-			NextReviewOffset: card.memorizable.NextReviewOffset,
-			RepetitionCount:  card.memorizable.RepetitionCount,
-			EF:               card.memorizable.EF,
-		}
+		record := card.toRecord()
 
 		c.store.Add(record)
 	}
@@ -110,152 +79,60 @@ func (c *FlashcardsController) ImportCards(csvStream io.Reader) {
 	c.view.GoToHome()
 }
 
-type MemorizingSession struct {
-	memorizedCount  int
-	cardsToMemorize []FlashcardRecord
-}
-
-func (c *FlashcardsController) CreateMemorizingSession(count int) {
+func (c *FlashcardsController) CreateMemorizingSession() {
 	records := c.store.ReadAll()
 
-	flashcardsInSession := make([]FlashcardRecord, 0)
-
-	for _, r := range records {
-		if len(flashcardsInSession) == count {
-			break
-		}
-
-		memorizable := &supermemo.Memorizable{
-			RepetitionCount:  r.RepetitionCount,
-			LastReviewDate:   r.LastReviewDate,
-			NextReviewOffset: r.NextReviewOffset,
-			EF:               r.EF,
-		}
-
-		if memorizable.IsNew() {
-			flashcardsInSession = append(flashcardsInSession, r)
-		}
-	}
+	c.session = CreateSession(records, LearnNew)
 
 	c.view.GoToQuest()
 
-	c.session = &MemorizingSession{memorizedCount: 0, cardsToMemorize: flashcardsInSession}
 }
 
-func (c *FlashcardsController) CreateReviewSession(count int) {
+func (c *FlashcardsController) CreateReviewSession() {
 	records := c.store.ReadAll()
 
-	flashcardsInSession := make([]FlashcardRecord, 0)
-
-	for _, r := range records {
-		if len(flashcardsInSession) == count {
-			break
-		}
-
-		memorizable := &supermemo.Memorizable{
-			RepetitionCount:  r.RepetitionCount,
-			LastReviewDate:   r.LastReviewDate,
-			NextReviewOffset: r.NextReviewOffset,
-			EF:               r.EF,
-		}
-
-		if memorizable.IsDueToReview() {
-			flashcardsInSession = append(flashcardsInSession, r)
-		}
-	}
+	c.session = CreateSession(records, Review)
 
 	c.view.GoToQuest()
-
-	c.session = &MemorizingSession{memorizedCount: 0, cardsToMemorize: flashcardsInSession}
 }
 
 func (c *FlashcardsController) ShowQuest() {
-	m := c.session
-
-	if m.memorizedCount == len(m.cardsToMemorize) {
+	if c.session.hasEnded() {
 		c.view.GoToHome()
 		return
 	}
 
-	card := m.cardsToMemorize[m.memorizedCount]
+	card := c.session.currentCard()
 
-	cardDTO := FlashcardDTO{Front: card.Front, Back: card.Back}
-
-	c.view.RenderCardQuestion(&cardDTO, m.memorizedCount+1, len(m.cardsToMemorize))
-}
-
-func (c *FlashcardsController) ShowAnswer() {
-	m := c.session
-
-	if m.memorizedCount == len(m.cardsToMemorize) {
-		c.view.GoToHome()
-	}
-
-	card := m.cardsToMemorize[m.memorizedCount]
-
-	cardDTO := FlashcardDTO{Front: card.Front, Back: card.Back}
-
-	c.view.RenderCardAnswer(
-		&cardDTO,
-		m.memorizedCount+1,
-		len(m.cardsToMemorize),
-		m.getAnswerFeedbackOptions(),
+	c.view.RenderCardQuestion(
+		card.toDTO(),
+		c.session.memorizedCount,
+		len(c.session.cardsToMemorize),
 	)
 }
 
-var answerFeedback = map[string]int{
-	"Complete Blackout":        0,
-	"Slipped my mind":          1,
-	"Ah shit, I knew it!":      2,
-	"Barely correct bro":       3,
-	"I remembered correctly:)": 4,
-	"Too easy!":                5,
+func (c *FlashcardsController) ShowAnswer() {
+	if c.session.hasEnded() {
+		c.view.GoToHome()
+	}
+
+	card := c.session.currentCard()
+
+	c.view.RenderCardAnswer(
+		card.toDTO(),
+		c.session.memorizedCount+1,
+		len(c.session.cardsToMemorize),
+		[]int{0, 1, 2, 3, 4, 5},
+	)
 }
 
-func (m *MemorizingSession) getAnswerFeedbackOptions() []string {
-	keys := make([]string, 0, len(answerFeedback))
-	for k := range answerFeedback {
-		keys = append(keys, k)
-	}
+func (c *FlashcardsController) SubmitAnswer(answer int) {
+	card := c.session.currentCard()
+	card.memorizable.SubmitRepetition(answer)
 
-	return keys
-}
+	c.store.Update(card.toRecord())
 
-func (c *FlashcardsController) SubmitAnswer(answer string) {
-	m := c.session
-	record := m.cardsToMemorize[m.memorizedCount]
-
-	qualityOfResponse := supermemo.QualityOfResponse(answerFeedback[answer])
-
-	card := &flashcard{
-		id:           record.Id,
-		front:        record.Front,
-		back:         record.Back,
-		creationDate: record.CreationDate,
-		memorizable: &supermemo.Memorizable{
-			RepetitionCount:  record.RepetitionCount,
-			LastReviewDate:   record.LastReviewDate,
-			NextReviewOffset: record.NextReviewOffset,
-			EF:               record.EF,
-		},
-	}
-
-	card.memorizable.SubmitRepetition(qualityOfResponse)
-
-	newRecord := &FlashcardRecord{
-		Id:               record.Id,
-		Front:            card.front,
-		Back:             card.back,
-		CreationDate:     card.creationDate,
-		LastReviewDate:   card.memorizable.LastReviewDate,
-		NextReviewOffset: card.memorizable.NextReviewOffset,
-		RepetitionCount:  card.memorizable.RepetitionCount,
-		EF:               card.memorizable.EF,
-	}
-
-	c.store.Update(newRecord)
-
-	m.memorizedCount++
+	c.session.goToNext()
 
 	c.view.GoToQuest()
 }
