@@ -10,5 +10,5 @@
 * [x] Handle failed answers according to supermemo
 * [ ] Think about more efficient way to update cards
 * [x] Verify if < 1.3 works
-* [ ] Use HTML templates in views
+* [x] Use HTML templates in views
 * [ ] Handle errors everywhere

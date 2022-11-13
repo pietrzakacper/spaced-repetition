@@ -1,33 +1,99 @@
 <html>
-<head>
-    <link rel="stylesheet" href="/static/main.css">
-</head>
-<body>
-    <form action="/review" method="POST">
-			<b>Cards to review</b>: {{ .DueToReviewCount }}
-			<input type="submit" value="Review"/>
-		</form>
-		<form action="/learnNew" method="POST">
-			<b>New cards</b>: {{ .NewCardsCount }}
-			<input type="submit" value="Memorize"/>
-		</form>
-		<label>Add single card</label>
-		<form action="/add" method="POST">
-			<input type="text" name="Front"/>
-			<input type="text" name="Back"/>
-			<input type="submit" value="Add"/>
-		</form>
-	
-		<label>Import cards from CSV</label>
-		<form action="/import" method="POST" enctype="multipart/form-data">
-			<input type="file" name="fileToUpload" id="fileToUpload"/>
-			<input type="submit"/>
-		</form>
+  <head>
+    <link rel="stylesheet" href="/static/main.css" />
+    <link
+      href="https://fonts.googleapis.com/css?family=Poppins:300,300i,500,500i,700"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+	<header>
+		<img src="/static/logo.svg"/>
+	</header>
+    <main class="main-container">
+      <section class="memorize-section box">
+        <form action="/review" method="POST">
+          <div class="memorize-column">
+            <span><b>Cards to review</b>: {{ .DueToReviewCount }}</span>
+            <input class="button" type="submit" value="Review" />
+          </div>
+        </form>
+        <form action="/learnNew" method="POST">
+          <div class="memorize-column">
+            <span><b>New cards</b>: {{ .NewCardsCount }}</span>
+            <input class="button secondary" type="submit" value="Memorize" />
+          </div>
+        </form>
+      </section>
+      <section class="box secondary">
+        <label>Add single card</label>
+        <br />
+        <br />
 
-        <b>All cards:</b> {{ .AllCardsCount }}
+        <form action="/add" method="POST">
+          <div class="add-container">
+            <div>
+              <input
+                class="text-input"
+                type="text"
+                name="Front"
+                placeholder="Front..."
+                autocomplete="off"
+              />
+              <input
+                class="text-input"
+                type="text"
+                name="Back"
+                placeholder="Back..."
+                autocomplete="off"
+              />
+            </div>
+            <input class="button accent2" type="submit" value="Add" />
+          </div>
+        </form>
+      </section>
 
-        {{ range .Cards }}
-            <p>Front: {{ .Front }}, Back: {{ .Back }}</p>
-        {{ end }}
-</body>
+      <section class="box secondary">
+        <label>Import cards from CSV</label>
+		<br/>
+		<br/>
+        <form action="/import" method="POST" enctype="multipart/form-data">
+          <div class="add-container">
+			<div class='file-input'>
+				<input class="button" type="file" name="fileToUpload" id="fileToUpload" />
+				<span class='button'>Choose</span>
+				<span class='label' data-js-label>No file selected</label>
+			</div>
+			<input class="button accent2" type="submit" value="Import"/>
+		</div>
+        </form>
+
+		<script>
+			var inputs = document.querySelectorAll('.file-input')
+
+			for (var i = 0, len = inputs.length; i < len; i++) {
+			customInput(inputs[i])
+			}
+
+			function customInput (el) {
+			const fileInput = el.querySelector('[type="file"]')
+			const label = el.querySelector('[data-js-label]')
+			
+			fileInput.onchange =
+			fileInput.onmouseout = function () {
+				if (!fileInput.value) return
+				
+				var value = fileInput.value.replace(/^.*[\\\/]/, '')
+				el.className += ' -chosen'
+				label.innerText = value
+			}
+			}
+		</script>
+      </section>
+
+      <b>All cards:</b> {{ .AllCardsCount }} {{ range .Cards }}
+      <p>Front: {{ .Front }}, Back: {{ .Back }}</p>
+      {{ end }}
+    </main>
+  </body>
 </html>
