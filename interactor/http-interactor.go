@@ -7,16 +7,23 @@ import (
 )
 
 type HttpInteractor struct {
+	view *view.HttpView
 }
 
-func (HttpInteractor) Start(c controller.Controller) {
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		flashcards, newCardsCount, dueToReviewCount := c.GetAllFlashCards()
+func CreateHttpInteractor(view *view.HttpView) HttpInteractor {
+	return HttpInteractor{view: view}
+}
 
-		view.RenderAllFlashcards(w, flashcards, newCardsCount, dueToReviewCount)
+func (i HttpInteractor) Start(c controller.Controller) {
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		i.view.SetRequestContext(w)
+
+		c.ShowHome()
 	})
 
 	http.HandleFunc("/add", func(w http.ResponseWriter, r *http.Request) {
+		i.view.SetRequestContext(w)
+
 		if r.Method != "POST" {
 			return
 		}
@@ -24,12 +31,11 @@ func (HttpInteractor) Start(c controller.Controller) {
 		r.ParseForm()
 
 		c.AddCard(r.Form.Get("Front"), r.Form.Get("Back"))
-
-		w.Header().Add("Location", "/")
-		w.WriteHeader(303)
 	})
 
 	http.HandleFunc("/import", func(w http.ResponseWriter, r *http.Request) {
+		i.view.SetRequestContext(w)
+
 		if r.Method != "POST" {
 			return
 		}
@@ -38,60 +44,48 @@ func (HttpInteractor) Start(c controller.Controller) {
 
 		file, _, _ := r.FormFile("fileToUpload")
 
-		w.Header().Add("Location", "/")
-		w.WriteHeader(303)
-
 		c.ImportCards(file)
 	})
 
-	var session *controller.MemorizingSession
-
 	http.HandleFunc("/learnNew", func(w http.ResponseWriter, r *http.Request) {
+		i.view.SetRequestContext(w)
+
 		if r.Method != "POST" {
 			return
 		}
 
-		session = c.CreateMemorizingSession(10)
-		w.Header().Add("Location", "/quest")
-		w.WriteHeader(303)
+		c.CreateMemorizingSession(10)
 	})
 
 	http.HandleFunc("/review", func(w http.ResponseWriter, r *http.Request) {
+		i.view.SetRequestContext(w)
+
 		if r.Method != "POST" {
 			return
 		}
 
-		session = c.CreateReviewSession(10)
-		w.Header().Add("Location", "/quest")
-		w.WriteHeader(303)
+		c.CreateReviewSession(10)
 	})
 
 	http.HandleFunc("/quest", func(w http.ResponseWriter, r *http.Request) {
-		cardNumber, totalCardsCount, card := session.GetCurrentQuest()
+		i.view.SetRequestContext(w)
 
-		if card == nil {
-			w.Header().Add("Location", "/")
-			w.WriteHeader(303)
-			return
-		}
-
-		view.RenderCardQuestion(w, card, cardNumber, totalCardsCount)
+		c.ShowQuest()
 	})
 
 	http.HandleFunc("/answer", func(w http.ResponseWriter, r *http.Request) {
-		cardNumber, totalCardsCount, card := session.GetCurrentQuest()
+		i.view.SetRequestContext(w)
 
-		view.RenderCardAnswer(w, card, cardNumber, totalCardsCount, session.GetAnswerFeedbackOptions())
+		c.ShowAnswer()
 	})
 
 	http.HandleFunc("/submitAnswer", func(w http.ResponseWriter, r *http.Request) {
+		i.view.SetRequestContext(w)
+
 		r.ParseForm()
 		answer := r.Form.Get("answerFeedback")
 
-		session.SubmitAnswer(answer)
-
-		w.Header().Add("Location", "/quest")
-		w.WriteHeader(303)
+		c.SubmitAnswer(answer)
 	})
 
 	http.ListenAndServe(":3000", nil)

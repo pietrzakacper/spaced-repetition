@@ -1,15 +1,38 @@
 package view
 
 import (
+	"controller"
 	"fmt"
 	"io"
-	"model"
 	"net/http"
 	"strconv"
 )
 
-func RenderAllFlashcards(w http.ResponseWriter, cards []model.Flashcard, newCardsCount uint, dueToReviewCount uint) {
-	w.Header().Add("Content-Type", "text/html")
+type HttpView struct {
+	w http.ResponseWriter
+}
+
+func (v *HttpView) SetRequestContext(w http.ResponseWriter) {
+	v.w = w
+}
+
+func (v *HttpView) GoToHome() {
+	v.w.Header().Add("Location", "/")
+	v.w.WriteHeader(303)
+}
+
+func (v *HttpView) GoToQuest() {
+	v.w.Header().Add("Location", "/quest")
+	v.w.WriteHeader(303)
+}
+
+func (v *HttpView) GoToAnswer() {
+	v.w.Header().Add("Location", "/answer")
+	v.w.WriteHeader(303)
+}
+
+func (v *HttpView) RenderHome(cards []controller.FlashcardDTO, newCardsCount uint, dueToReviewCount uint) {
+	v.w.Header().Add("Content-Type", "text/html")
 
 	html := "<html><body>"
 
@@ -44,11 +67,11 @@ func RenderAllFlashcards(w http.ResponseWriter, cards []model.Flashcard, newCard
 
 	html += "</body></html>"
 
-	io.WriteString(w, html)
+	io.WriteString(v.w, html)
 }
 
-func RenderCardQuestion(w http.ResponseWriter, card *model.Flashcard, cardNumber int, totalCardsInSession int) {
-	w.Header().Add("Content-Type", "text/html")
+func (v *HttpView) RenderCardQuestion(card *controller.FlashcardDTO, cardNumber int, totalCardsInSession int) {
+	v.w.Header().Add("Content-Type", "text/html")
 
 	html := "<html><body>"
 
@@ -69,11 +92,11 @@ func RenderCardQuestion(w http.ResponseWriter, card *model.Flashcard, cardNumber
 
 	html += "</body></html>"
 
-	io.WriteString(w, html)
+	io.WriteString(v.w, html)
 }
 
-func RenderCardAnswer(w http.ResponseWriter, card *model.Flashcard, cardNumber int, totalCardsInSession int, answerOptions []string) {
-	w.Header().Add("Content-Type", "text/html")
+func (v *HttpView) RenderCardAnswer(card *controller.FlashcardDTO, cardNumber int, totalCardsInSession int, answerOptions []string) {
+	v.w.Header().Add("Content-Type", "text/html")
 
 	html := "<html><body>"
 
@@ -100,5 +123,5 @@ func RenderCardAnswer(w http.ResponseWriter, card *model.Flashcard, cardNumber i
 
 	html += "</body></html>"
 
-	io.WriteString(w, html)
+	io.WriteString(v.w, html)
 }

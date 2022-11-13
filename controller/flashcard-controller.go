@@ -9,33 +9,43 @@ import (
 	"time"
 )
 
-var store = persistance.Create("db")
-
 type FlashcardsController struct {
+	view    View
+	store   persistance.Persistance
+	session *MemorizingSession
 }
 
-func (FlashcardsController) GetAllFlashCards() ([]model.Flashcard, uint, uint) {
-	records := store.Read()
+func CreateFlashcardsController(view View) FlashcardsController {
+	return FlashcardsController{
+		view:  view,
+		store: persistance.Create("db"),
+	}
+}
 
-	flashcards := make([]model.Flashcard, len(records))
+func (c *FlashcardsController) ShowHome() {
+	records := c.store.Read()
+
+	flashcardDTOs := make([]FlashcardDTO, len(records))
 
 	newCardsCount := uint(0)
 	dueToReviewCount := uint(0)
 
 	for i, r := range records {
 		entry := parser.ParseLine(r.Data)
-		flashcards[i] = *model.Deserialize(entry)
+		flashcard := *model.Deserialize(entry)
 
-		if flashcards[i].Metadata.Memorizable.IsNew() {
+		if flashcard.Metadata.Memorizable.IsNew() {
 			newCardsCount++
 		}
 
-		if dueToReview(&flashcards[i]) {
+		if dueToReview(&flashcard) {
 			dueToReviewCount++
 		}
+
+		flashcardDTOs[i] = FlashcardDTO{Front: flashcard.Front, Back: flashcard.Back}
 	}
 
-	return flashcards, newCardsCount, dueToReviewCount
+	c.view.RenderHome(flashcardDTOs, newCardsCount, dueToReviewCount)
 }
 
 func dueToReview(card *model.Flashcard) bool {
@@ -53,7 +63,7 @@ func dueToReview(card *model.Flashcard) bool {
 	return (lastRepInSeconds + offsetInSeconds) <= nowInSeconds
 }
 
-func (FlashcardsController) AddCard(front string, back string) {
+func (c *FlashcardsController) AddCard(front string, back string) {
 	card := model.Flashcard{Front: front, Back: back, Metadata: &model.Metadata{
 		CreationDate:       time.Now(),
 		LastRepetitionDate: time.Now(),
@@ -62,15 +72,27 @@ func (FlashcardsController) AddCard(front string, back string) {
 
 	entries := card.Serialize()
 
-	store.Add(parser.MakeLine(*entries))
+	c.store.Add(parser.MakeLine(*entries))
+
+	c.view.GoToHome()
 }
 
-func (c FlashcardsController) ImportCards(csvStream io.Reader) {
+func (c *FlashcardsController) ImportCards(csvStream io.Reader) {
 	entriesChan := parser.ParseCSVStream(csvStream)
 
 	for entry := range entriesChan {
-		c.AddCard(entry[0], entry[1])
+		card := model.Flashcard{Front: entry[0], Back: entry[1], Metadata: &model.Metadata{
+			CreationDate:       time.Now(),
+			LastRepetitionDate: time.Now(),
+			Memorizable:        supermemo.Create(),
+		}}
+
+		entries := card.Serialize()
+
+		c.store.Add(parser.MakeLine(*entries))
 	}
+
+	c.view.GoToHome()
 }
 
 type MemorizingSession struct {
@@ -83,8 +105,8 @@ type FlashcardRecord struct {
 	record    *persistance.Record
 }
 
-func (FlashcardsController) CreateMemorizingSession(count uint) *MemorizingSession {
-	records := store.Read()
+func (c *FlashcardsController) CreateMemorizingSession(count uint) {
+	records := c.store.Read()
 
 	flashcards := make([]FlashcardRecord, 0)
 
@@ -105,11 +127,13 @@ func (FlashcardsController) CreateMemorizingSession(count uint) *MemorizingSessi
 		}
 	}
 
-	return &MemorizingSession{memorizedCount: 0, cardsToMemorize: &flashcards}
+	c.view.GoToQuest()
+
+	c.session = &MemorizingSession{memorizedCount: 0, cardsToMemorize: &flashcards}
 }
 
-func (FlashcardsController) CreateReviewSession(count uint) *MemorizingSession {
-	records := store.Read()
+func (c *FlashcardsController) CreateReviewSession(count uint) {
+	records := c.store.Read()
 
 	flashcards := make([]FlashcardRecord, 0)
 
@@ -130,15 +154,43 @@ func (FlashcardsController) CreateReviewSession(count uint) *MemorizingSession {
 		}
 	}
 
-	return &MemorizingSession{memorizedCount: 0, cardsToMemorize: &flashcards}
+	c.view.GoToQuest()
+
+	c.session = &MemorizingSession{memorizedCount: 0, cardsToMemorize: &flashcards}
 }
 
-func (m *MemorizingSession) GetCurrentQuest() (int, int, *model.Flashcard) {
+func (c *FlashcardsController) ShowQuest() {
+	m := c.session
+
 	if m.memorizedCount == len(*m.cardsToMemorize) {
-		return 0, 0, nil
+		c.view.GoToHome()
+		return
 	}
 
-	return m.memorizedCount + 1, len(*m.cardsToMemorize), (*m.cardsToMemorize)[m.memorizedCount].flashcard
+	card := (*m.cardsToMemorize)[m.memorizedCount].flashcard
+
+	cardDTO := FlashcardDTO{Front: card.Front, Back: card.Back}
+
+	c.view.RenderCardQuestion(&cardDTO, m.memorizedCount+1, len(*m.cardsToMemorize))
+}
+
+func (c *FlashcardsController) ShowAnswer() {
+	m := c.session
+
+	if m.memorizedCount == len(*m.cardsToMemorize) {
+		c.view.GoToHome()
+	}
+
+	card := (*m.cardsToMemorize)[m.memorizedCount].flashcard
+
+	cardDTO := FlashcardDTO{Front: card.Front, Back: card.Back}
+
+	c.view.RenderCardAnswer(
+		&cardDTO,
+		m.memorizedCount+1,
+		len(*m.cardsToMemorize),
+		m.getAnswerFeedbackOptions(),
+	)
 }
 
 var answerFeedback = map[string]int{
@@ -150,7 +202,7 @@ var answerFeedback = map[string]int{
 	"Too easy!":                5,
 }
 
-func (m *MemorizingSession) GetAnswerFeedbackOptions() []string {
+func (m *MemorizingSession) getAnswerFeedbackOptions() []string {
 	keys := make([]string, 0, len(answerFeedback))
 	for k := range answerFeedback {
 		keys = append(keys, k)
@@ -159,7 +211,8 @@ func (m *MemorizingSession) GetAnswerFeedbackOptions() []string {
 	return keys
 }
 
-func (m *MemorizingSession) SubmitAnswer(answer string) {
+func (c *FlashcardsController) SubmitAnswer(answer string) {
+	m := c.session
 	card := (*m.cardsToMemorize)[m.memorizedCount]
 
 	qualityOfResponse := supermemo.QualityOfResponse(answerFeedback[answer])
@@ -171,4 +224,6 @@ func (m *MemorizingSession) SubmitAnswer(answer string) {
 	card.record.Save()
 
 	m.memorizedCount++
+
+	c.view.GoToQuest()
 }
