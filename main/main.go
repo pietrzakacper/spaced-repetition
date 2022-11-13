@@ -2,9 +2,7 @@ package main
 
 import (
 	"controller"
-	"io"
 	"net/http"
-	"strings"
 	"view"
 )
 
@@ -20,27 +18,9 @@ func main() {
 			return
 		}
 
-		body, _ := io.ReadAll(r.Body)
-		entries := strings.Split(string(body), "&")
+		r.ParseForm()
 
-		var (
-			front string
-			back  string
-		)
-
-		for _, entry := range entries {
-			kvPair := strings.Split(entry, "=")
-
-			if kvPair[0] == "Front" {
-				front = kvPair[1]
-			}
-
-			if kvPair[0] == "Back" {
-				back = kvPair[1]
-			}
-		}
-
-		controller.AddCard(front, back)
+		controller.AddCard(r.Form.Get("Front"), r.Form.Get("Back"))
 
 		w.Header().Add("Location", "/")
 		w.WriteHeader(303)
