@@ -2,7 +2,8 @@ package flashcard
 
 type MemorizingSession struct {
 	memorizedCount  int
-	cardsToMemorize []flashcard
+	cardsToMemorize []*flashcard
+	failedCards     []*flashcard
 }
 
 type SessionType int
@@ -15,7 +16,7 @@ const (
 var cardsInSession = 10
 
 func CreateSession(records []Record, sessionType SessionType) *MemorizingSession {
-	cardsToMemorize := make([]flashcard, 0)
+	cardsToMemorize := make([]*flashcard, 0)
 
 	for _, r := range records {
 		if len(cardsToMemorize) == cardsInSession {
@@ -24,22 +25,35 @@ func CreateSession(records []Record, sessionType SessionType) *MemorizingSession
 
 		card := r.ToCard()
 
+		card.answerSubmitted = false
+
 		if sessionType == Review && card.supermemo.IsDueToReview() {
-			cardsToMemorize = append(cardsToMemorize, *card)
+			cardsToMemorize = append(cardsToMemorize, card)
 		}
 
 		if sessionType == LearnNew && card.supermemo.IsNew() {
-			cardsToMemorize = append(cardsToMemorize, *card)
+			cardsToMemorize = append(cardsToMemorize, card)
 		}
 	}
 
-	return &MemorizingSession{memorizedCount: 0, cardsToMemorize: cardsToMemorize}
+	return &MemorizingSession{
+		memorizedCount:  0,
+		cardsToMemorize: cardsToMemorize,
+		failedCards:     make([]*flashcard, 0),
+	}
 }
 
 func (m *MemorizingSession) SubmitAnswer(answer int) *flashcard {
 	card := m.CurrentCard()
 
-	m.CurrentCard().supermemo.SubmitRepetition(answer)
+	if answer < 4 {
+		m.failedCards = append(m.failedCards, card)
+	}
+
+	if card.answerSubmitted == false {
+		m.CurrentCard().supermemo.SubmitRepetition(answer)
+		card.answerSubmitted = true
+	}
 
 	m.GoToNext()
 
@@ -47,7 +61,7 @@ func (m *MemorizingSession) SubmitAnswer(answer int) *flashcard {
 }
 
 func (m *MemorizingSession) CurrentCard() *flashcard {
-	return &m.cardsToMemorize[m.memorizedCount]
+	return m.cardsToMemorize[m.memorizedCount]
 }
 
 func (m *MemorizingSession) GoToNext() {
@@ -64,4 +78,14 @@ func (m *MemorizingSession) CurrentCardNumber() int {
 
 func (m *MemorizingSession) TotalCardsNumber() int {
 	return len(m.cardsToMemorize)
+}
+
+func (m *MemorizingSession) HasAnyFailedCards() bool {
+	return len(m.failedCards) > 0
+}
+
+func (m *MemorizingSession) ReviewFailedCardsAgain() {
+	m.memorizedCount = 0
+	m.cardsToMemorize = m.failedCards
+	m.failedCards = make([]*flashcard, 0)
 }

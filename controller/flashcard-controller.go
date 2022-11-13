@@ -87,8 +87,12 @@ func (c *FlashcardsController) CreateReviewSession() {
 
 func (c *FlashcardsController) ShowQuest() {
 	if c.session.HasEnded() {
-		c.view.GoToHome()
-		return
+		if c.session.HasAnyFailedCards() {
+			c.session.ReviewFailedCardsAgain()
+		} else {
+			c.view.GoToHome()
+			return
+		}
 	}
 
 	card := c.session.CurrentCard()
@@ -102,7 +106,7 @@ func (c *FlashcardsController) ShowQuest() {
 
 func (c *FlashcardsController) ShowAnswer() {
 	if c.session.HasEnded() {
-		c.view.GoToHome()
+		c.view.GoToQuest()
 	}
 
 	card := c.session.CurrentCard()
