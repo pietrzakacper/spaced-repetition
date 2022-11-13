@@ -2,9 +2,9 @@ package interactor
 
 import (
 	"controller"
-	"http/view"
 	"net/http"
 	"strconv"
+	"web/view"
 )
 
 type Interactor interface {
@@ -20,6 +20,9 @@ func CreateHttpInteractor(view *view.HttpView) HttpInteractor {
 }
 
 func (i HttpInteractor) Start(c controller.Controller) {
+	fs := http.FileServer(http.Dir("./static"))
+	http.Handle("/static/", http.StripPrefix("/static", fs))
+
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		i.view.SetRequestContext(w)
 
