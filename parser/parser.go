@@ -67,16 +67,6 @@ func ParseCSVStream(textStream io.Reader) <-chan []string {
 	return entryChan
 }
 
-func ParseCSVLines(lines []string) [][]string {
-	entries := make([][]string, len(lines))
-
-	for lineIndex, line := range lines {
-		entries[lineIndex] = ParseLine(line)
-	}
-
-	return entries
-}
-
 func FileToChannel(file io.Reader) chan string {
 	buff := make([]byte, 100)
 

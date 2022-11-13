@@ -109,7 +109,6 @@ func calculateNextEF(oldEF float64, qualityOfResponse QualityOfResponse) float64
 			(float64(0.08)+(float64(5)-float64(qualityOfResponse))*float64(0.02)))
 
 	if newEF < 1.3 {
-		// @TODO verify if it works
 		return 1.3
 	}
 

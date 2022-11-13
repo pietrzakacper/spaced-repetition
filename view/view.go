@@ -72,7 +72,6 @@ func RenderCardQuestion(w http.ResponseWriter, card *model.Flashcard, cardNumber
 	io.WriteString(w, html)
 }
 
-// @TODO use HTML templates
 func RenderCardAnswer(w http.ResponseWriter, card *model.Flashcard, cardNumber int, totalCardsInSession int, answerOptions []string) {
 	w.Header().Add("Content-Type", "text/html")
 

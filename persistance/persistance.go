@@ -88,7 +88,6 @@ func (r *Record) Save() {
 		newContent += id + idSeparator + data + "\n"
 	}
 
-	// @TODO that's turbo inefficient, but maybe it's enough
 	f.Truncate(0)
 	f.Seek(0, 0)
 	f.WriteString(newContent)

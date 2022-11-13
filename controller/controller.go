@@ -106,7 +106,6 @@ func CreateMemorizingSession(count uint) *MemorizingSession {
 }
 
 func CreateReviewSession(count uint) *MemorizingSession {
-	// @TODO handle failed answers
 	records := store.Read()
 
 	flashcards := make([]FlashcardRecord, 0)

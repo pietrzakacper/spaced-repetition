@@ -28,7 +28,6 @@ func main() {
 			back  string
 		)
 
-		// @TODO use form parsing
 		for _, entry := range entries {
 			kvPair := strings.Split(entry, "=")
 
@@ -93,7 +92,6 @@ func main() {
 			return
 		}
 
-		// @TODO move views to controllers
 		view.RenderCardQuestion(w, card, cardNumber, totalCardsCount)
 	})
 
