@@ -13,7 +13,7 @@ func main() {
 
 	var v controller.View = httpView
 	var flashcardController = controller.CreateFlashcardsController(v)
-	var c controller.Controller = &flashcardController
+	var c controller.Controller = flashcardController
 
 	i.Start(c)
 }

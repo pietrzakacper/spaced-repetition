@@ -15,8 +15,8 @@ type FlashcardsController struct {
 	session *MemorizingSession
 }
 
-func CreateFlashcardsController(view View) FlashcardsController {
-	return FlashcardsController{
+func CreateFlashcardsController(view View) *FlashcardsController {
+	return &FlashcardsController{
 		view:  view,
 		store: persistance.Create("db"),
 	}
