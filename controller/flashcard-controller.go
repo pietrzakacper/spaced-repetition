@@ -2,15 +2,14 @@ package controller
 
 import (
 	"csv"
+	"flashcard"
 	"io"
-	"supermemo"
-	"time"
 )
 
 type FlashcardsController struct {
 	view    View
 	store   Store
-	session *MemorizingSession
+	session *flashcard.MemorizingSession
 }
 
 func CreateFlashcardsController(view View, persistance Persistance) *FlashcardsController {
@@ -23,37 +22,32 @@ func CreateFlashcardsController(view View, persistance Persistance) *FlashcardsC
 func (c *FlashcardsController) ShowHome() {
 	records := c.store.ReadAll()
 
-	flashcardDTOs := make([]FlashcardDTO, len(records))
+	flashcardDTOs := make([]flashcard.DTO, len(records))
 
 	newCardsCount := 0
 	dueToReviewCount := 0
 
 	for i, r := range records {
-		card := (&flashcard{}).fromRecord(&r)
+		card := r.ToCard()
 
-		if card.memorizable.IsNew() {
+		if card.IsNew() {
 			newCardsCount++
 		}
 
-		if card.memorizable.IsDueToReview() {
+		if card.IsDueToReview() {
 			dueToReviewCount++
 		}
 
-		flashcardDTOs[i] = *card.toDTO()
+		flashcardDTOs[i] = *card.ToDTO()
 	}
 
 	c.view.RenderHome(flashcardDTOs, newCardsCount, dueToReviewCount)
 }
 
 func (c *FlashcardsController) AddCard(front string, back string) {
-	card := flashcard{
-		front:        front,
-		back:         back,
-		creationDate: time.Now(),
-		memorizable:  supermemo.Create(),
-	}
+	card := (&flashcard.DTO{Front: front, Back: back}).ToCard()
 
-	record := card.toRecord()
+	record := card.ToRecord()
 
 	c.store.Add(record)
 
@@ -64,14 +58,9 @@ func (c *FlashcardsController) ImportCards(csvStream io.Reader) {
 	entriesChan := csv.ParseCSVStream(csvStream)
 
 	for entry := range entriesChan {
-		card := flashcard{
-			front:        entry[0],
-			back:         entry[1],
-			creationDate: time.Now(),
-			memorizable:  supermemo.Create(),
-		}
+		card := (&flashcard.DTO{Front: entry[0], Back: entry[1]}).ToCard()
 
-		record := card.toRecord()
+		record := card.ToRecord()
 
 		c.store.Add(record)
 	}
@@ -82,7 +71,7 @@ func (c *FlashcardsController) ImportCards(csvStream io.Reader) {
 func (c *FlashcardsController) CreateMemorizingSession() {
 	records := c.store.ReadAll()
 
-	c.session = CreateSession(records, LearnNew)
+	c.session = flashcard.CreateSession(records, flashcard.LearnNew)
 
 	c.view.GoToQuest()
 
@@ -91,48 +80,45 @@ func (c *FlashcardsController) CreateMemorizingSession() {
 func (c *FlashcardsController) CreateReviewSession() {
 	records := c.store.ReadAll()
 
-	c.session = CreateSession(records, Review)
+	c.session = flashcard.CreateSession(records, flashcard.Review)
 
 	c.view.GoToQuest()
 }
 
 func (c *FlashcardsController) ShowQuest() {
-	if c.session.hasEnded() {
+	if c.session.HasEnded() {
 		c.view.GoToHome()
 		return
 	}
 
-	card := c.session.currentCard()
+	card := c.session.CurrentCard()
 
 	c.view.RenderCardQuestion(
-		card.toDTO(),
-		c.session.memorizedCount,
-		len(c.session.cardsToMemorize),
+		card.ToDTO(),
+		c.session.CurrentCardNumber(),
+		c.session.TotalCardsNumber(),
 	)
 }
 
 func (c *FlashcardsController) ShowAnswer() {
-	if c.session.hasEnded() {
+	if c.session.HasEnded() {
 		c.view.GoToHome()
 	}
 
-	card := c.session.currentCard()
+	card := c.session.CurrentCard()
 
 	c.view.RenderCardAnswer(
-		card.toDTO(),
-		c.session.memorizedCount+1,
-		len(c.session.cardsToMemorize),
+		card.ToDTO(),
+		c.session.CurrentCardNumber(),
+		c.session.TotalCardsNumber(),
 		[]int{0, 1, 2, 3, 4, 5},
 	)
 }
 
 func (c *FlashcardsController) SubmitAnswer(answer int) {
-	card := c.session.currentCard()
-	card.memorizable.SubmitRepetition(answer)
+	card := c.session.SubmitAnswer(answer)
 
-	c.store.Update(card.toRecord())
-
-	c.session.goToNext()
+	c.store.Update(card.ToRecord())
 
 	c.view.GoToQuest()
 }

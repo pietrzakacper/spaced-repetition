@@ -1,8 +1,8 @@
 package controller
 
 import (
+	"flashcard"
 	"io"
-	"time"
 )
 
 type Controller interface {
@@ -16,37 +16,21 @@ type Controller interface {
 	SubmitAnswer(answer int)
 }
 
-type FlashcardDTO struct {
-	Front string
-	Back  string
-}
-
 type View interface {
 	GoToHome()
 	GoToAnswer()
 	GoToQuest()
-	RenderHome(cards []FlashcardDTO, newCardsCount int, dueToReviewCount int)
-	RenderCardQuestion(card *FlashcardDTO, cardNumber int, totalCardsInSession int)
-	RenderCardAnswer(card *FlashcardDTO, cardNumber int, totalCardsInSession int, answerOptions []int)
+	RenderHome(cards []flashcard.DTO, newCardsCount int, dueToReviewCount int)
+	RenderCardQuestion(card *flashcard.DTO, cardNumber int, totalCardsInSession int)
+	RenderCardAnswer(card *flashcard.DTO, cardNumber int, totalCardsInSession int, answerOptions []int)
 }
 
 type Persistance interface {
 	Create(name string) Store
 }
 
-type FlashcardRecord struct {
-	Id               string
-	Front            string
-	Back             string
-	CreationDate     time.Time
-	LastReviewDate   time.Time
-	NextReviewOffset int
-	RepetitionCount  int
-	EF               float64
-}
-
 type Store interface {
-	ReadAll() []FlashcardRecord
-	Add(record *FlashcardRecord)
-	Update(record *FlashcardRecord)
+	ReadAll() []flashcard.Record
+	Add(record *flashcard.Record)
+	Update(record *flashcard.Record)
 }

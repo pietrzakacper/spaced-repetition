@@ -1,7 +1,7 @@
 package view
 
 import (
-	"controller"
+	"flashcard"
 	"fmt"
 	"io"
 	"net/http"
@@ -31,7 +31,7 @@ func (v *HttpView) GoToAnswer() {
 	v.w.WriteHeader(303)
 }
 
-func (v *HttpView) RenderHome(cards []controller.FlashcardDTO, newCardsCount int, dueToReviewCount int) {
+func (v *HttpView) RenderHome(cards []flashcard.DTO, newCardsCount int, dueToReviewCount int) {
 	v.w.Header().Add("Content-Type", "text/html")
 
 	html := "<html><body>"
@@ -70,7 +70,7 @@ func (v *HttpView) RenderHome(cards []controller.FlashcardDTO, newCardsCount int
 	io.WriteString(v.w, html)
 }
 
-func (v *HttpView) RenderCardQuestion(card *controller.FlashcardDTO, cardNumber int, totalCardsInSession int) {
+func (v *HttpView) RenderCardQuestion(card *flashcard.DTO, cardNumber int, totalCardsInSession int) {
 	v.w.Header().Add("Content-Type", "text/html")
 
 	html := "<html><body>"
@@ -104,7 +104,7 @@ var answerFeedback = map[int]string{
 	5: "Too easy!",
 }
 
-func (v *HttpView) RenderCardAnswer(card *controller.FlashcardDTO, cardNumber int, totalCardsInSession int, answerOptions []int) {
+func (v *HttpView) RenderCardAnswer(card *flashcard.DTO, cardNumber int, totalCardsInSession int, answerOptions []int) {
 	v.w.Header().Add("Content-Type", "text/html")
 
 	html := "<html><body>"

@@ -2,10 +2,10 @@ go 1.19
 
 use (
 	./controller
+	./csv
+	./flashcard
 	./interactor
 	./main
-	./csv
 	./persistance
-	./supermemo
 	./view
 )

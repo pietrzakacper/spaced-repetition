@@ -1,4 +1,4 @@
-package supermemo
+package flashcard
 
 import (
 	"fmt"
@@ -6,23 +6,28 @@ import (
 	"time"
 )
 
-type Memorizable struct {
+type supermemo struct {
 	RepetitionCount  int
 	LastReviewDate   time.Time
 	NextReviewOffset int
 	EF               float64
 }
 
-func Create() *Memorizable {
-	return &Memorizable{EF: 2.5, NextReviewOffset: 0, RepetitionCount: 0, LastReviewDate: time.Now()}
+func InitSupermemo() *supermemo {
+	return &supermemo{EF: 2.5, NextReviewOffset: 0, RepetitionCount: 0, LastReviewDate: time.Now()}
 }
 
-func (m *Memorizable) IsNew() bool {
+func (m *supermemo) IsNew() bool {
 	return m.RepetitionCount == 0
 }
 
-func (m *Memorizable) SubmitRepetition(qualityOfResponse int) {
-	m.RepetitionCount += 1
+func (m *supermemo) SubmitRepetition(qualityOfResponse int) {
+	if qualityOfResponse < 3 {
+		m.RepetitionCount = 1
+	} else {
+		m.RepetitionCount += 1
+	}
+
 	m.LastReviewDate = time.Now()
 
 	nextOffset := calculateNextReviewOffset(m.RepetitionCount, m.EF)
@@ -31,7 +36,7 @@ func (m *Memorizable) SubmitRepetition(qualityOfResponse int) {
 	m.EF = calculateNextEF(m.EF, qualityOfResponse)
 }
 
-func (m *Memorizable) IsDueToReview() bool {
+func (m *supermemo) IsDueToReview() bool {
 	if m.IsNew() {
 		return false
 	}

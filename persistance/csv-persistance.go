@@ -3,6 +3,7 @@ package persistance
 import (
 	"controller"
 	"csv"
+	"flashcard"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -29,13 +30,13 @@ func (p *CSVPersistance) Create(name string) controller.Store {
 
 var daysPrecision = "2006-02-01"
 
-func (s *CSVStore) ReadAll() []controller.FlashcardRecord {
+func (s *CSVStore) ReadAll() []flashcard.Record {
 	f, _ := os.Open(s.filepath)
 	defer f.Close()
 
 	stream := csv.TextToLines(csv.FileToChannel(f))
 
-	records := make([]controller.FlashcardRecord, 0)
+	records := make([]flashcard.Record, 0)
 
 	for line := range stream {
 		parts := strings.Split(line, ",")
@@ -48,7 +49,7 @@ func (s *CSVStore) ReadAll() []controller.FlashcardRecord {
 		nextReviewOffset, _ := strconv.ParseInt(parts[6], 10, 64)
 		ef, _ := strconv.ParseFloat(parts[7], 64)
 
-		record := controller.FlashcardRecord{
+		record := flashcard.Record{
 			Id:               id,
 			Front:            front,
 			Back:             back,
@@ -65,7 +66,7 @@ func (s *CSVStore) ReadAll() []controller.FlashcardRecord {
 	return records
 }
 
-func (s *CSVStore) Add(record *controller.FlashcardRecord) {
+func (s *CSVStore) Add(record *flashcard.Record) {
 	f, _ := os.OpenFile(s.filepath, os.O_APPEND|os.O_CREATE|os.O_RDWR, 0644)
 
 	defer f.Close()
@@ -92,7 +93,7 @@ func (s *CSVStore) Add(record *controller.FlashcardRecord) {
 	}
 }
 
-func (s *CSVStore) Update(record *controller.FlashcardRecord) {
+func (s *CSVStore) Update(record *flashcard.Record) {
 	f, _ := os.OpenFile(s.filepath, os.O_RDWR, 0644)
 	defer f.Close()
 

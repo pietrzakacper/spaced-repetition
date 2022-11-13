@@ -6,7 +6,7 @@
 * [x] Cleanup type e.g. int64
 * [x] Move dueToReview to supermemo
 * [x] Remove Metadata nesting from model
-* [ ] Refactor controllers to find common functionality
+* [x] Refactor controllers to find common functionality
 * [ ] Handle failed answers according to supermemo
 * [ ] Think about more efficient way to update cards
 * [ ] Verify if < 1.3 works
