@@ -31,7 +31,7 @@ func (v *HttpView) GoToAnswer() {
 	v.w.WriteHeader(303)
 }
 
-func (v *HttpView) RenderHome(cards []controller.FlashcardDTO, newCardsCount uint, dueToReviewCount uint) {
+func (v *HttpView) RenderHome(cards []controller.FlashcardDTO, newCardsCount int, dueToReviewCount int) {
 	v.w.Header().Add("Content-Type", "text/html")
 
 	html := "<html><body>"

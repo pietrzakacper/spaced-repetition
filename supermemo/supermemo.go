@@ -3,85 +3,41 @@ package supermemo
 import (
 	"fmt"
 	"math"
-	"strconv"
-	"strings"
 )
 
 type Memorizable struct {
-	repetitionCount      uint
-	nextRepetitionOffset Days
-	ef                   float64
+	RepetitionCount  int64
+	NextReviewOffset Days
+	EF               float64
 }
 
 // integer between 0-5
 type QualityOfResponse byte
-type Days uint
+type Days int64
 
 func Create() *Memorizable {
-	return &Memorizable{ef: 2.5, nextRepetitionOffset: 0, repetitionCount: 0}
+	return &Memorizable{EF: 2.5, NextReviewOffset: 0, RepetitionCount: 0}
 }
 
 func (m *Memorizable) IsNew() bool {
-	return m.repetitionCount == 0
+	return m.RepetitionCount == 0
 }
 
 func (m *Memorizable) GetNextRepetitionDaysOffset() Days {
-	return m.nextRepetitionOffset
+	return m.NextReviewOffset
 }
 
 func (m *Memorizable) SubmitRepetition(qualityOfResponse QualityOfResponse) {
-	m.repetitionCount += 1
+	m.RepetitionCount += 1
 
-	nextOffset := calculateNextRepetitionOffset(m.repetitionCount, m.ef)
+	nextOffset := calculateNextReviewOffset(m.RepetitionCount, m.EF)
 	// make sure the days offset is in days
-	m.nextRepetitionOffset = Days(math.Round(nextOffset))
+	m.NextReviewOffset = Days(math.Round(nextOffset))
 
-	m.ef = calculateNextEF(m.ef, qualityOfResponse)
+	m.EF = calculateNextEF(m.EF, qualityOfResponse)
 }
 
-func (m *Memorizable) Serialize() string {
-	return fmt.Sprintf("%d", m.repetitionCount) +
-		"|" + fmt.Sprintf("%d", m.nextRepetitionOffset) +
-		"|" + fmt.Sprintf("%.2f", m.ef)
-}
-
-func Deserialize(serializedCard string) *Memorizable {
-	components := strings.Split(serializedCard, "|")
-
-	if len(components) != 3 {
-		fmt.Println("Error: Incorrect number of components in a serializedCard", serializedCard)
-		return nil
-	}
-
-	repetitionCountParsed, err := strconv.ParseInt(components[0], 10, 64)
-
-	if err != nil {
-		fmt.Println("Error: Failed to parse repetitionCount", components[0])
-		return nil
-	}
-
-	nextRepetitionOffsetParsed, err := strconv.ParseInt(components[1], 10, 64)
-
-	if err != nil {
-		fmt.Println("Error: Failed to parse nextRepetitionOffset", components[1])
-		return nil
-	}
-
-	efParsed, err := strconv.ParseFloat(components[2], 64)
-
-	if err != nil {
-		fmt.Println("Error: Failed to parse ef", components[2])
-		return nil
-	}
-
-	return &Memorizable{
-		repetitionCount:      uint(repetitionCountParsed),
-		nextRepetitionOffset: Days(nextRepetitionOffsetParsed),
-		ef:                   efParsed,
-	}
-}
-
-func calculateNextRepetitionOffset(repetitionCount uint, EF float64) float64 {
+func calculateNextReviewOffset(repetitionCount int64, EF float64) float64 {
 	if repetitionCount < 1 {
 		fmt.Println("Error: repetitionCount cannot be less than 1")
 		return 0
@@ -95,7 +51,7 @@ func calculateNextRepetitionOffset(repetitionCount uint, EF float64) float64 {
 		return 6
 	}
 
-	return calculateNextRepetitionOffset(repetitionCount-1, EF) * EF
+	return calculateNextReviewOffset(repetitionCount-1, EF) * EF
 }
 
 func calculateNextEF(oldEF float64, qualityOfResponse QualityOfResponse) float64 {

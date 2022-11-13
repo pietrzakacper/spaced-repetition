@@ -44,7 +44,7 @@ func ParseLine(line string) []string {
 }
 
 func MakeLine(entries []string) string {
-	return strings.Join(entries, ",")
+	return strings.Join(entries, ",") + "\n"
 }
 
 func ParseCSVStream(textStream io.Reader) <-chan []string {
