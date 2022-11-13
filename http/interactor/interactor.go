@@ -2,10 +2,14 @@ package interactor
 
 import (
 	"controller"
+	"http/view"
 	"net/http"
 	"strconv"
-	"view"
 )
+
+type Interactor interface {
+	Start(c controller.Controller)
+}
 
 type HttpInteractor struct {
 	view *view.HttpView

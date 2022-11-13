@@ -2,9 +2,9 @@ package main
 
 import (
 	"controller"
-	"interactor"
+	"http/interactor"
+	"http/view"
 	"persistance"
-	"view"
 )
 
 func main() {

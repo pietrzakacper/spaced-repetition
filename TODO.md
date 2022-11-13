@@ -7,8 +7,8 @@
 * [x] Move dueToReview to supermemo
 * [x] Remove Metadata nesting from model
 * [x] Refactor controllers to find common functionality
-* [ ] Handle failed answers according to supermemo
+* [x] Handle failed answers according to supermemo
 * [ ] Think about more efficient way to update cards
-* [ ] Verify if < 1.3 works
+* [x] Verify if < 1.3 works
 * [ ] Use HTML templates in views
 * [ ] Handle errors everywhere

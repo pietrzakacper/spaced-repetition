@@ -4,8 +4,7 @@ use (
 	./controller
 	./csv
 	./flashcard
-	./interactor
+	./http
 	./main
 	./persistance
-	./view
 )
