@@ -1,8 +1,8 @@
 package controller
 
 import (
+	"csv"
 	"io"
-	"parser"
 	"supermemo"
 	"time"
 )
@@ -82,7 +82,7 @@ func (c *FlashcardsController) AddCard(front string, back string) {
 }
 
 func (c *FlashcardsController) ImportCards(csvStream io.Reader) {
-	entriesChan := parser.ParseCSVStream(csvStream)
+	entriesChan := csv.ParseCSVStream(csvStream)
 
 	for entry := range entriesChan {
 		card := flashcard{

@@ -2,9 +2,9 @@ package persistance
 
 import (
 	"controller"
+	"csv"
 	"fmt"
 	"os"
-	"parser"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -33,7 +33,7 @@ func (s *CSVStore) ReadAll() []controller.FlashcardRecord {
 	f, _ := os.Open(s.filepath)
 	defer f.Close()
 
-	stream := parser.TextToLines(parser.FileToChannel(f))
+	stream := csv.TextToLines(csv.FileToChannel(f))
 
 	records := make([]controller.FlashcardRecord, 0)
 
@@ -83,7 +83,7 @@ func (s *CSVStore) Add(record *controller.FlashcardRecord) {
 		strconv.FormatFloat(record.EF, 'e', 2, 64),
 	}
 
-	line := parser.MakeLine(entries)
+	line := csv.MakeLine(entries)
 
 	_, err := f.WriteString(line)
 
@@ -96,7 +96,7 @@ func (s *CSVStore) Update(record *controller.FlashcardRecord) {
 	f, _ := os.OpenFile(s.filepath, os.O_RDWR, 0644)
 	defer f.Close()
 
-	stream := parser.TextToLines(parser.FileToChannel(f))
+	stream := csv.TextToLines(csv.FileToChannel(f))
 
 	newContent := ""
 
@@ -118,7 +118,7 @@ func (s *CSVStore) Update(record *controller.FlashcardRecord) {
 			}
 		}
 
-		newContent += parser.MakeLine(append(idSlice, dataSlice...))
+		newContent += csv.MakeLine(append(idSlice, dataSlice...))
 	}
 
 	f.Truncate(0)

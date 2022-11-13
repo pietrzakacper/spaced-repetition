@@ -1,4 +1,4 @@
-package parser
+package csv
 
 import (
 	"reflect"
