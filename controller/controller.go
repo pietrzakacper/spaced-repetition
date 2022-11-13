@@ -2,7 +2,6 @@ package controller
 
 import (
 	"io"
-	"supermemo"
 	"time"
 )
 
@@ -12,8 +11,8 @@ type Controller interface {
 	ShowAnswer()
 	AddCard(front string, back string)
 	ImportCards(csvStream io.Reader)
-	CreateMemorizingSession(count int64)
-	CreateReviewSession(count int64)
+	CreateMemorizingSession(count int)
+	CreateReviewSession(count int)
 	SubmitAnswer(answer string)
 }
 
@@ -41,8 +40,8 @@ type FlashcardRecord struct {
 	Back             string
 	CreationDate     time.Time
 	LastReviewDate   time.Time
-	NextReviewOffset supermemo.Days
-	RepetitionCount  int64
+	NextReviewOffset int
+	RepetitionCount  int
 	EF               float64
 }
 

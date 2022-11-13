@@ -8,7 +8,6 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
-	"supermemo"
 	"time"
 
 	"github.com/google/uuid"
@@ -55,8 +54,8 @@ func (s *CSVStore) ReadAll() []controller.FlashcardRecord {
 			Back:             back,
 			CreationDate:     creationDate,
 			LastReviewDate:   lastReviewDate,
-			RepetitionCount:  repetitionCount,
-			NextReviewOffset: supermemo.Days(nextReviewOffset),
+			RepetitionCount:  int(repetitionCount),
+			NextReviewOffset: int(nextReviewOffset),
 			EF:               ef,
 		}
 
@@ -79,7 +78,7 @@ func (s *CSVStore) Add(record *controller.FlashcardRecord) {
 		record.Back,
 		record.CreationDate.Format(daysPrecision),
 		record.LastReviewDate.Format(daysPrecision),
-		strconv.FormatInt(record.RepetitionCount, 10),
+		strconv.FormatInt(int64(record.RepetitionCount), 10),
 		strconv.FormatInt(int64(record.NextReviewOffset), 10),
 		strconv.FormatFloat(record.EF, 'e', 2, 64),
 	}
@@ -113,7 +112,7 @@ func (s *CSVStore) Update(record *controller.FlashcardRecord) {
 				record.Back,
 				record.CreationDate.Format(daysPrecision),
 				record.LastReviewDate.Format(daysPrecision),
-				strconv.FormatInt(record.RepetitionCount, 10),
+				strconv.FormatInt(int64(record.RepetitionCount), 10),
 				strconv.FormatInt(int64(record.NextReviewOffset), 10),
 				strconv.FormatFloat(record.EF, 'e', -1, 64),
 			}

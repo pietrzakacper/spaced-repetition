@@ -69,7 +69,7 @@ func dueToReview(card *model.Flashcard) bool {
 	lastRepInSeconds := card.Metadata.LastReviewDate.Unix()
 
 	// convert to seconds
-	offsetInSeconds := int64(card.Metadata.Memorizable.GetNextRepetitionDaysOffset() * 24 * 60 * 60)
+	offsetInSeconds := int64(card.Metadata.Memorizable.NextReviewOffset * 24 * 60 * 60)
 
 	return (lastRepInSeconds + offsetInSeconds) <= nowInSeconds
 }
@@ -129,13 +129,13 @@ type MemorizingSession struct {
 	cardsToMemorize []FlashcardRecord
 }
 
-func (c *FlashcardsController) CreateMemorizingSession(count int64) {
+func (c *FlashcardsController) CreateMemorizingSession(count int) {
 	records := c.store.ReadAll()
 
 	flashcardsInSession := make([]FlashcardRecord, 0)
 
 	for _, r := range records {
-		if int64(len(flashcardsInSession)) == count {
+		if len(flashcardsInSession) == count {
 			break
 		}
 
@@ -164,13 +164,13 @@ func (c *FlashcardsController) CreateMemorizingSession(count int64) {
 	c.session = &MemorizingSession{memorizedCount: 0, cardsToMemorize: flashcardsInSession}
 }
 
-func (c *FlashcardsController) CreateReviewSession(count int64) {
+func (c *FlashcardsController) CreateReviewSession(count int) {
 	records := c.store.ReadAll()
 
 	flashcardsInSession := make([]FlashcardRecord, 0)
 
 	for _, r := range records {
-		if int64(len(flashcardsInSession)) == count {
+		if len(flashcardsInSession) == count {
 			break
 		}
 

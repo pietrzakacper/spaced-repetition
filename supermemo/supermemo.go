@@ -6,14 +6,13 @@ import (
 )
 
 type Memorizable struct {
-	RepetitionCount  int64
-	NextReviewOffset Days
+	RepetitionCount  int
+	NextReviewOffset int
 	EF               float64
 }
 
 // integer between 0-5
 type QualityOfResponse byte
-type Days int64
 
 func Create() *Memorizable {
 	return &Memorizable{EF: 2.5, NextReviewOffset: 0, RepetitionCount: 0}
@@ -23,21 +22,16 @@ func (m *Memorizable) IsNew() bool {
 	return m.RepetitionCount == 0
 }
 
-func (m *Memorizable) GetNextRepetitionDaysOffset() Days {
-	return m.NextReviewOffset
-}
-
 func (m *Memorizable) SubmitRepetition(qualityOfResponse QualityOfResponse) {
 	m.RepetitionCount += 1
 
 	nextOffset := calculateNextReviewOffset(m.RepetitionCount, m.EF)
-	// make sure the days offset is in days
-	m.NextReviewOffset = Days(math.Round(nextOffset))
+	m.NextReviewOffset = int(math.Round(nextOffset))
 
 	m.EF = calculateNextEF(m.EF, qualityOfResponse)
 }
 
-func calculateNextReviewOffset(repetitionCount int64, EF float64) float64 {
+func calculateNextReviewOffset(repetitionCount int, EF float64) float64 {
 	if repetitionCount < 1 {
 		fmt.Println("Error: repetitionCount cannot be less than 1")
 		return 0
