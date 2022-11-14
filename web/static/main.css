@@ -1,71 +1,91 @@
 body {
-    --backgroundColor: #fff;
-    --foregroundColor: #111;
-    --primaryColor: #03a9f4;
-    --primaryShade1: #e1f5fe;
-    --primaryShade2: #b3e5fc;
-    --primaryShade3: #4fc3f7;
-    --primaryShade4: #0288d1;
-    --primaryShade5: #0277bd;
-    --secondaryColor: #673ab7;
-    --secondaryShade1: #ede7f6;
-    --secondaryShade2: #d1c4e9;
-    --secondaryShade3: #9575cd;
-    --secondaryShade4: #512da8;
-    --secondaryShade5: #311b92;
-    --accentColor: #009688;
-    --accentShade1: #e0f2f1;
-    --accentShade2: #b2dfdb;
-    --accentShade3: #4db6ac;
-    --accentShade4: #00796b;
-    --accentShade5: #004d40;
-    --accent2Color: #8bc34a;
-    --accent2Shade1: #e7f6d5;
-    --accent2Shade2: #c5e1a5;
-    --accent2Shade3: #aed581;
-    --accent2Shade4: #689f38;
-    --accent2Shade5: #558b2f;
-    --accent3Color: #f44336;
-    --accent3Shade1: #ffdde0;
-    --accent3Shade2: #ffcdd2;
-    --accent3Shade3: #ef9a9a;
-    --accent3Shade4: #d32f2f;
-    --accent3Shade5: #b71c1c;
-    --neutralShade1: #f2f2f2;
-    --neutralShade2: #e8e9e9;
-    --neutralShade3: #d1d3d4;
-    --neutralShade4: #babdbf;
-    --neutralShade5: #808488;
-    --neutralShade6: #666a6d;
-    --neutralShade7: #4d5052;
-    --neutralShade8: #212122;
-    --grayColor: #999;
-    --lightGrayColor: #ddd;
-    --borderRadius: 6px;
-    --boxShadow: 0 2px 5px rgba(51, 51, 51, 0.2);
-    --canvasColor: #f9f9f9;
-  
+  --backgroundColor: #fff;
+  --foregroundColor: #111;
+  --primaryColor: #03a9f4;
+  --primaryShade1: #e1f5fe;
+  --primaryShade2: #b3e5fc;
+  --primaryShade3: #4fc3f7;
+  --primaryShade4: #0288d1;
+  --primaryShade5: #0277bd;
+  --secondaryColor: #673ab7;
+  --secondaryShade1: #ede7f6;
+  --secondaryShade2: #d1c4e9;
+  --secondaryShade3: #9575cd;
+  --secondaryShade4: #512da8;
+  --secondaryShade5: #311b92;
+  --accentColor: #009688;
+  --accentShade1: #e0f2f1;
+  --accentShade2: #b2dfdb;
+  --accentShade3: #4db6ac;
+  --accentShade4: #00796b;
+  --accentShade5: #004d40;
+  --accent2Color: #8bc34a;
+  --accent2Shade1: #e7f6d5;
+  --accent2Shade2: #c5e1a5;
+  --accent2Shade3: #aed581;
+  --accent2Shade4: #689f38;
+  --accent2Shade5: #558b2f;
+  --accent3Color: #f44336;
+  --accent3Shade1: #ffdde0;
+  --accent3Shade2: #ffcdd2;
+  --accent3Shade3: #ef9a9a;
+  --accent3Shade4: #d32f2f;
+  --accent3Shade5: #b71c1c;
+  --neutralShade1: #f2f2f2;
+  --neutralShade2: #e8e9e9;
+  --neutralShade3: #d1d3d4;
+  --neutralShade4: #babdbf;
+  --neutralShade5: #808488;
+  --neutralShade6: #666a6d;
+  --neutralShade7: #4d5052;
+  --neutralShade8: #212122;
+  --grayColor: #999;
+  --lightGrayColor: #ddd;
+  --borderRadius: 6px;
+  --boxShadow: 0 2px 5px rgba(51, 51, 51, 0.2);
+  --canvasColor: #f9f9f9;
+
   --borderRadius: 6px;
   font: 500 24px "Poppins", sans-serif;
 }
 
 header img {
-    margin-left: calc(10vw - 2rem);
-    margin-top: 2rem;
-    width: 300px;
+  margin-top: 2rem;
+  width: 300px;
 }
 
 .main-container {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  grid-template-rows: 1fr;
+  grid-column-gap: 0px;
+  grid-row-gap: 0px;
+  height: 100%;
 }
 
-.main-container > .box {
-    margin-top: 2rem;
-    width: 80vw;
-    padding: 2rem;
+.main-container > .main-content {
+  grid-area: 1 / 2 / 2 / 10;
+  height: 100%;
+  display: flex;
+  flex-flow: column;
+}
+
+.main-container .box {
+  margin-top: 2rem;
+  padding: 2rem;
+}
+
+main {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.cards {
+}
+
+.tools {
 }
 
 .button {
@@ -87,23 +107,23 @@ header img {
 }
 
 .button:hover {
-    background: var(--primaryShade4);
+  background: var(--primaryShade4);
 }
 
 .button.secondary {
-    background: var(--secondaryColor);
+  background: var(--secondaryColor);
 }
 
 .button.secondary:hover {
-    background: var(--secondaryShade4);
+  background: var(--secondaryShade4);
 }
 
 .button.accent2 {
-    background: var(--accent2Color);
+  background: var(--accent2Color);
 }
 
 .button.accent2:hover {
-    background: var(--accent2Shade4);
+  background: var(--accent2Shade4);
 }
 
 .memorize-column {
@@ -124,84 +144,74 @@ header img {
   grid-row-gap: 0px;
 }
 
-.box {
-    border-radius: 4px;
-}
-
-.box.secondary {
-    border: 2px solid var(--neutralShade3);
-    border-radius: 4px;
-}
-
-
 .text-input {
-    height: 50px;
-    font-size: 16px;
-    border: 2px solid var(--neutralShade3);
-    width: 100%;
-    padding: 12px;
-    font-family: "Poppins";
-    border-radius: var(--borderRadius);
-    color: var(--foregroundColor);
-    background: var(--backgroundColor);
-    
-    width: 256px;
-    height: 64px;
+  height: 50px;
+  font-size: 16px;
+  border: 2px solid var(--neutralShade3);
+  width: 100%;
+  padding: 12px;
+  font-family: "Poppins";
+  border-radius: var(--borderRadius);
+  color: var(--foregroundColor);
+  background: var(--backgroundColor);
+
+  width: 256px;
+  height: 64px;
 }
 
 .add-container {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .file-input {
-    display: inline-block;
-    text-align: left;
-    background: #fff;
-    position: relative;
-    border-radius: 6px;
+  display: inline-block;
+  text-align: left;
+  background: #fff;
+  position: relative;
+  border-radius: 6px;
 
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  
-  .file-input > [type='file'] {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    opacity: 0;
-    z-index: 10;
-    cursor: pointer;
-  }
-  
-  .file-input > .button {
-    display: inline-block;
-    cursor: pointer;
-    background: #eee;
-    box-sizing: border-box;
-    height: 64px;
-    border-radius: 6px;
-    margin-right: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  
-  .file-input:hover > .button {
-    background: var(--primaryColor);
-    color: white;
-  }
-  
-  .file-input > .label {
-    color: #333;
-    white-space: nowrap;
-    opacity: .3;
-  }
-  
-  .file-input.-chosen > .label {
-    opacity: 1;
-  }
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.file-input > [type="file"] {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  z-index: 10;
+  cursor: pointer;
+}
+
+.file-input > .button {
+  display: inline-block;
+  cursor: pointer;
+  background: #eee;
+  box-sizing: border-box;
+  height: 64px;
+  border-radius: 6px;
+  margin-right: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.file-input:hover > .button {
+  background: var(--primaryColor);
+  color: white;
+}
+
+.file-input > .label {
+  color: #333;
+  white-space: nowrap;
+  opacity: 0.3;
+}
+
+.file-input.-chosen > .label {
+  opacity: 1;
+}
