@@ -106,10 +106,6 @@ header img {
     background: var(--accent2Shade4);
 }
 
-.button.add {
-  
-}
-
 .memorize-column {
   display: grid;
   grid-template-columns: 1fr;
@@ -129,7 +125,6 @@ header img {
 }
 
 .box {
-    border: 2px solid var(--accent2Color);
     border-radius: 4px;
 }
 
@@ -159,7 +154,6 @@ header img {
     align-items: center;
     justify-content: space-between;
 }
-
 
 .file-input {
     display: inline-block;
