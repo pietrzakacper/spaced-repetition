@@ -10,21 +10,21 @@ func TextToLines(textChan <-chan string) <-chan string {
 	linesChan := make(chan string)
 
 	go func() {
-		line := ""
+		line := make([]rune, 0)
 		for textChunk := range textChan {
 			for _, char := range textChunk {
 				if string(char) == "\n" {
-					linesChan <- line
-					line = ""
+					linesChan <- string(line)
+					line = make([]rune, 0)
 					continue
 				}
 
-				line += string(char)
+				line = append(line, char)
 			}
 		}
 
-		if line != "" {
-			linesChan <- line
+		if len(line) != 0 {
+			linesChan <- string(line)
 		}
 
 		close(linesChan)
