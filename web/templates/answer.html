@@ -14,11 +14,13 @@
         </header>
         <main class="quest-main">
           <div class="quest-content">
-            <div class="card-number-indicator">{{ .CardNumber }} / {{ .TotalCardsInSession }} </div>
+            <div class="card-top">
+              <div class="card-number-indicator">{{ .CardNumber }} / {{ .TotalCardsInSession }} </div>
 
-            <div class="card-container">
-              <div class="card">
-                <h2>{{ .Back }}</h2>
+              <div class="card-container">
+                <div class="card">
+                  <span>{{ .Back }}</span>
+                </div>
               </div>
             </div>
 

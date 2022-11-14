@@ -134,14 +134,14 @@ header img {
 .quest-main {
   display: grid;
   grid-template-columns: 1fr;
-  grid-template-rows: repeat(6, 1fr);
+  grid-template-rows: repeat(8, 1fr);
   grid-column-gap: 0px;
   grid-row-gap: 0px;
   height: 100%;
 }
 
 .quest-content {
-  grid-area: 2 / 1 / 6 / 2;
+  grid-area: 2 / 1 / 8 / 2;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -161,6 +161,7 @@ header img {
 
 .card {
   margin: 2rem;
+  margin-top: 3rem;
   height: 22rem;
   width: 100%;
   background: var(--cardColor);
@@ -170,6 +171,9 @@ header img {
   align-items: center;
   border-radius: 2px;
   box-shadow: 6px 6px 9px -3px rgb(158 158 158);
+  padding: 2rem;
+  font-size: 30px;
+  font-weight: 600;
 }
 
 .card-show-container {
