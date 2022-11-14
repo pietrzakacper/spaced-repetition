@@ -41,6 +41,7 @@ body {
   --neutralShade8: #212122;
   --grayColor: #999;
   --lightGrayColor: #ddd;
+  --cardColor: #fff7cf;
   --borderRadius: 6px;
   --boxShadow: 0 2px 5px rgba(51, 51, 51, 0.2);
   --canvasColor: #f9f9f9;
@@ -75,12 +76,59 @@ header img {
   padding: 2rem;
 }
 
-main {
+.home-main {
   flex: 1 1 auto;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
 }
+
+.quest-main {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: repeat(6, 1fr);
+  grid-column-gap: 0px;
+  grid-row-gap: 0px;
+  height: 100%;
+}
+
+.quest-content {
+  grid-area: 2 / 1 / 6 / 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.card-number-indicator {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.card-container {
+  display: flex;
+  justify-content: center;
+}
+
+.card {
+  margin: 2rem;
+  height: 22rem;
+  width: 100%;
+  background: var(--cardColor);
+  max-width: 40rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 2px;
+  box-shadow: 6px 6px 9px -3px rgb(158 158 158);
+}
+
+.card-show-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
 
 .cards {
 }

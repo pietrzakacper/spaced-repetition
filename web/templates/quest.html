@@ -1,15 +1,36 @@
 <html>
   <head>
     <link rel="stylesheet" href="/static/main.css" />
+    <link
+      href="https://fonts.googleapis.com/css?family=Poppins:300,300i,500,500i,700"
+      rel="stylesheet"
+    />
   </head>
   <body>
-    <b>Card: </b> {{ .CardNumber }} / {{ .TotalCardsInSession }}
-    <br />
-    <h2>{{ .Front }}</h2>
+    <div class="main-container">
+      <div class="main-content">
+        <header>
+          <img src="/static/logo.svg"/>
+        </header>
+        <main class="quest-main">
+          <div class="quest-content">
+            <div class="card-number-indicator">{{ .CardNumber }} / {{ .TotalCardsInSession }} </div>
 
-    <form action="/answer" method="POST">
-      <label>Show Answer</label>
-      <input type="submit" />
-    </form>
+            <div class="card-container">
+              <div class="card">
+                <h2>{{ .Front }}</h2>
+              </div>
+            </div>
+
+            <div class="card-show-container">
+              <form action="/answer" method="POST">
+                <input class="button" type="submit" value="Show Answer" />
+              </form>
+            </div>
+          </div>
+        </main>
+        </div>
+      </div>
   </body>
 </html>
+
