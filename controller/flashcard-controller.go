@@ -4,6 +4,7 @@ import (
 	"csv"
 	"flashcard"
 	"io"
+	"strings"
 )
 
 type FlashcardsController struct {
@@ -58,7 +59,7 @@ func (c *FlashcardsController) ImportCards(csvStream io.Reader) {
 	entriesChan := csv.ParseCSVStream(csvStream)
 
 	for entry := range entriesChan {
-		card := (&flashcard.DTO{Front: entry[0], Back: entry[1]}).ToCard()
+		card := (&flashcard.DTO{Front: strings.Trim(entry[1], " "), Back: strings.Trim(entry[0], " ")}).ToCard()
 
 		record := card.ToRecord()
 
@@ -115,7 +116,7 @@ func (c *FlashcardsController) ShowAnswer() {
 		card.ToDTO(),
 		c.session.CurrentCardNumber(),
 		c.session.TotalCardsNumber(),
-		[]int{0, 1, 2, 3, 4, 5},
+		[]int{0, 2, 3, 5},
 	)
 }
 

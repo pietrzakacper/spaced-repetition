@@ -46,8 +46,56 @@ body {
   --boxShadow: 0 2px 5px rgba(51, 51, 51, 0.2);
   --canvasColor: #f9f9f9;
 
+  --answer0: #EB7070;
+  --answer2: #FEC771;
+  --answer3: #cce66c;
+  --answer5: #64E291;
+
+  --answer0-dimmed: #d36666;
+  --answer2-dimmed: #f0bd6b;
+  --answer3-dimmed: #b8d062;
+  --answer5-dimmed: #59ca80;
+
   --borderRadius: 6px;
   font: 500 24px "Poppins", sans-serif;
+}
+
+.button {
+  outline: none;
+  width: 100%;
+  text-align: center;
+  display: inline-block;
+  border: none;
+  font: 500 16px "Poppins", sans-serif;
+  padding: 20px;
+  cursor: pointer;
+  border-radius: var(--borderRadius);
+  background: var(--primaryColor);
+  color: var(--backgroundColor);
+  position: relative;
+  top: 0;
+  transition: 0.2s ease transform;
+  width: 200px;
+}
+
+.button:hover {
+  background: var(--primaryShade4);
+}
+
+.button.secondary {
+  background: var(--secondaryColor);
+}
+
+.button.secondary:hover {
+  background: var(--secondaryShade4);
+}
+
+.button.accent2 {
+  background: var(--accent2Color);
+}
+
+.button.accent2:hover {
+  background: var(--accent2Shade4);
 }
 
 header img {
@@ -97,6 +145,7 @@ header img {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  position: relative;
 }
 
 .card-number-indicator {
@@ -129,50 +178,55 @@ header img {
   justify-content: center;
 }
 
-
-.cards {
-}
-
-.tools {
-}
-
-.button {
-  outline: none;
+.answer-form-container {
   width: 100%;
-  text-align: center;
-  display: inline-block;
-  border: none;
-  font: 500 16px "Poppins", sans-serif;
-  padding: 20px;
-  cursor: pointer;
-  border-radius: var(--borderRadius);
-  background: var(--primaryColor);
-  color: var(--backgroundColor);
-  position: relative;
-  top: 0;
-  transition: 0.2s ease transform;
-  width: 200px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 
-.button:hover {
-  background: var(--primaryShade4);
+.answer-buttons-container {
+  width: 100%;
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
 }
 
-.button.secondary {
-  background: var(--secondaryColor);
+.answer-0 {
+  background: var(--answer0);  
+}
+.answer-0:hover {
+  background: var(--answer0-dimmed);  
 }
 
-.button.secondary:hover {
-  background: var(--secondaryShade4);
+.answer-1 {
+  
 }
 
-.button.accent2 {
-  background: var(--accent2Color);
+.answer-2 {
+  background: var(--answer2);  
+}
+.answer-2:hover {
+  background: var(--answer2-dimmed);  
 }
 
-.button.accent2:hover {
-  background: var(--accent2Shade4);
+
+.answer-3 {
+  background: var(--answer3);  
 }
+.answer-3:hover {
+  background: var(--answer3-dimmed);  
+}
+
+.answer-5 {
+  background: var(--answer5);
+}
+.answer-5:hover {
+  background: var(--answer5-dimmed);  
+}
+
+
 
 .memorize-column {
   display: grid;

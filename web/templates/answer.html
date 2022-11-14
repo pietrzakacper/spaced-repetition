@@ -1,19 +1,42 @@
 <html>
   <head>
     <link rel="stylesheet" href="/static/main.css" />
+    <link
+      href="https://fonts.googleapis.com/css?family=Poppins:300,300i,500,500i,700"
+      rel="stylesheet"
+    />
   </head>
   <body>
-    <b>Card: </b> {{ .CardNumber }} / {{ .TotalCardsInSession }}
-    <br />
-    <h2>{{ .Back }}</h2>
+    <div class="main-container">
+      <div class="main-content">
+        <header>
+          <img src="/static/logo.svg"/>
+        </header>
+        <main class="quest-main">
+          <div class="quest-content">
+            <div class="card-number-indicator">{{ .CardNumber }} / {{ .TotalCardsInSession }} </div>
 
-		<form action="/submitAnswer" method="POST">
-			<label>How's your memory?</label><br/>
+            <div class="card-container">
+              <div class="card">
+                <h2>{{ .Back }}</h2>
+              </div>
+            </div>
 
-      {{ range .Answers }}
-        <label for="{{ .Value }}">{{ .Label }}</label>
-        <input type="submit" id="{{ .Value }}" value="{{ .Value }}" name="answerFeedback"/>
-      {{ end }}
-    </form>
+            <div class="answer-form-container">
+                <label>How's your memory?</label><br/>
+                <div class="answer-buttons-container">
+                  {{ range .Answers }}
+                    <form action="/submitAnswer" method="POST">
+                        <input type="hidden" value="{{ .Value }}" name="answerFeedback"/>
+                        <input class="button answer-{{ .Value }}" type="submit" value="{{ .Label }}" />
+                    </form>
+                  {{ end }}
+                </div>
+            </div>
+          </div>
+        </main>
+        </div>
+      </div>
   </body>
 </html>
+
