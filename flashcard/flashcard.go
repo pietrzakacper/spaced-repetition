@@ -16,6 +16,7 @@ type flashcard struct {
 }
 
 type DTO struct {
+	Id    string
 	Front string
 	Back  string
 }
@@ -41,7 +42,7 @@ func (dto *DTO) ToCard() *flashcard {
 }
 
 func (card *flashcard) ToDTO() *DTO {
-	return &DTO{Front: card.front, Back: card.back}
+	return &DTO{Id: card.id, Front: card.front, Back: card.back}
 }
 
 func (record *Record) ToCard() *flashcard {

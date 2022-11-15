@@ -33,17 +33,39 @@ type HomeData struct {
 	DueToReviewCount int
 	NewCardsCount    int
 	AllCardsCount    int
-	Cards            []flashcard.DTO
+	Cards            []cardView
+}
+
+type cardView struct {
+	Front string
+	Back  string
+	Kind  byte
 }
 
 func (v *HttpView) RenderHome(cards []flashcard.DTO, newCardsCount int, dueToReviewCount int) {
 	template := t.Must(t.ParseFiles("templates/home.html"))
 
+	recentCards := make([]cardView, 0)
+
+	kind := byte(0)
+
+	for i := len(cards) - 1; i >= 0 && len(recentCards) < 5; i-- {
+		dto := cards[i]
+		for _, char := range dto.Id {
+			kind += byte(char)
+		}
+		kind := kind % 4
+
+		cardView := cardView{Front: dto.Front, Back: dto.Back, Kind: kind}
+
+		recentCards = append(recentCards, cardView)
+	}
+
 	data := HomeData{
 		DueToReviewCount: dueToReviewCount,
 		NewCardsCount:    newCardsCount,
 		AllCardsCount:    len(cards),
-		Cards:            cards,
+		Cards:            recentCards,
 	}
 
 	template.Execute(v.w, data)

@@ -127,7 +127,7 @@ header img {
 
 .main-container .box {
   margin-top: 2rem;
-  padding: 2rem;
+  padding: 2rem 2rem 0 2rem;
 }
 
 .home-main {
@@ -181,6 +181,76 @@ header img {
   font-size: 30px;
   font-weight: 600;
 }
+
+.recent-cards-container {
+  display: flex;
+}
+
+.small-card {
+  margin: 1rem 1rem 1rem 0;
+  height: 9rem;
+  width: 17rem;
+  min-width: 17rem;
+  max-width: 17rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 2px;
+  box-shadow: 8px 10px 10px -7px rgb(138 138 138);
+  font-size: 18px;
+  position: relative;
+}
+
+.small-card-front {
+  opacity: 0.5;
+  width: 100%;
+  height: 100%;
+  padding: 1rem;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.small-card-back {
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+  padding: 1rem;
+  box-sizing: border-box;
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.small-card-back:hover {
+  opacity: 1;
+}
+
+h3 {
+  margin: 0;
+  margin-bottom: 8px;
+}
+
+.bg-0 {
+  background: #ffcfd2;
+}
+
+.bg-1 {
+  background: #f1c0e8;
+}
+
+.bg-2 {
+  background: #cfbaf0;
+}
+
+.bg-3 {
+  background: #a3c4f3;
+}
+
 
 .card-show-container {
   width: 100%;

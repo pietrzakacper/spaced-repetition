@@ -13,7 +13,7 @@
           <img src="/static/logo.svg"/>
         </header>
         <main class="home-main">
-          <div class="cards">
+          <div class="memorize">
             <section class="memorize-section box">
               <form action="/review" method="POST">
                 <div class="memorize-column">
@@ -28,9 +28,18 @@
                 </div>
               </form>
             </section>
-            <section>
-              <h3>All cards: {{ .AllCardsCount }}</h3>
-            </section>
+   
+          </div>
+          <div class="cards">
+              <h3>Recently added</h3>
+              <div class="recent-cards-container">
+              {{ range .Cards }}
+                  <div class="small-card">
+                        <div class="small-card-front bg-{{ .Kind }}">{{ .Back }}</div>
+                        <div class="small-card-back bg-{{ .Kind }}">{{ .Front }}</div>
+                  </div>
+              {{ end }}
+              </div> 
           </div>
 
           <div class="tools">
