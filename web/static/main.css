@@ -1,5 +1,10 @@
 body {
-  --backgroundColor: #fff;
+  --backgroundColor: #f2e8cf;
+  background: var(--backgroundColor);
+  --inputBorderColor: black;
+  --buttonBorderColor: #003566;
+
+  --btnLabelColor: #fff;
   --foregroundColor: #111;
   --primaryColor: #03a9f4;
   --primaryShade1: #e1f5fe;
@@ -41,7 +46,7 @@ body {
   --neutralShade8: #212122;
   --grayColor: #999;
   --lightGrayColor: #ddd;
-  --cardColor: #fff7cf;
+  --cardColor: #f1c0e8;
   --borderRadius: 6px;
   --boxShadow: 0 2px 5px rgba(51, 51, 51, 0.2);
   --canvasColor: #f9f9f9;
@@ -71,11 +76,12 @@ body {
   cursor: pointer;
   border-radius: var(--borderRadius);
   background: var(--primaryColor);
-  color: var(--backgroundColor);
+  color: var(--btnLabelColor);
   position: relative;
   top: 0;
   transition: 0.2s ease transform;
   width: 200px;
+  border: 2px solid var(--buttonBorderColor);
 }
 
 .button:hover {
@@ -253,16 +259,21 @@ header img {
 .text-input {
   height: 50px;
   font-size: 16px;
-  border: 2px solid var(--neutralShade3);
   width: 100%;
   padding: 12px;
   font-family: "Poppins";
   border-radius: var(--borderRadius);
   color: var(--foregroundColor);
   background: var(--backgroundColor);
-
   width: 256px;
   height: 64px;
+  border: 2px dashed var(--buttonBorderColor);
+}
+
+
+.text-input:focus-visible {
+  outline: none;
+  border-style: solid;
 }
 
 .add-container {
@@ -274,7 +285,7 @@ header img {
 .file-input {
   display: inline-block;
   text-align: left;
-  background: #fff;
+  background: var(--backgroundColor);
   position: relative;
   border-radius: 6px;
 
@@ -297,7 +308,8 @@ header img {
 .file-input > .button {
   display: inline-block;
   cursor: pointer;
-  background: #eee;
+  color: var(--buttonBorderColor);
+  background: var(--backgroundColor);
   box-sizing: border-box;
   height: 64px;
   border-radius: 6px;
@@ -305,6 +317,7 @@ header img {
   display: flex;
   align-items: center;
   justify-content: center;
+  border: 2px solid var(--buttonBorderColor);
 }
 
 .file-input:hover > .button {
