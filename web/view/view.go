@@ -93,7 +93,7 @@ var answerLabels = map[int]string{
 	0: "Complete Blackout",
 	1: "Slipped my mind",
 	2: "Ah shit, I knew it!",
-	3: "Barely correct bro",
+	3: "Barely correct",
 	4: "I remembered correctly:)",
 	5: "Too easy!",
 }
