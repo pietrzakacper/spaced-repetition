@@ -1,6 +1,7 @@
 package csv
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"strings"
@@ -47,24 +48,63 @@ func MakeLine(entries []string) string {
 	return strings.Join(entries, ",") + "\n"
 }
 
-func ParseCSVStream(textStream io.Reader) <-chan []string {
+func ParseCSVStream(textStream io.Reader, extractColumns []string) (<-chan []string, error) {
 	linesChannel := TextToLines(FileToChannel(textStream))
 
 	entryChan := make(chan []string)
 
-	columnLine := ParseLine(<-linesChannel)
+	columnPositions, err := findColumnPositions(extractColumns, <-linesChannel)
 
-	fmt.Printf("Column names are: %s %s\n", columnLine[0], columnLine[1])
+	if err != nil {
+		return nil, err
+	}
 
 	go func() {
 		for line := range linesChannel {
-			entryChan <- ParseLine(line)
+			entry := ParseLine(line)
+			onlyRequiredColsEntry := make([]string, len(extractColumns))
+
+			for entryIndex, properColIndex := range columnPositions {
+				onlyRequiredColsEntry[properColIndex] = entry[entryIndex]
+			}
+
+			entryChan <- onlyRequiredColsEntry
 		}
 
 		close(entryChan)
 	}()
 
-	return entryChan
+	return entryChan, nil
+}
+
+func findColumnPositions(extractColumns []string, columnLine string) (map[int]int, error) {
+	columnEntries := ParseLine(columnLine)
+
+	columnPositions := make(map[int]int)
+
+	for columnIndex, columnName := range columnEntries {
+		extractColumnsIndex := indexOf(columnName, extractColumns)
+
+		if extractColumnsIndex > -1 {
+			columnPositions[columnIndex] = extractColumnsIndex
+		}
+	}
+
+	if len(columnPositions) < len(extractColumns) {
+		return nil, errors.New("Cannot find required columns")
+	}
+
+	return columnPositions, nil
+}
+
+func indexOf(elToFind string, arr []string) int {
+	for index, el := range arr {
+		if el == elToFind {
+			return index
+		}
+	}
+
+	return -1
 }
 
 func FileToChannel(file io.Reader) chan string {

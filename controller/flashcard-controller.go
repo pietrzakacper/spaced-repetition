@@ -3,6 +3,7 @@ package controller
 import (
 	"csv"
 	"flashcard"
+	"fmt"
 	"io"
 	"strings"
 )
@@ -56,17 +57,22 @@ func (c *FlashcardsController) AddCard(front string, back string) {
 }
 
 func (c *FlashcardsController) ImportCards(csvStream io.Reader) {
-	entriesChan := csv.ParseCSVStream(csvStream)
+	defer c.view.GoToHome()
+	entriesChan, err := csv.ParseCSVStream(csvStream, []string{"front", "back"})
+
+	if err != nil {
+		fmt.Println("Error importing cards:", err)
+		return
+	}
 
 	for entry := range entriesChan {
-		card := (&flashcard.DTO{Front: strings.Trim(entry[1], " "), Back: strings.Trim(entry[0], " ")}).ToCard()
+		fmt.Println(entry)
+		card := (&flashcard.DTO{Front: strings.Trim(entry[0], " "), Back: strings.Trim(entry[1], " ")}).ToCard()
 
 		record := card.ToRecord()
 
 		c.store.Add(record)
 	}
-
-	c.view.GoToHome()
 }
 
 func (c *FlashcardsController) CreateMemorizingSession() {
@@ -75,7 +81,6 @@ func (c *FlashcardsController) CreateMemorizingSession() {
 	c.session = flashcard.CreateSession(records, flashcard.LearnNew)
 
 	c.view.GoToQuest()
-
 }
 
 func (c *FlashcardsController) CreateReviewSession() {
