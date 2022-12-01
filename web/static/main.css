@@ -5,10 +5,9 @@ body {
   --textColor: #111132;
   --buttonBorderColor: var(--textColor);
 
-
   --btnLabelColor: #fff;
   --foregroundColor: #111;
-  --primaryColor: hsl(221deg, 88%, 60%);;
+  --primaryColor: hsl(221deg, 88%, 60%);
   --primaryShade1: #e1f5fe;
   --primaryShade2: #b3e5fc;
   --primaryShade3: #4fc3f7;
@@ -26,12 +25,12 @@ body {
   --accentShade3: #4db6ac;
   --accentShade4: #00796b;
   --accentShade5: #004d40;
-  --accent2Color:  #30d367;;
+  --accent2Color: #30d367;
   --accent2Shade1: #e7f6d5;
   --accent2Shade2: #c5e1a5;
   --accent2Shade3: #aed581;
   --accent2Shade4: #28b657;
-  --accent2Shade5: #558b2f;
+  --accent2Shade5: #8bd0a2;
   --accent3Color: #f44336;
   --accent3Shade1: #ffdde0;
   --accent3Shade2: #ffcdd2;
@@ -52,10 +51,10 @@ body {
   --boxShadow: 0 2px 5px rgba(51, 51, 51, 0.2);
   --canvasColor: #f9f9f9;
 
-  --answer0: #EB7070;
-  --answer2: #FEC771;
+  --answer0: #eb7070;
+  --answer2: #fec771;
   --answer3: #cce66c;
-  --answer5: #64E291;
+  --answer5: #64e291;
 
   --answer0-dimmed: #d36666;
   --answer2-dimmed: #f0bd6b;
@@ -65,7 +64,7 @@ body {
   --borderRadius: 2px;
   font-family: "Satoshi", sans-serif;
   font-weight: 500;
-  font-size:  24px;
+  font-size: 24px;
   color: var(--textColor);
 }
 
@@ -75,7 +74,7 @@ body {
   text-align: center;
   display: inline-block;
   border: none;
-  font-size: 16px;
+  font-size: 20px;
   padding: 20px;
   cursor: pointer;
   border-radius: var(--borderRadius);
@@ -90,7 +89,7 @@ body {
 }
 
 .button-color-dark {
-  color: var(--textColor)
+  color: var(--textColor);
 }
 
 .button:hover {
@@ -207,7 +206,7 @@ header img {
   border-radius: 2px;
   font-size: 18px;
   position: relative;
-  border: 2px solid var(--textColor)
+  border: 2px solid var(--textColor);
 }
 
 .small-card:hover {
@@ -264,7 +263,6 @@ h3 {
   background: #a3c4f3;
 }
 
-
 .card-show-container {
   width: 100%;
   display: flex;
@@ -287,39 +285,35 @@ h3 {
 }
 
 .answer-0 {
-  background: var(--answer0);  
+  background: var(--answer0);
 }
 .answer-0:hover {
-  background: var(--answer0-dimmed);  
+  background: var(--answer0-dimmed);
 }
 
 .answer-1 {
-  
 }
 
 .answer-2 {
-  background: var(--answer2);  
+  background: var(--answer2);
 }
 .answer-2:hover {
-  background: var(--answer2-dimmed);  
+  background: var(--answer2-dimmed);
 }
-
 
 .answer-3 {
-  background: var(--answer3);  
+  background: var(--answer3);
 }
 .answer-3:hover {
-  background: var(--answer3-dimmed);  
+  background: var(--answer3-dimmed);
 }
 
 .answer-5 {
   background: var(--answer5);
 }
 .answer-5:hover {
-  background: var(--answer5-dimmed);  
+  background: var(--answer5-dimmed);
 }
-
-
 
 .memorize-column {
   display: grid;
@@ -352,7 +346,6 @@ h3 {
   height: 64px;
   border: 2px solid var(--buttonBorderColor);
 }
-
 
 .text-input:focus-visible {
   outline: none;
@@ -404,7 +397,6 @@ h3 {
   cursor: pointer;
 }
 
-
 .file-input:hover > .button {
   background: var(--primaryColor);
   color: white;
@@ -419,4 +411,16 @@ h3 {
 
 .file-input.-chosen > .label {
   opacity: 1;
+}
+
+.logo {
+  font-size: 20px;
+  text-transform: lowercase;
+  font-weight: 900;
+  color: #511660;
+  border: 0px dashed #511660;
+  border-bottom-width: 3px;
+  width: 180px;
+  text-align: center;
+  padding: 10px;
 }

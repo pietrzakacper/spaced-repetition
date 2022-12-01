@@ -99,7 +99,7 @@ func findColumnPositions(extractColumns []string, columnLine string) (map[int]in
 
 func indexOf(elToFind string, arr []string) int {
 	for index, el := range arr {
-		if el == elToFind {
+		if strings.ToLower(el) == strings.ToLower(elToFind) {
 			return index
 		}
 	}
