@@ -7,16 +7,16 @@ import (
 	"strings"
 )
 
-func TextToLines(textChan <-chan string) <-chan string {
+func TextToLines(textChan <-chan []byte) <-chan string {
 	linesChan := make(chan string)
 
 	go func() {
-		line := make([]rune, 0)
+		line := make([]byte, 0)
 		for textChunk := range textChan {
 			for _, char := range textChunk {
 				if string(char) == "\n" {
 					linesChan <- string(line)
-					line = make([]rune, 0)
+					line = make([]byte, 0)
 					continue
 				}
 
@@ -62,6 +62,12 @@ func ParseCSVStream(textStream io.Reader, extractColumns []string) (<-chan []str
 	go func() {
 		for line := range linesChannel {
 			entry := ParseLine(line)
+
+			if len(entry) != len(extractColumns) {
+				fmt.Println("Skipping entry from line: ", line)
+				continue
+			}
+
 			onlyRequiredColsEntry := make([]string, len(extractColumns))
 
 			for entryIndex, properColIndex := range columnPositions {
@@ -107,13 +113,13 @@ func indexOf(elToFind string, arr []string) int {
 	return -1
 }
 
-func FileToChannel(file io.Reader) chan string {
-	buff := make([]byte, 100)
+func FileToChannel(file io.Reader) chan []byte {
 
-	textChannel := make(chan string)
+	textChannel := make(chan []byte)
 
 	go func() {
 		for {
+			buff := make([]byte, 100)
 			// read content to buffer
 			readTotal, err := file.Read(buff)
 			if err != nil {
@@ -122,7 +128,7 @@ func FileToChannel(file io.Reader) chan string {
 				}
 				break
 			}
-			fileContent := string(buff[:readTotal])
+			fileContent := buff[:readTotal]
 
 			textChannel <- fileContent
 		}

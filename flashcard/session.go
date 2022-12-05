@@ -69,6 +69,7 @@ func (m *MemorizingSession) GoToNext() {
 }
 
 func (m *MemorizingSession) HasEnded() bool {
+	// @TODO handle session that isn't initialized
 	return m.memorizedCount >= len(m.cardsToMemorize)
 }
 

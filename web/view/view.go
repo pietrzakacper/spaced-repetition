@@ -90,9 +90,9 @@ func (v *HttpView) RenderCardQuestion(card *flashcard.DTO, cardNumber int, total
 }
 
 var answerLabels = map[int]string{
-	0: "Complete Blackout",
+	0: "Blackout",
 	1: "Slipped my mind",
-	2: "Ah shit, I knew it!",
+	2: "Almost got it",
 	3: "Barely correct",
 	4: "I remembered correctly:)",
 	5: "Too easy!",

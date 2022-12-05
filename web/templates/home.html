@@ -32,8 +32,8 @@
               <div class="recent-cards-container">
               {{ range .Cards }}
                   <div class="small-card">
-                        <div class="small-card-front bg-{{ .Kind }}">{{ .Back }}</div>
-                        <div class="small-card-back bg-{{ .Kind }}">{{ .Front }}</div>
+                        <div class="small-card-front bg-{{ .Kind }}">{{ .Front }}</div>
+                        <div class="small-card-back bg-{{ .Kind }}">{{ .Back }}</div>
                   </div>
               {{ end }}
               </div> 

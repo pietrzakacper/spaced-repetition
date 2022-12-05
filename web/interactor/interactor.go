@@ -52,7 +52,12 @@ func (i HttpInteractor) Start(c controller.Controller) {
 
 		r.ParseMultipartForm(10 << 20)
 
-		file, _, _ := r.FormFile("fileToUpload")
+		file, _, err := r.FormFile("fileToUpload")
+
+		if err != nil {
+			i.view.GoToHome()
+			return
+		}
 
 		c.ImportCards(file)
 	})
