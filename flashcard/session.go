@@ -1,5 +1,11 @@
 package flashcard
 
+import (
+	"math/rand"
+
+	"golang.org/x/exp/slices"
+)
+
 type MemorizingSession struct {
 	memorizedCount  int
 	cardsToMemorize []*flashcard
@@ -16,24 +22,36 @@ const (
 var cardsInSession = 10
 
 func CreateSession(records []Record, sessionType SessionType) *MemorizingSession {
-	cardsToMemorize := make([]*flashcard, 0)
+	// cards that are valid (DueToReview or New depending on sessionType)
+	allValidCardsForSession := make([]*flashcard, 0)
 
 	for _, r := range records {
-		if len(cardsToMemorize) == cardsInSession {
-			break
-		}
-
 		card := r.ToCard()
 
 		card.answerSubmitted = false
 
 		if sessionType == Review && card.supermemo.IsDueToReview() {
-			cardsToMemorize = append(cardsToMemorize, card)
+			allValidCardsForSession = append(allValidCardsForSession, card)
 		}
 
 		if sessionType == LearnNew && card.supermemo.IsNew() {
-			cardsToMemorize = append(cardsToMemorize, card)
+			allValidCardsForSession = append(allValidCardsForSession, card)
 		}
+	}
+
+	// sort allValidCardsForSession randomly
+	slices.SortFunc(allValidCardsForSession, func(a, b *flashcard) bool {
+		return rand.Intn(10) > 5
+	})
+
+	cardsToMemorize := make([]*flashcard, 0)
+
+	for _, c := range allValidCardsForSession {
+		if len(cardsToMemorize) == cardsInSession {
+			break
+		}
+
+		cardsToMemorize = append(cardsToMemorize, c)
 	}
 
 	return &MemorizingSession{

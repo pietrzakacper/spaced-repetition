@@ -9,12 +9,10 @@ import (
 
 func main() {
 	var httpView = &view.HttpView{}
-	var csvPersistance = &persistance.BadgerPersistance{}
-
 	var i interactor.Interactor = interactor.CreateHttpInteractor(httpView)
 
 	var v controller.View = httpView
-	var p controller.Persistance = csvPersistance
+	var p controller.Persistance = &persistance.BadgerPersistance{}
 	var flashcardController = controller.CreateFlashcardsController(v, p)
 	var c controller.Controller = flashcardController
 
