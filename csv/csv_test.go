@@ -8,14 +8,14 @@ import (
 )
 
 func TestTextToLines(t *testing.T) {
-	textChan := make(chan string, 8)
+	textChan := make(chan []byte, 8)
 	linesChan := TextToLines(textChan)
 
-	textChan <- "a 1\nb 2\n"
-	textChan <- "c"
-	textChan <- " 3\n"
-	textChan <- "d "
-	textChan <- "4"
+	textChan <- []byte("a 1\nb 2\n")
+	textChan <- []byte("c")
+	textChan <- []byte(" 3\n")
+	textChan <- []byte("d ")
+	textChan <- []byte("4")
 	close(textChan)
 
 	lines := make([]string, 0, 4)

@@ -9,7 +9,7 @@ import (
 
 func main() {
 	var httpView = &view.HttpView{}
-	var csvPersistance = &persistance.CSVPersistance{}
+	var csvPersistance = &persistance.BadgerPersistance{}
 
 	var i interactor.Interactor = interactor.CreateHttpInteractor(httpView)
 
