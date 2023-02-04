@@ -47,16 +47,10 @@ func (v *HttpView) RenderHome(cards []flashcard.DTO, newCardsCount int, dueToRev
 
 	recentCards := make([]cardView, 0)
 
-	kind := byte(0)
-
 	for i := len(cards) - 1; i >= 0 && len(recentCards) < 5; i-- {
 		dto := cards[i]
-		for _, char := range dto.Id {
-			kind += byte(char)
-		}
-		kind := kind % 4
 
-		cardView := cardView{Front: dto.Front, Back: dto.Back, Kind: kind}
+		cardView := cardView{Front: dto.Front, Back: dto.Back, Kind: getCardKind(dto.Id)}
 
 		recentCards = append(recentCards, cardView)
 	}
@@ -137,17 +131,23 @@ func (v *HttpView) RenderCards(cards []flashcard.DTO) {
 
 	cardViews := make([]cardView, len(cards))
 
-	kind := byte(0)
-
 	for index, dto := range cards {
-		for _, char := range dto.Id {
-			kind += byte(char)
+		cardViews[index] = cardView{
+			Front: dto.Front, Back: dto.Back, Kind: getCardKind(dto.Id),
 		}
-
-		kind := kind % 4
-
-		cardViews[index] = cardView{Front: dto.Front, Back: dto.Back, Kind: kind}
 	}
 
 	template.Execute(v.w, CardsData{Cards: cardViews})
+}
+
+func getCardKind(cardId string) byte {
+	// integer between 0-3
+	kind := byte(0)
+
+	// compute short hash from id
+	for _, char := range cardId {
+		kind = (kind + byte(char)) % 4
+	}
+
+	return kind
 }
