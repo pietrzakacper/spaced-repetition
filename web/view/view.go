@@ -19,6 +19,11 @@ func (v *HttpView) GoToHome() {
 	v.w.WriteHeader(303)
 }
 
+func (v *HttpView) GoToCards() {
+	v.w.Header().Add("Location", "/cards")
+	v.w.WriteHeader(303)
+}
+
 func (v *HttpView) GoToQuest() {
 	v.w.Header().Add("Location", "/quest")
 	v.w.WriteHeader(303)

@@ -3,6 +3,7 @@ package persistance
 import (
 	"controller"
 	"encoding/json"
+	"errors"
 	"flashcard"
 	"log"
 	"os"
@@ -116,6 +117,9 @@ func (b *BadgerStore) Add(record *flashcard.Record) {
 
 func (b *BadgerStore) Update(record *flashcard.Record) {
 	b.setRecord(record.Id, record)
+}
+func (s *BadgerStore) Find(cardId string) (flashcard.Record, error) {
+	return flashcard.Record{}, errors.New("Not implemented")
 }
 
 func (b *BadgerStore) setRecord(id string, record *flashcard.Record) {

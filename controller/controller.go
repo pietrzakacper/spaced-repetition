@@ -15,12 +15,14 @@ type Controller interface {
 	CreateReviewSession()
 	SubmitAnswer(answer int)
 	ShowCards()
+	DeleteCard(cardId string)
 }
 
 type View interface {
 	GoToHome()
 	GoToAnswer()
 	GoToQuest()
+	GoToCards()
 	RenderHome(cards []flashcard.DTO, newCardsCount int, dueToReviewCount int)
 	RenderCardQuestion(card *flashcard.DTO, cardNumber int, totalCardsInSession int)
 	RenderCardAnswer(card *flashcard.DTO, cardNumber int, totalCardsInSession int, answerOptions []int)
@@ -35,4 +37,5 @@ type Store interface {
 	ReadAll() []flashcard.Record
 	Add(record *flashcard.Record)
 	Update(record *flashcard.Record)
+	Find(cardId string) (flashcard.Record, error)
 }

@@ -30,6 +30,7 @@ type Record struct {
 	NextReviewOffset int
 	RepetitionCount  int
 	EF               float64
+	Deleted          bool
 }
 
 func (dto *DTO) ToCard() *flashcard {

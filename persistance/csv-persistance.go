@@ -3,6 +3,7 @@ package persistance
 import (
 	"controller"
 	"csv"
+	"errors"
 	"flashcard"
 	"fmt"
 	"os"
@@ -49,6 +50,12 @@ func (s *CSVStore) ReadAll() []flashcard.Record {
 		nextReviewOffset, _ := strconv.ParseInt(parts[6], 10, 64)
 		ef, _ := strconv.ParseFloat(parts[7], 64)
 
+		deleted := false
+
+		if len(parts) >= 9 {
+			deleted, _ = strconv.ParseBool(parts[8])
+		}
+
 		record := flashcard.Record{
 			Id:               id,
 			Front:            front,
@@ -58,12 +65,50 @@ func (s *CSVStore) ReadAll() []flashcard.Record {
 			RepetitionCount:  int(repetitionCount),
 			NextReviewOffset: int(nextReviewOffset),
 			EF:               ef,
+			Deleted:          deleted,
 		}
 
 		records = append(records, record)
 	}
 
 	return records
+}
+
+func (s *CSVStore) Find(cardId string) (flashcard.Record, error) {
+	f, _ := os.Open(s.filepath)
+	defer f.Close()
+
+	stream := csv.TextToLines(csv.FileToChannel(f))
+
+	for line := range stream {
+		parts := strings.Split(line, ",")
+		id := parts[0]
+
+		if id == cardId {
+			front := parts[1]
+			back := parts[2]
+			creationDate, _ := time.Parse(daysPrecision, parts[3])
+			lastReviewDate, _ := time.Parse(daysPrecision, parts[4])
+			repetitionCount, _ := strconv.ParseInt(parts[5], 10, 64)
+			nextReviewOffset, _ := strconv.ParseInt(parts[6], 10, 64)
+			ef, _ := strconv.ParseFloat(parts[7], 64)
+
+			record := flashcard.Record{
+				Id:               id,
+				Front:            front,
+				Back:             back,
+				CreationDate:     creationDate,
+				LastReviewDate:   lastReviewDate,
+				RepetitionCount:  int(repetitionCount),
+				NextReviewOffset: int(nextReviewOffset),
+				EF:               ef,
+			}
+
+			return record, nil
+		}
+	}
+
+	return flashcard.Record{}, errors.New("No card found for id: " + cardId)
 }
 
 func (s *CSVStore) Add(record *flashcard.Record) {
@@ -82,6 +127,7 @@ func (s *CSVStore) Add(record *flashcard.Record) {
 		strconv.FormatInt(int64(record.RepetitionCount), 10),
 		strconv.FormatInt(int64(record.NextReviewOffset), 10),
 		strconv.FormatFloat(record.EF, 'e', 2, 64),
+		"false",
 	}
 
 	line := csv.MakeLine(entries)
@@ -116,6 +162,7 @@ func (s *CSVStore) Update(record *flashcard.Record) {
 				strconv.FormatInt(int64(record.RepetitionCount), 10),
 				strconv.FormatInt(int64(record.NextReviewOffset), 10),
 				strconv.FormatFloat(record.EF, 'e', -1, 64),
+				strconv.FormatBool(record.Deleted),
 			}
 		}
 

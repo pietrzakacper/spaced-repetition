@@ -21,8 +21,20 @@ func CreateFlashcardsController(view View, persistance Persistance) *FlashcardsC
 	}
 }
 
+func (c *FlashcardsController) getAllCards() []flashcard.Record {
+	notDeletedCards := make([]flashcard.Record, 0)
+
+	for _, card := range c.store.ReadAll() {
+		if card.Deleted == false {
+			notDeletedCards = append(notDeletedCards, card)
+		}
+	}
+
+	return notDeletedCards
+}
+
 func (c *FlashcardsController) ShowHome() {
-	records := c.store.ReadAll()
+	records := c.getAllCards()
 
 	flashcardDTOs := make([]flashcard.DTO, len(records))
 
@@ -76,7 +88,7 @@ func (c *FlashcardsController) ImportCards(csvStream io.Reader) {
 }
 
 func (c *FlashcardsController) CreateMemorizingSession() {
-	records := c.store.ReadAll()
+	records := c.getAllCards()
 
 	c.session = flashcard.CreateSession(records, flashcard.LearnNew)
 
@@ -84,7 +96,7 @@ func (c *FlashcardsController) CreateMemorizingSession() {
 }
 
 func (c *FlashcardsController) CreateReviewSession() {
-	records := c.store.ReadAll()
+	records := c.getAllCards()
 
 	c.session = flashcard.CreateSession(records, flashcard.Review)
 
@@ -134,7 +146,7 @@ func (c *FlashcardsController) SubmitAnswer(answer int) {
 }
 
 func (c *FlashcardsController) ShowCards() {
-	records := c.store.ReadAll()
+	records := c.getAllCards()
 
 	flashcardDTOs := make([]flashcard.DTO, len(records))
 
@@ -145,4 +157,21 @@ func (c *FlashcardsController) ShowCards() {
 	}
 
 	c.view.RenderCards(flashcardDTOs)
+}
+
+func (c *FlashcardsController) DeleteCard(cardId string) {
+	card, err := c.store.Find(cardId)
+
+	if err != nil {
+		fmt.Println(err)
+		// @TODO change it to go to all cards view
+		c.view.GoToCards()
+		return
+	}
+
+	card.Deleted = true
+
+	c.store.Update(&card)
+
+	c.view.GoToCards()
 }

@@ -111,6 +111,17 @@ func (i HttpInteractor) Start(c controller.Controller) {
 		c.ShowCards()
 	})
 
+	http.HandleFunc("/delete-card", func(w http.ResponseWriter, r *http.Request) {
+		// if r.Method != "POST" {
+		// 	return
+		// }
+		cardId := r.URL.Query().Get("id")
+
+		i.view.SetRequestContext(w)
+
+		c.DeleteCard(cardId)
+	})
+
 	port := os.Getenv("PORT")
 
 	if port == "" {
