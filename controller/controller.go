@@ -14,6 +14,7 @@ type Controller interface {
 	CreateMemorizingSession()
 	CreateReviewSession()
 	SubmitAnswer(answer int)
+	ShowCards()
 }
 
 type View interface {
@@ -23,6 +24,7 @@ type View interface {
 	RenderHome(cards []flashcard.DTO, newCardsCount int, dueToReviewCount int)
 	RenderCardQuestion(card *flashcard.DTO, cardNumber int, totalCardsInSession int)
 	RenderCardAnswer(card *flashcard.DTO, cardNumber int, totalCardsInSession int, answerOptions []int)
+	RenderCards(cards []flashcard.DTO)
 }
 
 type Persistance interface {

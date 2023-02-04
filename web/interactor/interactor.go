@@ -105,6 +105,12 @@ func (i HttpInteractor) Start(c controller.Controller) {
 		c.SubmitAnswer(int(answer))
 	})
 
+	http.HandleFunc("/cards", func(w http.ResponseWriter, r *http.Request) {
+		i.view.SetRequestContext(w)
+
+		c.ShowCards()
+	})
+
 	port := os.Getenv("PORT")
 
 	if port == "" {

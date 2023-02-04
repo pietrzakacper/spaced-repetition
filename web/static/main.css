@@ -195,6 +195,13 @@ header img {
   overflow: auto;
 }
 
+.all-cards-container {
+  display: flex;
+  width: 100%;
+  justify-content: space-evenly;
+  flex-wrap: wrap;
+}
+
 .small-card {
   margin: 1rem 1rem 1rem 0;
   height: 9rem;

@@ -127,3 +127,27 @@ func (v *HttpView) RenderCardAnswer(card *flashcard.DTO, cardNumber int, totalCa
 
 	template.Execute(v.w, data)
 }
+
+type CardsData struct {
+	Cards []cardView
+}
+
+func (v *HttpView) RenderCards(cards []flashcard.DTO) {
+	template := t.Must(t.ParseFiles("templates/cards.html"))
+
+	cardViews := make([]cardView, len(cards))
+
+	kind := byte(0)
+
+	for index, dto := range cards {
+		for _, char := range dto.Id {
+			kind += byte(char)
+		}
+
+		kind := kind % 4
+
+		cardViews[index] = cardView{Front: dto.Front, Back: dto.Back, Kind: kind}
+	}
+
+	template.Execute(v.w, CardsData{Cards: cardViews})
+}

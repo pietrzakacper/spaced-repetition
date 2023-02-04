@@ -132,3 +132,17 @@ func (c *FlashcardsController) SubmitAnswer(answer int) {
 
 	c.view.GoToQuest()
 }
+
+func (c *FlashcardsController) ShowCards() {
+	records := c.store.ReadAll()
+
+	flashcardDTOs := make([]flashcard.DTO, len(records))
+
+	for i, r := range records {
+		card := r.ToCard()
+
+		flashcardDTOs[i] = *card.ToDTO()
+	}
+
+	c.view.RenderCards(flashcardDTOs)
+}
