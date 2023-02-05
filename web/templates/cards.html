@@ -14,15 +14,43 @@
             <div class="all-cards-container">
               {{ range .Cards }}
               <div>
-              <div class="small-card">
-                <div class="small-card-front bg-{{ .Kind }}">{{ .Front }}</div>
-                <div class="small-card-back bg-{{ .Kind }}">{{ .Back }}</div>
-              </div>
-              <div class="edit-buttons-container">            
-                <form method="POST" action="/delete-card?id={{ .Id }}">
-                  <button class="edit-button"><img src="/static/delete.svg"></button>
-                </form>
-              </div>
+                <div class="small-card">
+                  <div class="small-card-front bg-{{ .Kind }}">
+                    <form action="/edit-card?id={{ .Id }}" method="POST" class="edit-card-container">
+                        <input
+                          class="edit-card-text-input"
+                          type="text"
+                          name="Front"
+                          value="{{ .Front }}"
+                          placeholder="Front..."
+                          autocomplete="off"
+                        />
+                        <input
+                          class="edit-card-text-input"
+                          type="text"
+                          name="Back"
+                          value="{{ .Back }}"
+                          placeholder="Back..."
+                          autocomplete="off"
+                        />
+                    </form>
+                  </div>
+                </div>
+                <div class="edit-buttons-container">
+                  <form
+                    method="POST"
+                    action="/edit-card?id={{ .Id }}&front=test"
+                  >
+                    <button class="edit-button">
+                      <img src="/static/edit.svg" />
+                    </button>
+                  </form>
+                  <form method="POST" action="/delete-card?id={{ .Id }}">
+                    <button class="edit-button">
+                      <img src="/static/delete.svg" />
+                    </button>
+                  </form>
+                </div>
               </div>
               {{ end }}
             </div>

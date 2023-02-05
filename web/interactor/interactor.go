@@ -126,13 +126,13 @@ func (i HttpInteractor) Start(c controller.Controller) {
 		if r.Method != "POST" {
 			return
 		}
-		cardId := r.URL.Query().Get("id")
-		front := r.URL.Query().Get("front")
-		back := r.URL.Query().Get("back")
-
 		i.view.SetRequestContext(w)
 
-		c.EditCard(cardId, front, back)
+		cardId := r.URL.Query().Get("id")
+
+		r.ParseForm()
+
+		c.EditCard(cardId, r.Form.Get("Front"), r.Form.Get("Back"))
 	})
 
 	port := os.Getenv("PORT")

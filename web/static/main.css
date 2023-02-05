@@ -450,3 +450,26 @@ h3 {
 .edit-button:hover {
   transform: translateY(-2px);
 }
+
+.edit-card-text-input {
+  height: 50px;
+  font-size: 16px;
+  width: 100%;
+  padding: 12px;
+  font-family: "Satoshi";
+  border-radius: var(--borderRadius);
+  color: var(--textColor);
+  background: var(--backgroundColor);
+  width: 256px;
+  border: 2px solid var(--buttonBorderColor);
+}
+
+.edit-card-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  margin-block-end: 0;
+}
