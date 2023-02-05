@@ -112,14 +112,27 @@ func (i HttpInteractor) Start(c controller.Controller) {
 	})
 
 	http.HandleFunc("/delete-card", func(w http.ResponseWriter, r *http.Request) {
-		// if r.Method != "POST" {
-		// 	return
-		// }
+		if r.Method != "POST" {
+			return
+		}
 		cardId := r.URL.Query().Get("id")
 
 		i.view.SetRequestContext(w)
 
 		c.DeleteCard(cardId)
+	})
+
+	http.HandleFunc("/edit-card", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != "POST" {
+			return
+		}
+		cardId := r.URL.Query().Get("id")
+		front := r.URL.Query().Get("front")
+		back := r.URL.Query().Get("back")
+
+		i.view.SetRequestContext(w)
+
+		c.EditCard(cardId, front, back)
 	})
 
 	port := os.Getenv("PORT")

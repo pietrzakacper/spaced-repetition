@@ -16,6 +16,7 @@ type Controller interface {
 	SubmitAnswer(answer int)
 	ShowCards()
 	DeleteCard(cardId string)
+	EditCard(cardId, front, back string)
 }
 
 type View interface {

@@ -174,3 +174,25 @@ func (c *FlashcardsController) DeleteCard(cardId string) {
 
 	c.view.GoToCards()
 }
+
+func (c *FlashcardsController) EditCard(cardId, front, back string) {
+	card, err := c.store.Find(cardId)
+
+	if err != nil {
+		fmt.Println(err)
+		c.view.GoToCards()
+		return
+	}
+
+	if len(front) > 0 {
+		card.Front = front
+	}
+
+	if len(back) > 0 {
+		card.Back = back
+	}
+
+	c.store.Update(&card)
+
+	c.view.GoToCards()
+}
