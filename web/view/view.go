@@ -42,6 +42,8 @@ type HomeData struct {
 }
 
 type cardView struct {
+	// @TODO set it in all places
+	Id    string
 	Front string
 	Back  string
 	Kind  byte
@@ -138,7 +140,7 @@ func (v *HttpView) RenderCards(cards []flashcard.DTO) {
 
 	for index, dto := range cards {
 		cardViews[index] = cardView{
-			Front: dto.Front, Back: dto.Back, Kind: getCardKind(dto.Id),
+			Id: dto.Id, Front: dto.Front, Back: dto.Back, Kind: getCardKind(dto.Id),
 		}
 	}
 
