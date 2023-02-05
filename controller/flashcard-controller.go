@@ -164,7 +164,6 @@ func (c *FlashcardsController) DeleteCard(cardId string) {
 
 	if err != nil {
 		fmt.Println(err)
-		// @TODO change it to go to all cards view
 		c.view.GoToCards()
 		return
 	}
