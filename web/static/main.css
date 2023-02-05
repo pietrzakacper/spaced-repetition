@@ -432,3 +432,21 @@ h3 {
   text-align: center;
   padding: 10px;
 }
+
+.edit-buttons-container {
+  display: flex;
+  justify-content: flex-end;
+  padding-right: 16px;
+}
+
+.edit-button {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+
+  transition: transform linear 100ms;
+}
+
+.edit-button:hover {
+  transform: translateY(-2px);
+}

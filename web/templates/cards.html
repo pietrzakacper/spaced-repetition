@@ -18,9 +18,11 @@
                 <div class="small-card-front bg-{{ .Kind }}">{{ .Front }}</div>
                 <div class="small-card-back bg-{{ .Kind }}">{{ .Back }}</div>
               </div>
-              <form method="POST" action="/delete-card?id={{ .Id }}">
-                <button>Delete</button>
-              </form>
+              <div class="edit-buttons-container">            
+                <form method="POST" action="/delete-card?id={{ .Id }}">
+                  <button class="edit-button"><img src="/static/delete.svg"></button>
+                </form>
+              </div>
               </div>
               {{ end }}
             </div>
