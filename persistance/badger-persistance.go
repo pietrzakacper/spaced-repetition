@@ -3,7 +3,6 @@ package persistance
 import (
 	"controller"
 	"encoding/json"
-	"errors"
 	"flashcard"
 	"log"
 	"os"
@@ -31,6 +30,7 @@ type FlashcardSerialized struct {
 	RepetitionCount  int
 	NextReviewOffset int
 	EF               float64
+	Deleted          bool
 }
 
 func (f *FlashcardSerialized) toRecord() flashcard.Record {
@@ -46,6 +46,7 @@ func (f *FlashcardSerialized) toRecord() flashcard.Record {
 		RepetitionCount:  f.RepetitionCount,
 		NextReviewOffset: f.NextReviewOffset,
 		EF:               f.EF,
+		Deleted:          f.Deleted,
 	}
 }
 
@@ -119,7 +120,38 @@ func (b *BadgerStore) Update(record *flashcard.Record) {
 	b.setRecord(record.Id, record)
 }
 func (s *BadgerStore) Find(cardId string) (flashcard.Record, error) {
-	return flashcard.Record{}, errors.New("Not implemented")
+	f := &FlashcardSerialized{}
+
+	err := s.db.View(func(txn *badger.Txn) error {
+		record, err := txn.Get([]byte(cardId))
+
+		if err != nil {
+			return err
+		}
+
+		err = record.Value(
+			func(v []byte) error {
+				err := json.Unmarshal(v, f)
+
+				if err != nil {
+					return err
+				}
+
+				return nil
+			})
+
+		if err != nil {
+			return err
+		}
+
+		return nil
+	})
+
+	if err != nil {
+		return f.toRecord(), err
+	}
+
+	return f.toRecord(), nil
 }
 
 func (b *BadgerStore) setRecord(id string, record *flashcard.Record) {
@@ -132,6 +164,7 @@ func (b *BadgerStore) setRecord(id string, record *flashcard.Record) {
 		RepetitionCount:  record.RepetitionCount,
 		NextReviewOffset: record.NextReviewOffset,
 		EF:               record.EF,
+		Deleted:          record.Deleted,
 	}
 
 	flashcardSerializedStr, err := json.Marshal(flashcardSerialized)
