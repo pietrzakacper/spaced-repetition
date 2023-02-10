@@ -159,20 +159,19 @@ func (c *FlashcardsController) ShowCards() {
 	c.view.RenderCards(flashcardDTOs)
 }
 
-func (c *FlashcardsController) DeleteCard(cardId string) {
+func (c *FlashcardsController) DeleteCard(cardId string) error {
 	card, err := c.store.Find(cardId)
 
 	if err != nil {
 		fmt.Println(err)
-		c.view.GoToCards()
-		return
+		return err
 	}
 
 	card.Deleted = true
 
 	c.store.Update(&card)
 
-	c.view.GoToCards()
+	return nil
 }
 
 func (c *FlashcardsController) EditCard(cardId, front, back string) {

@@ -13,7 +13,7 @@
           <div class="cards">
             <div class="all-cards-container">
               {{ range .Cards }}
-              <div id="small-card-container">
+              <div id="small-card-container" cardId="{{ .Id }}">
                 <div class="small-card" id="small-card">
                   <div class="small-card-front bg-{{ .Kind }}">
                     {{ .Front }}
@@ -51,15 +51,10 @@
                   <button class="edit-button" id="edit-button">
                     <img src="/static/edit.svg" />
                   </button>
-                  <form
-                    method="POST"
-                    action="/delete-card?id={{ .Id }}"
-                    id="delete-form"
-                  >
-                    <button class="edit-button">
-                      <img src="/static/delete.svg" />
-                    </button>
-                  </form>
+
+                  <button class="edit-button" id="delete-button">
+                    <img src="/static/delete.svg" />
+                  </button>
                 </div>
                 <div
                   class="edit-buttons-container hidden"
@@ -105,6 +100,19 @@
               .addEventListener("click", () => {
                 $card.querySelector("form").submit();
               });
+          });
+
+        $card
+          .querySelector("#delete-button")
+          .addEventListener("click", async () => {
+            const cardId = $card.getAttribute("cardId");
+            const res = await fetch(`/delete-card?id=${cardId}`, {
+              method: "POST",
+            });
+
+            if (res.status === 200) {
+              $card.parentElement.removeChild($card);
+            }
           });
       });
     </script>

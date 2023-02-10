@@ -119,7 +119,12 @@ func (i HttpInteractor) Start(c controller.Controller) {
 
 		i.view.SetRequestContext(w)
 
-		c.DeleteCard(cardId)
+		err := c.DeleteCard(cardId)
+
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
 	})
 
 	http.HandleFunc("/edit-card", func(w http.ResponseWriter, r *http.Request) {

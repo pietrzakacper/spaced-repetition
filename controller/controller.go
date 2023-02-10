@@ -15,7 +15,7 @@ type Controller interface {
 	CreateReviewSession()
 	SubmitAnswer(answer int)
 	ShowCards()
-	DeleteCard(cardId string)
+	DeleteCard(cardId string) error
 	EditCard(cardId, front, back string)
 }
 
