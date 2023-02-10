@@ -436,7 +436,10 @@ h3 {
 .edit-buttons-container {
   display: flex;
   justify-content: flex-end;
+  align-items: flex-start;
   padding-right: 16px;
+  height: 50px;
+  box-sizing: border-box;
 }
 
 .edit-button {
@@ -472,4 +475,8 @@ h3 {
   align-items: center;
   justify-content: space-between;
   margin-block-end: 0;
+}
+
+.hidden {
+  display: none;
 }
