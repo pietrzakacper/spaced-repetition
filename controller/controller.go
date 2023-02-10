@@ -16,7 +16,7 @@ type Controller interface {
 	SubmitAnswer(answer int)
 	ShowCards()
 	DeleteCard(cardId string) error
-	EditCard(cardId, front, back string)
+	EditCard(cardId, front, back string) error
 }
 
 type View interface {

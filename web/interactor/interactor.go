@@ -2,6 +2,7 @@ package interactor
 
 import (
 	"controller"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"os"
@@ -19,6 +20,11 @@ type HttpInteractor struct {
 
 func CreateHttpInteractor(view *view.HttpView) HttpInteractor {
 	return HttpInteractor{view: view}
+}
+
+type EditCardPayload struct {
+	Front string
+	Back  string
 }
 
 func (i HttpInteractor) Start(c controller.Controller) {
@@ -135,9 +141,20 @@ func (i HttpInteractor) Start(c controller.Controller) {
 
 		cardId := r.URL.Query().Get("id")
 
-		r.ParseForm()
+		payload := EditCardPayload{}
+		err := json.NewDecoder(r.Body).Decode(&payload)
 
-		c.EditCard(cardId, r.Form.Get("Front"), r.Form.Get("Back"))
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+
+		err = c.EditCard(cardId, payload.Front, payload.Back)
+
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
 	})
 
 	port := os.Getenv("PORT")

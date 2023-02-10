@@ -15,19 +15,22 @@
               {{ range .Cards }}
               <div id="small-card-container" cardId="{{ .Id }}">
                 <div class="small-card" id="small-card">
-                  <div class="small-card-front bg-{{ .Kind }}">
+                  <div
+                    class="small-card-front bg-{{ .Kind }}"
+                    id="small-card-front"
+                  >
                     {{ .Front }}
                   </div>
-                  <div class="small-card-back bg-{{ .Kind }}">{{ .Back }}</div>
+                  <div
+                    class="small-card-back bg-{{ .Kind }}"
+                    id="small-card-back"
+                  >
+                    {{ .Back }}
+                  </div>
                 </div>
                 <div class="small-card hidden" id="small-card-edit-form">
                   <div class="small-card-front bg-{{ .Kind }}">
-                    <form
-                      class="edit-card-container"
-                      action="/edit-card?id={{ .Id }}"
-                      method="POST"
-                      id="edit-form"
-                    >
+                    <div class="edit-card-container">
                       <input
                         class="edit-card-text-input"
                         type="text"
@@ -44,7 +47,7 @@
                         placeholder="Back..."
                         autocomplete="off"
                       />
-                    </form>
+                    </div>
                   </div>
                 </div>
                 <div class="edit-buttons-container" id="edit-buttons-container">
@@ -79,33 +82,72 @@
       const $cards = document.querySelectorAll("#small-card-container");
 
       Array.from($cards).forEach(($card) => {
+        const cardId = $card.getAttribute("cardId");
+
+        const showEditForm = () => {
+          $card.querySelector("#small-card").classList.add("hidden");
+          $card
+            .querySelector("#edit-buttons-container")
+            .classList.add("hidden");
+
+          $card
+            .querySelector("#edit-actions-container")
+            .classList.remove("hidden");
+          $card
+            .querySelector("#small-card-edit-form")
+            .classList.remove("hidden");
+        };
+
+        const hideEditForm = () => {
+          $card.querySelector("#small-card").classList.remove("hidden");
+          $card
+            .querySelector("#edit-buttons-container")
+            .classList.remove("hidden");
+
+          $card
+            .querySelector("#edit-actions-container")
+            .classList.add("hidden");
+          $card.querySelector("#small-card-edit-form").classList.add("hidden");
+        };
+
         $card
           .querySelector("#edit-button")
-          .addEventListener("click", (event) => {
-            event.preventDefault();
-            $card.querySelector("#small-card").classList.add("hidden");
-            $card
-              .querySelector("#edit-buttons-container")
-              .classList.add("hidden");
+          .addEventListener("click", showEditForm);
 
-            $card
-              .querySelector("#edit-actions-container")
-              .classList.remove("hidden");
-            $card
-              .querySelector("#small-card-edit-form")
-              .classList.remove("hidden");
+        $card
+          .querySelector("#cancel-button")
+          .addEventListener("click", hideEditForm);
 
-            $card
-              .querySelector("#approve-button")
-              .addEventListener("click", () => {
-                $card.querySelector("form").submit();
-              });
+        $card
+          .querySelector("#approve-button")
+          .addEventListener("click", async () => {
+            const $frontInput = $card.querySelector("input[name=Front]");
+            const $backInput = $card.querySelector("input[name=Back]");
+
+            const res = await fetch(`/edit-card?id=${cardId}`, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                Front: $frontInput.value,
+                Back: $backInput.value,
+              }),
+            });
+
+            const $smallCardFront = $card.querySelector("#small-card-front");
+            const $smallCardBack = $card.querySelector("#small-card-back");
+
+            if (res.status === 200) {
+              $smallCardFront.innerText = $frontInput.value;
+              $smallCardBack.innerText = $backInput.value;
+              hideEditForm();
+            }
           });
 
         $card
           .querySelector("#delete-button")
           .addEventListener("click", async () => {
-            const cardId = $card.getAttribute("cardId");
             const res = await fetch(`/delete-card?id=${cardId}`, {
               method: "POST",
             });
