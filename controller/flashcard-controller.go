@@ -14,11 +14,8 @@ type FlashcardsController struct {
 	session *flashcard.MemorizingSession
 }
 
-func CreateFlashcardsController(view View, persistance Persistance) *FlashcardsController {
-	return &FlashcardsController{
-		view:  view,
-		store: persistance.Create("db"),
-	}
+func CreateFlashcardsController(view View, store Store) *FlashcardsController {
+	return &FlashcardsController{view, store, nil}
 }
 
 func (c *FlashcardsController) getAllCards() []flashcard.Record {
@@ -153,7 +150,8 @@ func (c *FlashcardsController) ShowCards() {
 	for i, r := range records {
 		card := r.ToCard()
 
-		flashcardDTOs[i] = *card.ToDTO()
+		// add cards in reversed order (from Newest to Oldest)
+		flashcardDTOs[len(records)-1-i] = *card.ToDTO()
 	}
 
 	c.view.RenderCards(flashcardDTOs)

@@ -6,4 +6,5 @@ use (
 	./flashcard
 	./web
 	./persistance
+	./user
 )

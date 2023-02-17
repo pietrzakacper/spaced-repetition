@@ -1,20 +1,16 @@
 package main
 
 import (
-	"controller"
 	"persistance"
+	"user"
 	"web/interactor"
 	"web/view"
 )
 
 func main() {
 	var httpView = &view.HttpView{}
-	var i interactor.Interactor = interactor.CreateHttpInteractor(httpView)
+	var userSessionFactory = &user.UserSessionFactory{View: httpView, Persistance: &persistance.CSVPersistance{}}
+	var i interactor.Interactor = interactor.CreateHttpInteractor(httpView, userSessionFactory)
 
-	var v controller.View = httpView
-	var p controller.Persistance = &persistance.CSVPersistance{}
-	var flashcardController = controller.CreateFlashcardsController(v, p)
-	var c controller.Controller = flashcardController
-
-	i.Start(c)
+	i.Start()
 }

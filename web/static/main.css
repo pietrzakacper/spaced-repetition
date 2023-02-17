@@ -198,7 +198,7 @@ header img {
 .all-cards-container {
   display: flex;
   width: 100%;
-  justify-content: space-evenly;
+  justify-content: space-between;
   flex-wrap: wrap;
 }
 
@@ -479,4 +479,8 @@ h3 {
 
 .hidden {
   display: none;
+}
+
+.cards {
+  margin-top: 2rem;
 }
