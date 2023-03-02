@@ -11,12 +11,17 @@
     <div class="main-container">
       <div class="main-content">
         <header>
-          <div class="logo">Spaced Repetition</div>
+          <a href="/" class="logo">Spaced Repetition</a>
         </header>
         <main class="quest-main">
+          <div class="cards-nav">
+            <a href="/"><img src="/static/back.svg" /></a>
+          </div>
           <div class="quest-content">
             <div class="card-top">
-              <div class="card-number-indicator">{{ .CardNumber }} / {{ .TotalCardsInSession }} </div>
+              <div class="card-number-indicator">
+                {{ .CardNumber }} / {{ .TotalCardsInSession }}
+              </div>
 
               <div class="card-container">
                 <div class="card">
@@ -32,8 +37,7 @@
             </div>
           </div>
         </main>
-        </div>
       </div>
+    </div>
   </body>
 </html>
-

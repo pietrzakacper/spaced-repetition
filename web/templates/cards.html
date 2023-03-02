@@ -7,9 +7,12 @@
     <div class="main-container">
       <div class="main-content">
         <header>
-          <div class="logo">Spaced Repetition</div>
+          <a href="/" class="logo">Spaced Repetition</a>
         </header>
         <main>
+          <div class="cards-nav">
+            <a href="/"><img src="/static/back.svg" /></a>
+          </div>
           <div class="cards">
             <div class="all-cards-container">
               {{ range .Cards }}

@@ -11,12 +11,17 @@
     <div class="main-container">
       <div class="main-content">
         <header>
-          <div class="logo">Spaced Repetition</div>
+          <a href="/" class="logo">Spaced Repetition</a>
         </header>
         <main class="quest-main">
+          <div class="cards-nav">
+            <a href="/"><img src="/static/back.svg" /></a>
+          </div>
           <div class="quest-content">
             <div class="card-top">
-              <div class="card-number-indicator">{{ .CardNumber }} / {{ .TotalCardsInSession }} </div>
+              <div class="card-number-indicator">
+                {{ .CardNumber }} / {{ .TotalCardsInSession }}
+              </div>
 
               <div class="card-container">
                 <div class="card">
@@ -26,20 +31,27 @@
             </div>
 
             <div class="answer-form-container">
-                <label>How's your memory?</label><br/>
-                <div class="answer-buttons-container">
-                  {{ range .Answers }}
-                    <form action="/submitAnswer" method="POST">
-                        <input type="hidden" value="{{ .Value }}" name="answerFeedback"/>
-                        <input class="button answer-{{ .Value }} button-color-dark" type="submit" value="{{ .Label }}" />
-                    </form>
-                  {{ end }}
-                </div>
+              <label>How's your memory?</label><br />
+              <div class="answer-buttons-container">
+                {{ range .Answers }}
+                <form action="/submitAnswer" method="POST">
+                  <input
+                    type="hidden"
+                    value="{{ .Value }}"
+                    name="answerFeedback"
+                  />
+                  <input
+                    class="button answer-{{ .Value }} button-color-dark"
+                    type="submit"
+                    value="{{ .Label }}"
+                  />
+                </form>
+                {{ end }}
+              </div>
             </div>
           </div>
         </main>
-        </div>
       </div>
+    </div>
   </body>
 </html>
-

@@ -431,6 +431,7 @@ h3 {
   width: 180px;
   text-align: center;
   padding: 10px;
+  text-decoration: none;
 }
 
 .edit-buttons-container {
@@ -482,5 +483,30 @@ h3 {
 }
 
 .cards {
+  margin-top: 1rem;
+}
+
+.cards-header {
+  display: flex;
+  align-items: center;
+}
+
+.cards-header-main {
+  margin: 0;
+}
+
+.show-all-cards-btn {
+  margin-left: 1rem;
+  text-decoration: underline;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  color: black;
+}
+
+.cards-nav {
   margin-top: 2rem;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
 }
