@@ -22,9 +22,13 @@ type CSVStore struct {
 	filepath string
 }
 
-func (p *CSVPersistance) Create(name string) controller.Store {
+func (p *CSVPersistance) Create(name string, userId string) controller.Store {
 	cwd, _ := os.Getwd()
-	filepath := filepath.Join(cwd, name+".csv")
+	filepath := filepath.Join(cwd, name+"_"+userId+".csv")
+
+	if _, err := os.Stat(filepath); err != nil {
+		os.Create(filepath)
+	}
 
 	return &CSVStore{filepath}
 }

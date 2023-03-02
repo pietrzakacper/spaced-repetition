@@ -50,7 +50,7 @@ func (f *FlashcardSerialized) toRecord() flashcard.Record {
 	}
 }
 
-func (p *BadgerPersistance) Create(name string) controller.Store {
+func (p *BadgerPersistance) Create(name string, userId string) controller.Store {
 	cwd, _ := os.Getwd()
 
 	var opts badger.Options

@@ -31,7 +31,7 @@ type View interface {
 }
 
 type Persistance interface {
-	Create(name string) Store
+	Create(name string, userId string) Store
 }
 
 type Store interface {

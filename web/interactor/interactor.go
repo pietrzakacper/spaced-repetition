@@ -26,6 +26,7 @@ type HttpInteractor struct {
 func CreateHttpInteractor(view *view.HttpView, sessionFactory *user.UserSessionFactory) HttpInteractor {
 	return HttpInteractor{
 		view,
+		// @TODO create a view per session
 		sessionFactory,
 		map[string]*controller.FlashcardsController{},
 	}
@@ -38,7 +39,15 @@ type EditCardPayload struct {
 
 // @TODO think about making a server middleware
 func (i HttpInteractor) authenticateUser(w http.ResponseWriter, r *http.Request) (*controller.FlashcardsController, error) {
-	authToken := r.Header.Get("Cookie")
+	cookies := r.Cookies()
+
+	cookieMap := make(map[string]string, 1)
+
+	for _, str := range cookies {
+		cookieMap[str.Name] = str.Value
+	}
+
+	authToken := cookieMap["sessionToken"]
 
 	// @TODO investigate double call
 	fmt.Printf("TOKEN: %v\n", authToken)

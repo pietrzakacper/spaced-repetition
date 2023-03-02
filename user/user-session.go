@@ -8,7 +8,7 @@ type UserSessionFactory struct {
 }
 
 func (u *UserSessionFactory) Create(userId string) *controller.FlashcardsController {
-	store := u.Persistance.Create("db")
+	store := u.Persistance.Create("db", userId)
 	// @TODO learn why we cannot return a pointer here
 	return controller.CreateFlashcardsController(u.View, store)
 }
