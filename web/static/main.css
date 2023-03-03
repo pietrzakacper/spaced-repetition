@@ -510,3 +510,31 @@ h3 {
   justify-content: flex-start;
   align-items: center;
 }
+
+.login-main-container {
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.login-main-content {
+  height: 120;
+  width: 300px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-around;
+  padding: 50px;
+  border: 4px dashed #511660;
+}
+
+.login-header {
+  margin: none;
+}
+
+.login-logo {
+  border: none;
+  margin: 0;
+}

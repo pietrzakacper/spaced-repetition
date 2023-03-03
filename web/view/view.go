@@ -8,10 +8,16 @@ import (
 
 type HttpView struct {
 	w http.ResponseWriter
+	u UserContext
 }
 
-func (v *HttpView) SetRequestContext(w http.ResponseWriter) {
+type UserContext struct {
+	Email string
+}
+
+func (v *HttpView) SetRequestContext(w http.ResponseWriter, u UserContext) {
 	v.w = w
+	v.u = u
 }
 
 func (v *HttpView) GoToHome() {
@@ -157,4 +163,10 @@ func getCardKind(cardId string) byte {
 	}
 
 	return kind
+}
+
+func (v *HttpView) RenderLogin() {
+	template := t.Must(t.ParseFiles("templates/login.html"))
+
+	template.Execute(v.w, nil)
 }

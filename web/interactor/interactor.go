@@ -10,6 +10,8 @@ import (
 	"strconv"
 	"user"
 	"web/view"
+
+	"google.golang.org/api/oauth2/v1"
 )
 
 type Interactor interface {
@@ -37,8 +39,20 @@ type EditCardPayload struct {
 	Back  string
 }
 
+// @TODO do that once
+func verifyIdToken(idToken string) (*oauth2.Tokeninfo, error) {
+	oauth2Service, err := oauth2.New(http.DefaultClient)
+	tokenInfoCall := oauth2Service.Tokeninfo()
+	tokenInfoCall.IdToken(idToken)
+	tokenInfo, err := tokenInfoCall.Do()
+	if err != nil {
+		return nil, err
+	}
+	return tokenInfo, nil
+}
+
 // @TODO think about making a server middleware
-func (i HttpInteractor) authenticateUser(w http.ResponseWriter, r *http.Request) (*controller.FlashcardsController, error) {
+func (i HttpInteractor) authenticateUser(w http.ResponseWriter, r *http.Request, keepLocationOnAuthFail ...bool) (*controller.FlashcardsController, error) {
 	cookies := r.Cookies()
 
 	cookieMap := make(map[string]string, 1)
@@ -48,56 +62,76 @@ func (i HttpInteractor) authenticateUser(w http.ResponseWriter, r *http.Request)
 	}
 
 	authToken := cookieMap["sessionToken"]
+	w.Header().Add("Referrer-Policy", "no-referrer-when-downgrade")
 
 	// @TODO investigate double call
-	fmt.Printf("TOKEN: %v\n", authToken)
-	// @TODO authenticate the user
-
 	if authToken == "" {
-		w.WriteHeader(401)
-		// @TODO redirect to login
+		fmt.Printf("/login error: No sessionToken")
+
+		if len(keepLocationOnAuthFail) == 0 || !keepLocationOnAuthFail[0] {
+			w.Header().Add("Location", "/")
+			w.WriteHeader(303)
+		}
+
 		return nil, errors.New("Unauthorized")
 	}
 
-	c := i.sessions[authToken]
+	tokenInfo, err := verifyIdToken(authToken)
+
+	if err != nil {
+		fmt.Printf("/login error: %v\n", err)
+
+		if len(keepLocationOnAuthFail) == 0 || !keepLocationOnAuthFail[0] {
+			w.Header().Add("Location", "/")
+			w.WriteHeader(303)
+		}
+
+		return nil, errors.New("Unauthorized")
+	}
+
+	i.view.SetRequestContext(w, view.UserContext{Email: tokenInfo.Email})
+
+	c := i.sessions[tokenInfo.UserId]
 
 	if c == nil {
-		c = i.sessionFactory.Create(authToken)
-		i.sessions[authToken] = c
+		c = i.sessionFactory.Create(tokenInfo.UserId)
+		i.sessions[tokenInfo.UserId] = c
 	}
 
 	return c, nil
 }
 
 func (i HttpInteractor) Start() {
+	// @TODO invalidate cache on deployment
 	fs := http.FileServer(http.Dir("./static"))
 	http.Handle("/static/", http.StripPrefix("/static", fs))
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		i.view.SetRequestContext(w)
-
-		if c, err := i.authenticateUser(w, r); err == nil {
+		if c, err := i.authenticateUser(w, r, true); err == nil {
+			// user logged in
 			c.ShowHome()
-		}
-	})
-
-	http.HandleFunc("/login", func(w http.ResponseWriter, r *http.Request) {
-		i.view.SetRequestContext(w)
-
-		if r.Method != "POST" {
 			return
 		}
 
-		if c, err := i.authenticateUser(w, r); err == nil {
-			r.ParseForm()
+		// user logged out
+		i.view.SetRequestContext(w, view.UserContext{})
+		i.view.RenderLogin()
+	})
 
-			c.AddCard(r.Form.Get("Front"), r.Form.Get("Back"))
+	http.HandleFunc("/login", func(w http.ResponseWriter, r *http.Request) {
+		r.ParseForm()
+		token := r.Form.Get("credential")
+		_, err := verifyIdToken(token)
+
+		if err == nil {
+			w.Header().Add("Set-Cookie", "sessionToken="+token)
 		}
+
+		w.Header().Add("Location", "/")
+		w.WriteHeader(303)
 	})
 
 	http.HandleFunc("/add", func(w http.ResponseWriter, r *http.Request) {
-		i.view.SetRequestContext(w)
-
 		if r.Method != "POST" {
 			return
 		}
@@ -111,8 +145,6 @@ func (i HttpInteractor) Start() {
 	})
 
 	http.HandleFunc("/import", func(w http.ResponseWriter, r *http.Request) {
-		i.view.SetRequestContext(w)
-
 		if r.Method != "POST" {
 			return
 		}
@@ -132,8 +164,6 @@ func (i HttpInteractor) Start() {
 	})
 
 	http.HandleFunc("/learnNew", func(w http.ResponseWriter, r *http.Request) {
-		i.view.SetRequestContext(w)
-
 		if r.Method != "POST" {
 			return
 		}
@@ -144,8 +174,6 @@ func (i HttpInteractor) Start() {
 	})
 
 	http.HandleFunc("/review", func(w http.ResponseWriter, r *http.Request) {
-		i.view.SetRequestContext(w)
-
 		if r.Method != "POST" {
 			return
 		}
@@ -156,24 +184,18 @@ func (i HttpInteractor) Start() {
 	})
 
 	http.HandleFunc("/quest", func(w http.ResponseWriter, r *http.Request) {
-		i.view.SetRequestContext(w)
-
 		if c, err := i.authenticateUser(w, r); err == nil {
 			c.ShowQuest()
 		}
 	})
 
 	http.HandleFunc("/answer", func(w http.ResponseWriter, r *http.Request) {
-		i.view.SetRequestContext(w)
-
 		if c, err := i.authenticateUser(w, r); err == nil {
 			c.ShowAnswer()
 		}
 	})
 
 	http.HandleFunc("/submitAnswer", func(w http.ResponseWriter, r *http.Request) {
-		i.view.SetRequestContext(w)
-
 		if c, err := i.authenticateUser(w, r); err == nil {
 			r.ParseForm()
 			answerStr := r.Form.Get("answerFeedback")
@@ -185,8 +207,6 @@ func (i HttpInteractor) Start() {
 	})
 
 	http.HandleFunc("/cards", func(w http.ResponseWriter, r *http.Request) {
-		i.view.SetRequestContext(w)
-
 		if c, err := i.authenticateUser(w, r); err == nil {
 			c.ShowCards()
 		}
@@ -199,8 +219,6 @@ func (i HttpInteractor) Start() {
 
 		if c, err := i.authenticateUser(w, r); err == nil {
 			cardId := r.URL.Query().Get("id")
-
-			i.view.SetRequestContext(w)
 
 			err := c.DeleteCard(cardId)
 
@@ -215,7 +233,6 @@ func (i HttpInteractor) Start() {
 		if r.Method != "POST" {
 			return
 		}
-		i.view.SetRequestContext(w)
 
 		if c, err := i.authenticateUser(w, r); err == nil {
 			cardId := r.URL.Query().Get("id")
