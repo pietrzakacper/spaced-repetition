@@ -555,3 +555,9 @@ h3 {
   animation-iteration-count:infinite;
   animation-direction:alternate;
 }
+
+input:disabled {
+  opacity: 0.4;
+  cursor: default;
+  border: none;
+}

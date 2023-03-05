@@ -25,7 +25,6 @@ type HttpInteractor struct {
 
 func CreateHttpInteractor(sessionFactory *user.UserSessionFactory) HttpInteractor {
 	return HttpInteractor{
-		// @TODO create a view per session
 		sessionFactory,
 		map[string]*user.UserSession{},
 	}

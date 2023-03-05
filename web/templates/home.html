@@ -15,17 +15,23 @@
               <form action="/review" method="POST">
                 <div class="memorize-column">
                   <span><b>Cards to review</b>: {{ .DueToReviewCount }}</span>
-                  <input class="button" type="submit" value="Review" />
+                  <input
+                    {{if eq .DueToReviewCount 0}}disabled{{end}}
+                    class="button"
+                    type="submit"
+                    value="Review"
+                   />
                 </div>
               </form>
               <form action="/learnNew" method="POST">
                 <div class="memorize-column">
                   <span><b>New cards</b>: {{ .NewCardsCount }}</span>
-                  {{ if and (ne .AllCardsCount 0) (eq .AllCardsCount .NewCardsCount) }}
-                    <input class="button secondary glow-animation" type="submit" value="Memorize" />
-                  {{ else }}
-                    <input class="button secondary" type="submit" value="Memorize" />
-                  {{end}}
+                    <input
+                      {{if eq .NewCardsCount 0}}disabled{{end}}
+                      class="button secondary {{ if and (ne .AllCardsCount 0) (eq .AllCardsCount .NewCardsCount) }}glow-animation{{end}}"
+                      type="submit"
+                      value="Memorize"
+                    />
                 </div>
               </form>
             </section>
