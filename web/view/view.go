@@ -81,27 +81,29 @@ type QuestData struct {
 	CardNumber          int
 	TotalCardsInSession int
 	Front               string
+	ExtraRound          bool
 }
 
-func (v *HttpView) RenderCardQuestion(card *flashcard.DTO, cardNumber int, totalCardsInSession int) {
+func (v *HttpView) RenderCardQuestion(card *flashcard.DTO, cardNumber int, totalCardsInSession int, extraRound bool) {
 	template := t.Must(t.ParseFiles("templates/quest.html"))
 
 	data := QuestData{
 		CardNumber:          cardNumber,
 		TotalCardsInSession: totalCardsInSession,
 		Front:               card.Front,
+		ExtraRound:          extraRound,
 	}
 
 	template.Execute(v.w, data)
 }
 
 var answerLabels = map[int]string{
-	0: "Blackout",
-	1: "Slipped my mind",
-	2: "Almost got it",
-	3: "Barely correct",
-	4: "I remembered correctly:)",
-	5: "Too easy!",
+	0: "blackout",
+	1: "slipped my mind",
+	2: "almost got it",
+	3: "barely correct",
+	4: "i remembered correctly:)",
+	5: "too easy!",
 }
 
 type Answer struct {

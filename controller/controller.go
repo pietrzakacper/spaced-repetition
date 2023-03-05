@@ -25,7 +25,7 @@ type View interface {
 	GoToQuest()
 	GoToCards()
 	RenderHome(cards []flashcard.DTO, newCardsCount int, dueToReviewCount int)
-	RenderCardQuestion(card *flashcard.DTO, cardNumber int, totalCardsInSession int)
+	RenderCardQuestion(card *flashcard.DTO, cardNumber int, totalCardsInSession int, extraRound bool)
 	RenderCardAnswer(card *flashcard.DTO, cardNumber int, totalCardsInSession int, answerOptions []int)
 	RenderCards(cards []flashcard.DTO)
 }

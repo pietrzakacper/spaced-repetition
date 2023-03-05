@@ -2,16 +2,20 @@
   <head>
     <link rel="stylesheet" href="/static/satoshi.css" />
     <link rel="stylesheet" href="/static/main.css" />
+    <link rel="icon" href="/static/favicon.ico"/>
   </head>
   <body>
     <div class="main-container">
       <div class="main-content">
-        <header>
+        <header class="top">
           <a href="/" class="logo">Spaced Repetition</a>
         </header>
         <main class="home-main">
           <div class="memorize">
-            <section class="memorize-section box">
+             {{if and (ne .AllCardsCount 0) (eq .DueToReviewCount 0) (eq .NewCardsCount 0)}}
+             <section class="all-memorized-msg">You've memorized all your cards 🥳 <br/> Come back tomorrow to review them 🙏</section>
+              {{end}}
+            <section class="memorize-section box  {{if and (ne .AllCardsCount 0) (eq .DueToReviewCount 0) (eq .NewCardsCount 0)}}inactive{{end}}">
               <form action="/review" method="POST">
                 <div class="memorize-column">
                   <span><b>Cards to review</b>: {{ .DueToReviewCount }}</span>
@@ -19,7 +23,7 @@
                     {{if eq .DueToReviewCount 0}}disabled{{end}}
                     class="button"
                     type="submit"
-                    value="Review"
+                    value="review"
                    />
                 </div>
               </form>
@@ -30,7 +34,7 @@
                       {{if eq .NewCardsCount 0}}disabled{{end}}
                       class="button secondary {{ if and (ne .AllCardsCount 0) (eq .AllCardsCount .NewCardsCount) }}glow-animation{{end}}"
                       type="submit"
-                      value="Memorize"
+                      value="memorize"
                     />
                 </div>
               </form>
@@ -54,42 +58,33 @@
 
           <div class="tools">
             <section>
-              {{ if eq .AllCardsCount 0 }}
-                <label class="glow-animation">Add single card</label>
-              {{ else }}
-                <label>Add single card</label>
-              {{end}}
-              <br />
-              <br />
-
+              <label class="tool-label  {{ if eq .AllCardsCount 0 }}glow-animation{{end}}">Add single card</label>
               <form action="/add" method="POST">
                 <div class="add-container">
                   <div>
                     <input
                       class="text-input"
                       type="text"
-                      name="Front"
-                      placeholder="Front..."
+                      name="front"
+                      placeholder="front..."
                       autocomplete="off"
                     />
                     <input
                       class="text-input"
                       type="text"
-                      name="Back"
-                      placeholder="Back..."
+                      name="back"
+                      placeholder="back..."
                       autocomplete="off"
                     />
                   </div>
-                  <input class="button accent2" type="submit" value="Add" />
+                  <input class="button accent2" type="submit" value="add" />
                 </div>
               </form>
             </section>
 
 
             <section>
-                <label>Import cards from CSV</label>
-                <br/>
-                <br/>
+                <label class="tool-label">Import cards from CSV</label>
                 <form action="/import" method="POST" enctype="multipart/form-data">
                   <div class="add-container">
                     <div class='file-input'>
@@ -97,7 +92,7 @@
                       <span class='button'>Choose</span>
                       <span class='label' data-js-label>No file selected</label>
                     </div>
-                    <input class="button accent2" type="submit" value="Import"/>
+                    <input class="button accent2" type="submit" value="import"/>
                   </div>
                 </form>
                 <script>

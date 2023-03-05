@@ -10,6 +10,7 @@ type MemorizingSession struct {
 	memorizedCount  int
 	cardsToMemorize []*flashcard
 	failedCards     []*flashcard
+	extraRound      bool
 }
 
 type SessionType int
@@ -107,4 +108,10 @@ func (m *MemorizingSession) ReviewFailedCardsAgain() {
 	m.memorizedCount = 0
 	m.cardsToMemorize = m.failedCards
 	m.failedCards = make([]*flashcard, 0)
+	m.extraRound = true
+}
+
+/* are we showing an extra round to memorize the failed cards? */
+func (m *MemorizingSession) IsExtraRound() bool {
+	return m.extraRound
 }

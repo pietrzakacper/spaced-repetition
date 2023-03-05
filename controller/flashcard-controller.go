@@ -116,6 +116,7 @@ func (c *FlashcardsController) ShowQuest() {
 		card.ToDTO(),
 		c.session.CurrentCardNumber(),
 		c.session.TotalCardsNumber(),
+		c.session.IsExtraRound(),
 	)
 }
 

@@ -2,6 +2,7 @@
   <head>
     <link rel="stylesheet" href="/static/satoshi.css" />
     <link rel="stylesheet" href="/static/main.css" />
+    <link rel="icon" href="/static/favicon.ico"/>
     <link
       href="https://fonts.googleapis.com/css?family=Poppins:300,300i,500,500i,700"
       rel="stylesheet"
@@ -10,12 +11,12 @@
   <body>
     <div class="main-container">
       <div class="main-content">
-        <header>
+        <header class="top">
           <a href="/" class="logo">Spaced Repetition</a>
         </header>
         <main class="quest-main">
           <div class="cards-nav">
-            <a href="/"><img src="/static/back.svg" /></a>
+            <a href="/"><img src="/static/close.svg" /></a>
           </div>
           <div class="quest-content">
             <div class="card-top">
@@ -25,6 +26,9 @@
 
               <div class="card-container">
                 <div class="card">
+                  {{if .ExtraRound }}
+                    <div class="lets-try-again-msg">Let's try again...</div>
+                  {{end}}
                   <span>{{ .Front }}</span>
                 </div>
               </div>
@@ -32,7 +36,7 @@
 
             <div class="card-show-container">
               <form action="/answer" method="POST">
-                <input class="button" type="submit" value="Show Answer" />
+                <input class="button" type="submit" value="show answer" />
               </form>
             </div>
           </div>

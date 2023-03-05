@@ -66,6 +66,8 @@ body {
   font-weight: 500;
   font-size: 24px;
   color: var(--textColor);
+
+  text-transform: lowercase;
 }
 
 .button {
@@ -135,14 +137,14 @@ header img {
 
 .main-container .box {
   margin-top: 2rem;
-  padding: 2rem 2rem 0 2rem;
+  padding: 0rem 2rem 0 2rem;
 }
 
 .home-main {
   flex: 1 1 auto;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: space-around;
 }
 
 .quest-main {
@@ -171,11 +173,15 @@ header img {
 .card-container {
   display: flex;
   justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  margin-top: 3rem;
 }
 
 .card {
+  position: relative;
   margin: 2rem;
-  margin-top: 3rem;
+  margin-top: 0rem;
   height: 22rem;
   width: 100%;
   background: var(--cardColor);
@@ -421,6 +427,10 @@ h3 {
   opacity: 1;
 }
 
+header.top {
+  margin-top: 16px;
+}
+
 .logo {
   font-size: 20px;
   text-transform: lowercase;
@@ -539,25 +549,62 @@ h3 {
   margin: 0;
 }
 
-@keyframes text-glow{
-  from{text-shadow:0px 0px 5px #fff,0px 0px 5px #614ad3;}
-  to{text-shadow:0px 0px 20px #fff,0px 0px 20px #614ad3;}
+@keyframes text-glow {
+  from {
+    text-shadow: 0px 0px 5px #fff, 0px 0px 5px #614ad3;
+  }
+  to {
+    text-shadow: 0px 0px 20px #fff, 0px 0px 20px #614ad3;
+  }
 }
 
-@keyframes opacity-glow{
-  from{opacity: 0.2;}
-  to{opacity: 1;}
+@keyframes opacity-glow {
+  from {
+    opacity: 0.2;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .glow-animation {
-  animation-name:opacity-glow;
-  animation-duration:1s;
-  animation-iteration-count:infinite;
-  animation-direction:alternate;
+  animation-name: opacity-glow;
+  animation-duration: 1s;
+  animation-iteration-count: infinite;
+  animation-direction: alternate;
 }
 
 input:disabled {
   opacity: 0.4;
   cursor: default;
   border: none;
+}
+
+.inactive {
+  opacity: 0.4;
+}
+
+.all-memorized-msg {
+  width: 100%;
+  text-align: center;
+  margin-top: 48px;
+}
+
+.cards-nav img {
+  width: 32px;
+}
+
+.lets-try-again-msg {
+  width: 44rem;
+  color: #717171;
+  position: absolute;
+  top: 0;
+  transform: translateY(calc(-100% - 4px));
+  font-size: 20px;
+  font-weight: 500;
+}
+
+.tool-label {
+  display: block;
+  margin-bottom: 1rem;
 }

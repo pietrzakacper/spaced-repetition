@@ -141,7 +141,14 @@ func (i HttpInteractor) Start() {
 		if c, err := i.authenticateUser(w, r); err == nil {
 			r.ParseForm()
 
-			c.AddCard(r.Form.Get("Front"), r.Form.Get("Back"))
+			front, back := r.Form.Get("front"), r.Form.Get("back")
+
+			if front == "" || back == "" {
+				c.GoToHome()
+				return
+			}
+
+			c.AddCard(front, back)
 		}
 	})
 

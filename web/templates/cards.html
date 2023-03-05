@@ -2,11 +2,12 @@
   <head>
     <link rel="stylesheet" href="/static/satoshi.css" />
     <link rel="stylesheet" href="/static/main.css" />
+    <link rel="icon" href="/static/favicon.ico"/>
   </head>
   <body>
     <div class="main-container">
       <div class="main-content">
-        <header>
+        <header class="top">
           <a href="/" class="logo">Spaced Repetition</a>
         </header>
         <main>
@@ -39,7 +40,7 @@
                         type="text"
                         name="Front"
                         value="{{ .Front }}"
-                        placeholder="Front..."
+                        placeholder="front..."
                         autocomplete="off"
                       />
                       <input
@@ -47,7 +48,7 @@
                         type="text"
                         name="Back"
                         value="{{ .Back }}"
-                        placeholder="Back..."
+                        placeholder="back..."
                         autocomplete="off"
                       />
                     </div>
