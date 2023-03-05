@@ -11,6 +11,7 @@ type flashcard struct {
 	creationDate time.Time
 
 	answerSubmitted bool
+	savedAnswer     int
 
 	supermemo *supermemo
 }

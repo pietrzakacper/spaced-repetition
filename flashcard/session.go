@@ -65,13 +65,15 @@ func CreateSession(records []Record, sessionType SessionType) *MemorizingSession
 func (m *MemorizingSession) SubmitAnswer(answer int) *flashcard {
 	card := m.CurrentCard()
 
-	if answer < 4 {
-		m.failedCards = append(m.failedCards, card)
+	if card.answerSubmitted == false {
+		card.answerSubmitted = true
+		card.savedAnswer = answer
 	}
 
-	if card.answerSubmitted == false {
-		m.CurrentCard().supermemo.SubmitRepetition(answer)
-		card.answerSubmitted = true
+	if answer < 4 {
+		m.failedCards = append(m.failedCards, card)
+	} else {
+		m.CurrentCard().supermemo.SubmitRepetition(card.savedAnswer)
 	}
 
 	m.GoToNext()
