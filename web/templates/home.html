@@ -21,7 +21,11 @@
               <form action="/learnNew" method="POST">
                 <div class="memorize-column">
                   <span><b>New cards</b>: {{ .NewCardsCount }}</span>
-                  <input class="button secondary" type="submit" value="Memorize" />
+                  {{ if and (ne .AllCardsCount 0) (eq .AllCardsCount .NewCardsCount) }}
+                    <input class="button secondary glow-animation" type="submit" value="Memorize" />
+                  {{ else }}
+                    <input class="button secondary" type="submit" value="Memorize" />
+                  {{end}}
                 </div>
               </form>
             </section>
@@ -44,7 +48,11 @@
 
           <div class="tools">
             <section>
-              <label>Add single card</label>
+              {{ if eq .AllCardsCount 0 }}
+                <label class="glow-animation">Add single card</label>
+              {{ else }}
+                <label>Add single card</label>
+              {{end}}
               <br />
               <br />
 
