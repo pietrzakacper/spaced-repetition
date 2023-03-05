@@ -7,17 +7,16 @@ import (
 )
 
 type HttpView struct {
-	w http.ResponseWriter
-	u UserContext
+	w         http.ResponseWriter
+	userEmail string
 }
 
-type UserContext struct {
-	Email string
+func CreateHttpView(userEmail string) *HttpView {
+	return &HttpView{w: nil, userEmail: userEmail}
 }
 
-func (v *HttpView) SetRequestContext(w http.ResponseWriter, u UserContext) {
+func (v *HttpView) SetRequestContext(w http.ResponseWriter) {
 	v.w = w
-	v.u = u
 }
 
 func (v *HttpView) GoToHome() {

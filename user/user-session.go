@@ -1,31 +1,30 @@
 package user
 
-import "controller"
+import (
+	"controller"
+	"web/view"
+)
 
 type UserSessionFactory struct {
-	controller.View
 	controller.Persistance
 }
 
-func (u *UserSessionFactory) Create(userId string) *controller.FlashcardsController {
-	store := u.Persistance.Create("db", userId)
-	// @TODO learn why we cannot return a pointer here
-	return controller.CreateFlashcardsController(u.View, store)
+type UserSession struct {
+	*controller.FlashcardsController
+	*view.HttpView
 }
 
-// var flashcardController = controller.CreateFlashcardsController(v, p)
+type UserContext struct {
+	Id    string
+	Email string
+}
 
-// var v controller.View = httpView
-// var p controller.Persistance = &persistance.CSVPersistance{}
+func (u *UserSessionFactory) Create(userContext UserContext) *UserSession {
+	store := u.Persistance.Create("db", userContext.Id)
+	view := view.CreateHttpView(userContext.Email)
 
-// type UserSession interface {
-// 	GetController() Controller
-// }
-
-// type Persistance interface {
-// 	Create(name string) StoreFactory
-// }
-
-// type StoreFactory interface {
-// 	Create(userId string) Store
-// }
+	return &UserSession{
+		FlashcardsController: controller.CreateFlashcardsController(view, store),
+		HttpView:             view,
+	}
+}

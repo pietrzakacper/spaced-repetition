@@ -4,14 +4,12 @@ import (
 	"persistance"
 	"user"
 	"web/interactor"
-	"web/view"
 )
 
 // @TODO make the code threadsafe
 func main() {
-	var httpView = &view.HttpView{}
-	var userSessionFactory = &user.UserSessionFactory{View: httpView, Persistance: &persistance.BadgerPersistance{}}
-	var i interactor.Interactor = interactor.CreateHttpInteractor(httpView, userSessionFactory)
+	var userSessionFactory = &user.UserSessionFactory{Persistance: &persistance.CSVPersistance{}}
+	var i interactor.Interactor = interactor.CreateHttpInteractor(userSessionFactory)
 
 	i.Start()
 }

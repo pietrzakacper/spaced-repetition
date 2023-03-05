@@ -1,7 +1,6 @@
 package interactor
 
 import (
-	"controller"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -19,18 +18,16 @@ type Interactor interface {
 }
 
 type HttpInteractor struct {
-	view           *view.HttpView
 	sessionFactory *user.UserSessionFactory
 
-	sessions map[string]*controller.FlashcardsController
+	sessions map[string]*user.UserSession
 }
 
-func CreateHttpInteractor(view *view.HttpView, sessionFactory *user.UserSessionFactory) HttpInteractor {
+func CreateHttpInteractor(sessionFactory *user.UserSessionFactory) HttpInteractor {
 	return HttpInteractor{
-		view,
 		// @TODO create a view per session
 		sessionFactory,
-		map[string]*controller.FlashcardsController{},
+		map[string]*user.UserSession{},
 	}
 }
 
@@ -39,7 +36,6 @@ type EditCardPayload struct {
 	Back  string
 }
 
-// @TODO do that once
 func verifyIdToken(idToken string) (*oauth2.Tokeninfo, error) {
 	oauth2Service, err := oauth2.New(http.DefaultClient)
 	tokenInfoCall := oauth2Service.Tokeninfo()
@@ -52,7 +48,7 @@ func verifyIdToken(idToken string) (*oauth2.Tokeninfo, error) {
 }
 
 // @TODO think about making a server middleware
-func (i HttpInteractor) authenticateUser(w http.ResponseWriter, r *http.Request, keepLocationOnAuthFail ...bool) (*controller.FlashcardsController, error) {
+func (i HttpInteractor) authenticateUser(w http.ResponseWriter, r *http.Request, keepLocationOnAuthFail ...bool) (*user.UserSession, error) {
 	cookies := r.Cookies()
 
 	cookieMap := make(map[string]string, 1)
@@ -63,6 +59,14 @@ func (i HttpInteractor) authenticateUser(w http.ResponseWriter, r *http.Request,
 
 	authToken := cookieMap["sessionToken"]
 	w.Header().Add("Referrer-Policy", "no-referrer-when-downgrade")
+
+	c := i.sessions[authToken]
+
+	if c != nil {
+		fmt.Println("Found session")
+		c.SetRequestContext(w)
+		return c, nil
+	}
 
 	// @TODO investigate double call
 	if authToken == "" {
@@ -89,14 +93,12 @@ func (i HttpInteractor) authenticateUser(w http.ResponseWriter, r *http.Request,
 		return nil, errors.New("Unauthorized")
 	}
 
-	i.view.SetRequestContext(w, view.UserContext{Email: tokenInfo.Email})
+	c = i.sessionFactory.Create(user.UserContext{
+		Id: tokenInfo.UserId, Email: tokenInfo.Email,
+	})
+	i.sessions[authToken] = c
 
-	c := i.sessions[tokenInfo.UserId]
-
-	if c == nil {
-		c = i.sessionFactory.Create(tokenInfo.UserId)
-		i.sessions[tokenInfo.UserId] = c
-	}
+	c.SetRequestContext(w)
 
 	return c, nil
 }
@@ -114,8 +116,9 @@ func (i HttpInteractor) Start() {
 		}
 
 		// user logged out
-		i.view.SetRequestContext(w, view.UserContext{})
-		i.view.RenderLogin()
+		anonymousView := view.CreateHttpView("")
+		anonymousView.SetRequestContext(w)
+		anonymousView.RenderLogin()
 	})
 
 	http.HandleFunc("/login", func(w http.ResponseWriter, r *http.Request) {
@@ -137,7 +140,6 @@ func (i HttpInteractor) Start() {
 		}
 
 		if c, err := i.authenticateUser(w, r); err == nil {
-
 			r.ParseForm()
 
 			c.AddCard(r.Form.Get("Front"), r.Form.Get("Back"))
@@ -155,7 +157,7 @@ func (i HttpInteractor) Start() {
 			file, _, err := r.FormFile("fileToUpload")
 
 			if err != nil {
-				i.view.GoToHome()
+				c.GoToHome()
 				return
 			}
 
