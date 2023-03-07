@@ -3,6 +3,8 @@
     <link rel="stylesheet" href="/static/satoshi.css" />
     <link rel="stylesheet" href="/static/main.css" />
     <link rel="icon" href="/static/favicon.ico"/>
+    <meta name="viewport" content="width=device-width initial-scale=1">
+    <title>spaced repetition</title>
   </head>
   <body>
     <div class="main-container">
@@ -82,9 +84,10 @@
               </form>
             </section>
 
-
-            <section>
-                <label class="tool-label">Import cards from CSV</label>
+            <section class="import-tool-section">
+                <label class="tool-label import-label">Import cards from CSV
+                  <span class="import-instruction">columns should be (front, back)</span>
+                </label>
                 <form action="/import" method="POST" enctype="multipart/form-data">
                   <div class="add-container">
                     <div class='file-input'>

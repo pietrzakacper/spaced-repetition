@@ -608,3 +608,21 @@ input:disabled {
   display: block;
   margin-bottom: 1rem;
 }
+
+.import-label {
+  line-height: 24px;
+  vertical-align: middle;
+}
+
+.import-instruction {
+  font-size: 20px;
+  opacity: 0.5;
+  margin-left: 8px;
+  color: #717171;
+  opacity: 0;
+  transition: opacity 500ms linear;
+}
+
+.import-tool-section:hover .import-instruction {
+  opacity: 1;
+}

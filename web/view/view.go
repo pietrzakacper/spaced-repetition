@@ -82,6 +82,7 @@ type QuestData struct {
 	TotalCardsInSession int
 	Front               string
 	ExtraRound          bool
+	Kind                byte
 }
 
 func (v *HttpView) RenderCardQuestion(card *flashcard.DTO, cardNumber int, totalCardsInSession int, extraRound bool) {
@@ -92,6 +93,7 @@ func (v *HttpView) RenderCardQuestion(card *flashcard.DTO, cardNumber int, total
 		TotalCardsInSession: totalCardsInSession,
 		Front:               card.Front,
 		ExtraRound:          extraRound,
+		Kind:                getCardKind(card.Id),
 	}
 
 	template.Execute(v.w, data)
@@ -115,6 +117,7 @@ type AnswerData struct {
 	TotalCardsInSession int
 	Back                string
 	Answers             []Answer
+	Kind                byte
 }
 
 func (v *HttpView) RenderCardAnswer(card *flashcard.DTO, cardNumber int, totalCardsInSession int, answerOptions []int) {
@@ -131,6 +134,7 @@ func (v *HttpView) RenderCardAnswer(card *flashcard.DTO, cardNumber int, totalCa
 		TotalCardsInSession: totalCardsInSession,
 		Back:                card.Back,
 		Answers:             Answers,
+		Kind:                getCardKind(card.Id),
 	}
 
 	template.Execute(v.w, data)
