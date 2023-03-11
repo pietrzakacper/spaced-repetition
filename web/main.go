@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"persistance"
 	"user"
 	"web/interactor"
@@ -8,8 +9,10 @@ import (
 
 // @TODO make the code threadsafe
 func main() {
-	var userSessionFactory = &user.UserSessionFactory{Persistance: &persistance.CSVPersistance{}}
+	fmt.Println("Running main...")
+	var userSessionFactory = &user.UserSessionFactory{Persistance: &persistance.BadgerPersistance{}}
 	var i interactor.Interactor = interactor.CreateHttpInteractor(userSessionFactory)
 
+	fmt.Println("Running interactor.Start()...")
 	i.Start()
 }

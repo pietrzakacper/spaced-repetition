@@ -4,8 +4,10 @@ import (
 	"controller"
 	"encoding/json"
 	"flashcard"
+	"fmt"
 	"log"
 	"os"
+	"path/filepath"
 	"sort"
 	"time"
 
@@ -51,14 +53,22 @@ func (f *FlashcardSerialized) toRecord() flashcard.Record {
 }
 
 func (p *BadgerPersistance) Create(name string, userId string) controller.Store {
-	cwd, _ := os.Getwd()
+	dbDir := os.Getenv("DB_DIR")
+
+	if dbDir == "" {
+		dbDir, _ = os.Getwd()
+	}
+
+	absDbDir, _ := filepath.Abs(dbDir)
+	dbPath := absDbDir + "/.db/badger-" + name + "-" + userId
+	fmt.Println("Creating badgerdb: " + dbPath)
 
 	var opts badger.Options
 
 	if p.inMemory {
 		opts = badger.DefaultOptions("").WithInMemory(true)
 	} else {
-		opts = badger.DefaultOptions(cwd + "/badger-" + name)
+		opts = badger.DefaultOptions(dbPath)
 	}
 
 	db, err := badger.Open(opts)
@@ -66,6 +76,8 @@ func (p *BadgerPersistance) Create(name string, userId string) controller.Store 
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	fmt.Println("Finished creating badgerdb: " + dbPath)
 
 	return &BadgerStore{db}
 }

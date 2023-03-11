@@ -20,7 +20,7 @@ type UserContext struct {
 }
 
 func (u *UserSessionFactory) Create(userContext UserContext) *UserSession {
-	store := u.Persistance.Create("db", userContext.Id)
+	store := u.Persistance.Create("db", userContext.Email)
 	view := view.CreateHttpView(userContext.Email)
 
 	return &UserSession{

@@ -3,3 +3,4 @@ flashcards.csv
 web/*.csv
 web/badger-db
 *.pem
+.db
