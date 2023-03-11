@@ -19,5 +19,6 @@ RUN cp -r ./web/templates ./bin/templates
 RUN cp -r ./web/static ./bin/static
 
 WORKDIR /app/bin
-EXPOSE 3000
+ENV PORT 8080
+EXPOSE 8080
 CMD ["./spaced-repetition"]
