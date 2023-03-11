@@ -4,6 +4,7 @@ import (
 	"flashcard"
 	t "html/template"
 	"net/http"
+	"os"
 )
 
 type HttpView struct {
@@ -170,8 +171,18 @@ func getCardKind(cardId string) byte {
 	return kind
 }
 
+type LoginData struct {
+	AppUrl string
+}
+
 func (v *HttpView) RenderLogin() {
 	template := t.Must(t.ParseFiles("templates/login.html"))
 
-	template.Execute(v.w, nil)
+	appUrl := os.Getenv("APP_URL")
+
+	if appUrl == "" {
+		appUrl = "http://localhost:3000"
+	}
+
+	template.Execute(v.w, LoginData{AppUrl: appUrl})
 }

@@ -1,0 +1,7 @@
+**/flashcards.csv
+**/**/__debug_bin
+**/web/*.csv
+**/web/badger-db
+**/*.pem
+**/.db
+fly.toml
