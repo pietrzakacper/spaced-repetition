@@ -4,7 +4,11 @@ kill_timeout = 5
 processes = []
 
 [env]
-  APP_URL = https://spaced.sh
+  APP_URL = "https://spaced.sh"
+
+[mounts]
+  source="spaced_repetition_db"
+  destination="/app/bin/.db"
 
 [experimental]
   auto_rollback = true
