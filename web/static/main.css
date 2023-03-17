@@ -315,10 +315,10 @@ h3 {
   background: var(--answer2-dimmed);
 }
 
-.answer-3 {
+.answer-4 {
   background: var(--answer3);
 }
-.answer-3:hover {
+.answer-4:hover {
   background: var(--answer3-dimmed);
 }
 

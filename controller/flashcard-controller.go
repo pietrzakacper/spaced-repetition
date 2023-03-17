@@ -131,7 +131,7 @@ func (c *FlashcardsController) ShowAnswer() {
 		card.ToDTO(),
 		c.session.CurrentCardNumber(),
 		c.session.TotalCardsNumber(),
-		[]int{0, 2, 3, 5},
+		[]int{0, 2, 4, 5},
 	)
 }
 

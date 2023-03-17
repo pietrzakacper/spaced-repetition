@@ -105,7 +105,7 @@ var answerLabels = map[int]string{
 	1: "slipped my mind",
 	2: "almost got it",
 	3: "barely correct",
-	4: "i remembered correctly:)",
+	4: "correct",
 	5: "too easy!",
 }
 

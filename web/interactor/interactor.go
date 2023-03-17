@@ -62,7 +62,6 @@ func (i HttpInteractor) authenticateUser(w http.ResponseWriter, r *http.Request,
 	c := i.sessions[authToken]
 
 	if c != nil {
-		fmt.Println("Found session")
 		c.SetRequestContext(w)
 		return c, nil
 	}
