@@ -41,6 +41,28 @@
                 </div>
               </form>
             </section>
+          <section class="memorize-section-mobile box {{if and (ne .AllCardsCount 0) (eq .DueToReviewCount 0) (eq .NewCardsCount 0)}}inactive{{end}}">
+              <form action="/review" method="POST">
+                <div class="memorize-column">
+                  <input
+                    {{if eq .DueToReviewCount 0}}disabled{{end}}
+                    class="button"
+                    type="submit"
+                    value="review ({{ .DueToReviewCount }})"
+                   />
+                </div>
+              </form>
+              <form action="/learnNew" method="POST">
+                <div class="memorize-column">
+                    <input
+                      {{if eq .NewCardsCount 0}}disabled{{end}}
+                      class="button secondary {{ if and (ne .AllCardsCount 0) (eq .AllCardsCount .NewCardsCount) }}glow-animation{{end}}"
+                      type="submit"
+                      value="memorize ({{ .NewCardsCount }})"
+                    />
+                </div>
+              </form>
+            </section>
    
           </div>
           <div class="cards">
