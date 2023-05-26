@@ -43,12 +43,16 @@ func (m *supermemo) IsDueToReview() bool {
 
 	nowInSeconds := time.Now().Unix()
 
-	lastRepInSeconds := m.LastReviewDate.Unix()
+	lastRepInSeconds := startOfDay(m.LastReviewDate).Unix()
 
 	// convert to seconds
 	offsetInSeconds := int64(m.NextReviewOffset * 24 * 60 * 60)
 
 	return (lastRepInSeconds + offsetInSeconds) <= nowInSeconds
+}
+
+func startOfDay(t time.Time) time.Time {
+	return time.Date(t.Year(), t.Month(), t.Day(), 0, 0, 0, 0, t.Location())
 }
 
 func calculateNextReviewOffset(repetitionCount int, EF float64) float64 {

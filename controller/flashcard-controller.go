@@ -136,6 +136,11 @@ func (c *FlashcardsController) ShowAnswer() {
 }
 
 func (c *FlashcardsController) SubmitAnswer(answer int) {
+	if c.session.HasEnded() {
+		c.view.GoToQuest()
+		return
+	}
+
 	card := c.session.SubmitAnswer(answer)
 
 	c.store.Update(card.ToRecord())

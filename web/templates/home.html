@@ -1,7 +1,7 @@
 <html>
   <head>
     <link rel="stylesheet" href="/static/satoshi.css" />
-    <link rel="stylesheet" href="/static/main.css" />
+    <link rel="stylesheet" href="/static/main-v1.0.0.css" />
     <link rel="icon" href="/static/favicon.ico"/>
     <meta name="viewport" content="width=device-width initial-scale=1">
     <title>spaced repetition</title>
@@ -146,5 +146,9 @@
         </main>
         </div>
       </div>
+      <script>
+        // autorefresh every 8h
+        setInterval(() => window.location.reload(), 8 * 60 * 60 * 1000)
+      </script>
   </body>
 </html>

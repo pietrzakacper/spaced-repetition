@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"sync"
 	"user"
 	"web/view"
 
@@ -20,13 +21,15 @@ type Interactor interface {
 type HttpInteractor struct {
 	sessionFactory *user.UserSessionFactory
 
-	sessions map[string]*user.UserSession
+	sessions     map[string]*user.UserSession
+	sessionsLock sync.Mutex
 }
 
 func CreateHttpInteractor(sessionFactory *user.UserSessionFactory) HttpInteractor {
 	return HttpInteractor{
 		sessionFactory,
 		map[string]*user.UserSession{},
+		sync.Mutex{},
 	}
 }
 
@@ -48,6 +51,22 @@ func verifyIdToken(idToken string) (*oauth2.Tokeninfo, error) {
 
 // @TODO think about making a server middleware
 func (i HttpInteractor) authenticateUser(w http.ResponseWriter, r *http.Request, keepLocationOnAuthFail ...bool) (*user.UserSession, error) {
+	if os.Getenv("LOCAL_DEV") == "true" {
+		if c := i.sessions["LOCAL"]; c != nil {
+			c.SetRequestContext(w)
+			return c, nil
+		}
+		c := i.sessionFactory.Create(user.UserContext{
+			Id: "123", Email: "kacpietrzak@gmail.com",
+		})
+
+		i.sessions["LOCAL"] = c
+
+		c.SetRequestContext(w)
+
+		return c, nil
+	}
+
 	cookies := r.Cookies()
 
 	cookieMap := make(map[string]string, 1)
@@ -59,7 +78,11 @@ func (i HttpInteractor) authenticateUser(w http.ResponseWriter, r *http.Request,
 	authToken := cookieMap["sessionToken"]
 	w.Header().Add("Referrer-Policy", "no-referrer-when-downgrade")
 
+	i.sessionsLock.Lock()
+
 	c := i.sessions[authToken]
+
+	defer i.sessionsLock.Unlock()
 
 	if c != nil {
 		c.SetRequestContext(w)

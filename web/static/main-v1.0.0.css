@@ -393,6 +393,10 @@ h3 {
   justify-content: center;
 }
 
+.card-show-container form {
+  position: relative;
+}
+
 .answer-form-container {
   width: 100%;
   display: flex;
@@ -665,7 +669,7 @@ h3 {
 input:disabled {
   opacity: 0.4;
   cursor: default;
-  border: none;
+  border-color: transparent;
 }
 
 .inactive {
@@ -713,4 +717,16 @@ input:disabled {
 
 .import-tool-section:hover .import-instruction {
   opacity: 1;
+}
+
+.answer-buttons-container form {
+  position: relative;
+}
+
+.keyboard-nav {
+  position: absolute;
+  top: 2px;
+  right: 7px;
+  opacity: 0.7;
+  font-size: 18px;
 }
