@@ -7,6 +7,7 @@ import (
 	"log"
 	"os"
 	"sort"
+	"time"
 
 	_ "github.com/lib/pq"
 )
@@ -60,15 +61,20 @@ func (p *PostgresStore) ReadAll() []flashcard.Record {
 	return records
 }
 
-func (p *PostgresStore) Add(record *flashcard.Record) {
+func (p *PostgresStore) Add(r *flashcard.Record) {
 	_, err := p.db.Exec(`
 		INSERT into flashcards
-		(id, front, back, user_id, creation_date)
-		VALUES (gen_random_uuid(), $1, $2, $3, $4)`,
-		record.Front,
-		record.Back,
+		(id, creation_date, user_id, front, back, repetition_count, next_review_offset, ef, deleted, last_review_date)
+		VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7, $8, $9)`,
+		time.Now(),
 		p.userId,
-		record.CreationDate,
+		r.Front,
+		r.Back,
+		r.RepetitionCount,
+		r.NextReviewOffset,
+		r.EF,
+		r.Deleted,
+		r.LastReviewDate,
 	)
 
 	if err != nil {
