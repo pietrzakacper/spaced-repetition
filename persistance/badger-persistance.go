@@ -9,7 +9,6 @@ import (
 	"os"
 	"path/filepath"
 	"sort"
-	"time"
 
 	"github.com/dgraph-io/badger/v3"
 	"github.com/google/uuid"
@@ -21,35 +20,6 @@ type BadgerPersistance struct {
 
 type BadgerStore struct {
 	db *badger.DB
-}
-
-type FlashcardSerialized struct {
-	Id               string
-	Front            string
-	Back             string
-	CreationDate     int64
-	LastReviewDate   int64
-	RepetitionCount  int
-	NextReviewOffset int
-	EF               float64
-	Deleted          bool
-}
-
-func (f *FlashcardSerialized) toRecord() flashcard.Record {
-	creationDate := time.UnixMicro(f.CreationDate)
-	lastReviewDate := time.UnixMicro(f.LastReviewDate)
-
-	return flashcard.Record{
-		Id:               f.Id,
-		Front:            f.Front,
-		Back:             f.Back,
-		CreationDate:     creationDate,
-		LastReviewDate:   lastReviewDate,
-		RepetitionCount:  f.RepetitionCount,
-		NextReviewOffset: f.NextReviewOffset,
-		EF:               f.EF,
-		Deleted:          f.Deleted,
-	}
 }
 
 func (p *BadgerPersistance) Create(name string, userId string) controller.Store {
@@ -92,14 +62,14 @@ func (b *BadgerStore) ReadAll() []flashcard.Record {
 		defer it.Close()
 		for it.Rewind(); it.Valid(); it.Next() {
 			err := it.Item().Value(func(v []byte) error {
-				f := &FlashcardSerialized{}
+				f := &flashcard.FlashcardSerialized{}
 				err := json.Unmarshal(v, f)
 
 				if err != nil {
 					return err
 				}
 
-				records = append(records, f.toRecord())
+				records = append(records, f.ToRecord())
 
 				return nil
 			})
@@ -132,7 +102,7 @@ func (b *BadgerStore) Update(record *flashcard.Record) {
 	b.setRecord(record.Id, record)
 }
 func (s *BadgerStore) Find(cardId string) (flashcard.Record, error) {
-	f := &FlashcardSerialized{}
+	f := &flashcard.FlashcardSerialized{}
 
 	err := s.db.View(func(txn *badger.Txn) error {
 		record, err := txn.Get([]byte(cardId))
@@ -160,14 +130,14 @@ func (s *BadgerStore) Find(cardId string) (flashcard.Record, error) {
 	})
 
 	if err != nil {
-		return f.toRecord(), err
+		return f.ToRecord(), err
 	}
 
-	return f.toRecord(), nil
+	return f.ToRecord(), nil
 }
 
 func (b *BadgerStore) setRecord(id string, record *flashcard.Record) {
-	flashcardSerialized := &FlashcardSerialized{
+	flashcardSerialized := &flashcard.FlashcardSerialized{
 		Id:               id,
 		Front:            record.Front,
 		Back:             record.Back,
