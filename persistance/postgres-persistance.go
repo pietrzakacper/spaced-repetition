@@ -6,7 +6,7 @@ import (
 	"flashcard"
 	"log"
 	"os"
-	"time"
+	"sort"
 
 	_ "github.com/lib/pq"
 )
@@ -32,47 +32,86 @@ func (p *PostgresPersistance) Create(name string, userId string) controller.Stor
 func (p *PostgresStore) ReadAll() []flashcard.Record {
 	records := make([]flashcard.Record, 0)
 
-	rows, err := p.db.Query("SELECT id, front, back, repetition_count, next_review_offset, ef, deleted, creation_date, last_review_date FROM flashcards WHERE user_id=$1", p.userId)
+	rows, err := p.db.Query(`
+		SELECT
+		id, front, back, repetition_count, next_review_offset, ef, deleted, creation_date, last_review_date
+		FROM flashcards
+		WHERE user_id=$1`,
+		p.userId,
+	)
 
 	defer rows.Close()
 
 	if err != nil {
 		log.Fatalln(err)
-		return records
 	}
-
-	var id, front, back string
-	var creationDate, lastReviewDate time.Time
-	var nextReviewOffset, repetitionCount int
-	var ef float64
-	var deleted bool
 
 	for rows.Next() {
-		rows.Scan(&id, &front, &back, &repetitionCount, &nextReviewOffset, &ef, &deleted, &creationDate, &lastReviewDate)
-		records = append(records, flashcard.Record{
-			Id:               id,
-			Front:            front,
-			Back:             back,
-			CreationDate:     creationDate,
-			LastReviewDate:   lastReviewDate,
-			NextReviewOffset: nextReviewOffset,
-			EF:               ef,
-			Deleted:          deleted,
-		})
+		r := flashcard.Record{}
+
+		rows.Scan(&r.Id, &r.Front, &r.Back, &r.RepetitionCount, &r.NextReviewOffset, &r.EF, &r.Deleted, &r.CreationDate, &r.LastReviewDate)
+		records = append(records, r)
 	}
+
+	sort.Slice(records, func(i, j int) bool {
+		return records[i].CreationDate.UnixMicro() < records[j].CreationDate.UnixMicro()
+	})
 
 	return records
 }
 
 func (p *PostgresStore) Add(record *flashcard.Record) {
+	_, err := p.db.Exec(`
+		INSERT into flashcards
+		(id, front, back, user_id, creation_date)
+		VALUES (gen_random_uuid(), $1, $2, $3, $4)`,
+		record.Front,
+		record.Back,
+		p.userId,
+		record.CreationDate,
+	)
 
+	if err != nil {
+		log.Fatalln(err)
+	}
 }
 
-func (p *PostgresStore) Update(record *flashcard.Record) {
+func (p *PostgresStore) Update(r *flashcard.Record) {
+	_, err := p.db.Exec(`
+		UPDATE flashcards
+		SET front=$1, back=$2, repetition_count=$3, next_review_offset=$4, ef=$5, deleted=$6, last_review_date=$7
+		WHERE id=$8`,
+		r.Front,
+		r.Back,
+		r.RepetitionCount,
+		r.NextReviewOffset,
+		r.EF,
+		r.Deleted,
+		r.LastReviewDate,
+		r.Id,
+	)
+
+	if err != nil {
+		log.Fatalln(err)
+	}
 }
 
-func (s *PostgresStore) Find(cardId string) (flashcard.Record, error) {
-	f := &flashcard.FlashcardSerialized{}
+func (p *PostgresStore) Find(cardId string) (flashcard.Record, error) {
+	rows, err := p.db.Query(`
+		SELECT
+		id, front, back, repetition_count, next_review_offset, ef, deleted, creation_date, last_review_date
+		FROM flashcards
+		WHERE id=$1`,
+		cardId,
+	)
 
-	return f.ToRecord(), nil
+	if err != nil || !rows.Next() {
+		log.Fatalln(err)
+	}
+
+	r := flashcard.Record{}
+
+	rows.Scan(&r.Id, &r.Front, &r.Back, &r.RepetitionCount, &r.NextReviewOffset, &r.EF, &r.Deleted, &r.CreationDate, &r.LastReviewDate)
+
+	return r, nil
 }

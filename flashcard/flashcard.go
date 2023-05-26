@@ -82,32 +82,3 @@ func (card *flashcard) IsNew() bool {
 func (card *flashcard) IsDueToReview() bool {
 	return card.supermemo.IsDueToReview()
 }
-
-type FlashcardSerialized struct {
-	Id               string
-	Front            string
-	Back             string
-	CreationDate     int64
-	LastReviewDate   int64
-	RepetitionCount  int
-	NextReviewOffset int
-	EF               float64
-	Deleted          bool
-}
-
-func (f *FlashcardSerialized) ToRecord() Record {
-	creationDate := time.UnixMicro(f.CreationDate)
-	lastReviewDate := time.UnixMicro(f.LastReviewDate)
-
-	return Record{
-		Id:               f.Id,
-		Front:            f.Front,
-		Back:             f.Back,
-		CreationDate:     creationDate,
-		LastReviewDate:   lastReviewDate,
-		RepetitionCount:  f.RepetitionCount,
-		NextReviewOffset: f.NextReviewOffset,
-		EF:               f.EF,
-		Deleted:          f.Deleted,
-	}
-}
