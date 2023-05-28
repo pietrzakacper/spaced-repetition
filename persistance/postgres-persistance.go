@@ -48,7 +48,6 @@ func (p *PostgresStore) ReadAll() []flashcard.Record {
 		WHERE user_id=$1`,
 		p.userId,
 	)
-
 	defer rows.Close()
 
 	if err != nil {
@@ -118,6 +117,7 @@ func (p *PostgresStore) Find(cardId string) (flashcard.Record, error) {
 		WHERE id=$1`,
 		cardId,
 	)
+	defer rows.Close()
 
 	if err != nil || !rows.Next() {
 		log.Fatalln(err)
