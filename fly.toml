@@ -6,10 +6,6 @@ processes = []
 [env]
   APP_URL = "https://spaced.sh"
 
-[mounts]
-  source="spaced_repetition_db"
-  destination="/app/bin/.db"
-
 [experimental]
   auto_rollback = true
 
