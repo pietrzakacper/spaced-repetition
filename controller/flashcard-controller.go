@@ -143,9 +143,16 @@ func (c *FlashcardsController) SubmitAnswer(answer int) {
 
 	card := c.session.SubmitAnswer(answer)
 
-	c.store.Update(card.ToRecord())
+	if c.session.HasEnded() && !c.session.HasAnyFailedCards() {
+		// if this is the last card in session, we want the DB update to happen before redirect
+		// to show consistent view to the user
+		c.store.Update(card.ToRecord())
+		c.view.GoToHome()
+	} else {
+		c.view.GoToQuest()
+		go c.store.Update(card.ToRecord())
+	}
 
-	c.view.GoToQuest()
 }
 
 func (c *FlashcardsController) ShowCards() {

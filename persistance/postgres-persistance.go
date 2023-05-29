@@ -26,9 +26,8 @@ func (p *PostgresPersistance) Create(name string, userId string) controller.Stor
 	if db == nil {
 		var err error
 		db, err = sql.Open("pgx", os.Getenv("DATABASE_URL"))
-		db.SetConnMaxLifetime(time.Minute * 3)
 		db.SetMaxOpenConns(10)
-		db.SetMaxIdleConns(10)
+		db.SetMaxIdleConns(0)
 
 		if err != nil {
 			log.Fatal(err)
