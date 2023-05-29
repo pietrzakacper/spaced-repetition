@@ -215,13 +215,15 @@ func (i HttpInteractor) Start() {
 
 	http.HandleFunc("/quest", func(w http.ResponseWriter, r *http.Request) {
 		if c, err := i.authenticateUser(w, r); err == nil {
-			c.ShowQuest()
+
+			c.ShowQuest(view.DecodeCookiesToMemorizingSession(r))
 		}
 	})
 
 	http.HandleFunc("/answer", func(w http.ResponseWriter, r *http.Request) {
 		if c, err := i.authenticateUser(w, r); err == nil {
-			c.ShowAnswer()
+
+			c.ShowAnswer(view.DecodeCookiesToMemorizingSession(r))
 		}
 	})
 
@@ -232,7 +234,7 @@ func (i HttpInteractor) Start() {
 
 			answer, _ := strconv.ParseInt(answerStr, 10, 32)
 
-			c.SubmitAnswer(int(answer))
+			c.SubmitAnswer(view.DecodeCookiesToMemorizingSession(r), int(answer))
 		}
 	})
 

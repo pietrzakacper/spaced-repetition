@@ -7,7 +7,6 @@ import (
 	"web/interactor"
 )
 
-// @TODO make the code threadsafe
 func main() {
 	fmt.Println("Running main...")
 	var userSessionFactory = &user.UserSessionFactory{Persistance: &persistance.PostgresPersistance{}}

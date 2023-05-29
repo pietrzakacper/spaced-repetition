@@ -30,6 +30,13 @@ func (v *HttpView) GoToCards() {
 	v.w.WriteHeader(303)
 }
 
+func (v *HttpView) UpdateClientSession(session *flashcard.MemorizingSessionDTO) {
+	cookies := EncodeMemorizingSessionToCookies(session)
+	for cookieName, cookieValue := range cookies {
+		v.w.Header().Add("Set-Cookie", cookieName+"="+cookieValue)
+	}
+}
+
 func (v *HttpView) GoToQuest() {
 	v.w.Header().Add("Location", "/quest")
 	v.w.WriteHeader(303)

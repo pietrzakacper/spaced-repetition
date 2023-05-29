@@ -2,6 +2,7 @@ package flashcard
 
 import (
 	"math/rand"
+	"time"
 
 	"golang.org/x/exp/slices"
 )
@@ -10,7 +11,53 @@ type MemorizingSession struct {
 	memorizedCount  int
 	cardsToMemorize []*flashcard
 	failedCards     []*flashcard
-	extraRound      bool
+	answers         map[string]int // key=cardId value=savedAnswer
+}
+
+type FlashcardInSessionDTO struct {
+	Id               string
+	Front            string
+	Back             string
+	CreationDate     time.Time
+	RepetitionCount  int
+	LastReviewDate   time.Time
+	NextReviewOffset int
+	EF               float64
+}
+
+type MemorizingSessionDTO struct {
+	MemorizedCount  int
+	CardsToMemorize []*FlashcardInSessionDTO
+	FailedCards     []*FlashcardInSessionDTO
+	Answers         map[string]int
+}
+
+func (f *flashcard) ToMemorizingSessionDTO() *FlashcardInSessionDTO {
+	return &FlashcardInSessionDTO{
+		Id:               f.id,
+		Front:            f.front,
+		Back:             f.back,
+		CreationDate:     f.creationDate,
+		RepetitionCount:  f.supermemo.RepetitionCount,
+		LastReviewDate:   f.supermemo.LastReviewDate,
+		NextReviewOffset: f.supermemo.NextReviewOffset,
+		EF:               f.supermemo.EF,
+	}
+}
+
+func (f *FlashcardInSessionDTO) ToFlashcard() *flashcard {
+	return &flashcard{
+		id:           f.Id,
+		front:        f.Front,
+		back:         f.Back,
+		creationDate: f.CreationDate,
+		supermemo: &supermemo{
+			RepetitionCount:  f.RepetitionCount,
+			LastReviewDate:   f.LastReviewDate,
+			NextReviewOffset: f.NextReviewOffset,
+			EF:               f.EF,
+		},
+	}
 }
 
 type SessionType int
@@ -28,8 +75,6 @@ func CreateSession(records []Record, sessionType SessionType) *MemorizingSession
 
 	for _, r := range records {
 		card := r.ToCard()
-
-		card.answerSubmitted = false
 
 		if sessionType == Review && card.supermemo.IsDueToReview() {
 			allValidCardsForSession = append(allValidCardsForSession, card)
@@ -59,21 +104,63 @@ func CreateSession(records []Record, sessionType SessionType) *MemorizingSession
 		memorizedCount:  0,
 		cardsToMemorize: cardsToMemorize,
 		failedCards:     make([]*flashcard, 0),
+		answers:         make(map[string]int),
+	}
+}
+
+func (m *MemorizingSession) ToDTO() *MemorizingSessionDTO {
+	cardsToMemorizeDTOs := make([]*FlashcardInSessionDTO, len(m.cardsToMemorize))
+
+	for i, f := range m.cardsToMemorize {
+		cardsToMemorizeDTOs[i] = f.ToMemorizingSessionDTO()
+	}
+
+	failedCardsDTOs := make([]*FlashcardInSessionDTO, len(m.failedCards))
+
+	for i, f := range m.failedCards {
+		failedCardsDTOs[i] = f.ToMemorizingSessionDTO()
+	}
+
+	return &MemorizingSessionDTO{
+		CardsToMemorize: cardsToMemorizeDTOs,
+		FailedCards:     failedCardsDTOs,
+		MemorizedCount:  m.memorizedCount,
+		Answers:         m.answers,
+	}
+}
+
+func (m *MemorizingSessionDTO) ToMemorizingSession() *MemorizingSession {
+	cardsToMemorize := make([]*flashcard, len(m.CardsToMemorize))
+
+	for i, f := range m.CardsToMemorize {
+		cardsToMemorize[i] = f.ToFlashcard()
+	}
+
+	failedCards := make([]*flashcard, len(m.FailedCards))
+
+	for i, f := range m.FailedCards {
+		failedCards[i] = f.ToFlashcard()
+	}
+
+	return &MemorizingSession{
+		cardsToMemorize: cardsToMemorize,
+		failedCards:     failedCards,
+		memorizedCount:  m.MemorizedCount,
+		answers:         m.Answers,
 	}
 }
 
 func (m *MemorizingSession) SubmitAnswer(answer int) *flashcard {
 	card := m.CurrentCard()
 
-	if card.answerSubmitted == false {
-		card.answerSubmitted = true
-		card.savedAnswer = answer
+	if _, hasAnswer := m.answers[card.id]; !hasAnswer {
+		m.answers[card.id] = answer
 	}
 
 	if answer < 4 {
 		m.failedCards = append(m.failedCards, card)
 	} else {
-		m.CurrentCard().supermemo.SubmitRepetition(card.savedAnswer)
+		m.CurrentCard().supermemo.SubmitRepetition(m.answers[card.id])
 	}
 
 	m.GoToNext()
@@ -90,7 +177,6 @@ func (m *MemorizingSession) GoToNext() {
 }
 
 func (m *MemorizingSession) HasEnded() bool {
-	// @TODO handle session that isn't initialized
 	return m.memorizedCount >= len(m.cardsToMemorize)
 }
 
@@ -110,10 +196,10 @@ func (m *MemorizingSession) ReviewFailedCardsAgain() {
 	m.memorizedCount = 0
 	m.cardsToMemorize = m.failedCards
 	m.failedCards = make([]*flashcard, 0)
-	m.extraRound = true
 }
 
 /* are we showing an extra round to memorize the failed cards? */
 func (m *MemorizingSession) IsExtraRound() bool {
-	return m.extraRound
+	_, hasAnswer := m.answers[m.CurrentCard().id]
+	return hasAnswer
 }

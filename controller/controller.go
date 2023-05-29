@@ -7,19 +7,20 @@ import (
 
 type Controller interface {
 	ShowHome()
-	ShowQuest()
-	ShowAnswer()
-	AddCard(front string, back string)
-	ImportCards(csvStream io.Reader)
 	CreateMemorizingSession()
 	CreateReviewSession()
-	SubmitAnswer(answer int)
+	ShowQuest(sessionDTO *flashcard.MemorizingSessionDTO)
+	ShowAnswer(sessionDTO *flashcard.MemorizingSessionDTO)
+	SubmitAnswer(sessionDTO *flashcard.MemorizingSessionDTO, answer int)
+	AddCard(front string, back string)
+	ImportCards(csvStream io.Reader)
 	ShowCards()
 	DeleteCard(cardId string) error
 	EditCard(cardId, front, back string) error
 }
 
 type View interface {
+	UpdateClientSession(session *flashcard.MemorizingSessionDTO)
 	GoToHome()
 	GoToAnswer()
 	GoToQuest()

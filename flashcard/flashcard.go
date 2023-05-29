@@ -10,9 +10,6 @@ type flashcard struct {
 	back         string
 	creationDate time.Time
 
-	answerSubmitted bool
-	savedAnswer     int
-
 	supermemo *supermemo
 }
 

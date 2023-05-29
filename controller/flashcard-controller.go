@@ -9,13 +9,12 @@ import (
 )
 
 type FlashcardsController struct {
-	view    View
-	store   Store
-	session *flashcard.MemorizingSession
+	view  View
+	store Store
 }
 
 func CreateFlashcardsController(view View, store Store) *FlashcardsController {
-	return &FlashcardsController{view, store, nil}
+	return &FlashcardsController{view, store}
 }
 
 func (c *FlashcardsController) getAllCards() []flashcard.Record {
@@ -87,68 +86,77 @@ func (c *FlashcardsController) ImportCards(csvStream io.Reader) {
 func (c *FlashcardsController) CreateMemorizingSession() {
 	records := c.getAllCards()
 
-	c.session = flashcard.CreateSession(records, flashcard.LearnNew)
+	session := flashcard.CreateSession(records, flashcard.LearnNew)
 
+	c.view.UpdateClientSession(session.ToDTO())
 	c.view.GoToQuest()
 }
 
 func (c *FlashcardsController) CreateReviewSession() {
 	records := c.getAllCards()
 
-	c.session = flashcard.CreateSession(records, flashcard.Review)
+	session := flashcard.CreateSession(records, flashcard.Review)
 
+	c.view.UpdateClientSession(session.ToDTO())
 	c.view.GoToQuest()
 }
 
-func (c *FlashcardsController) ShowQuest() {
-	if c.session.HasEnded() {
-		if c.session.HasAnyFailedCards() {
-			c.session.ReviewFailedCardsAgain()
+func (c *FlashcardsController) ShowQuest(sessionDTO *flashcard.MemorizingSessionDTO) {
+	session := sessionDTO.ToMemorizingSession()
+	if session.HasEnded() {
+		if session.HasAnyFailedCards() {
+			session.ReviewFailedCardsAgain()
+			c.view.UpdateClientSession(session.ToDTO())
 		} else {
 			c.view.GoToHome()
 			return
 		}
 	}
 
-	card := c.session.CurrentCard()
+	card := session.CurrentCard()
 
 	c.view.RenderCardQuestion(
 		card.ToDTO(),
-		c.session.CurrentCardNumber(),
-		c.session.TotalCardsNumber(),
-		c.session.IsExtraRound(),
+		session.CurrentCardNumber(),
+		session.TotalCardsNumber(),
+		session.IsExtraRound(),
 	)
 }
 
-func (c *FlashcardsController) ShowAnswer() {
-	if c.session.HasEnded() {
+func (c *FlashcardsController) ShowAnswer(sessionDTO *flashcard.MemorizingSessionDTO) {
+	session := sessionDTO.ToMemorizingSession()
+
+	if session.HasEnded() {
 		c.view.GoToQuest()
 	}
 
-	card := c.session.CurrentCard()
+	card := session.CurrentCard()
 
 	c.view.RenderCardAnswer(
 		card.ToDTO(),
-		c.session.CurrentCardNumber(),
-		c.session.TotalCardsNumber(),
+		session.CurrentCardNumber(),
+		session.TotalCardsNumber(),
 		[]int{0, 2, 4, 5},
 	)
 }
 
-func (c *FlashcardsController) SubmitAnswer(answer int) {
-	if c.session.HasEnded() {
+func (c *FlashcardsController) SubmitAnswer(sessionDTO *flashcard.MemorizingSessionDTO, answer int) {
+	session := sessionDTO.ToMemorizingSession()
+
+	if session.HasEnded() {
 		c.view.GoToQuest()
 		return
 	}
 
-	card := c.session.SubmitAnswer(answer)
+	card := session.SubmitAnswer(answer)
 
-	if c.session.HasEnded() && !c.session.HasAnyFailedCards() {
+	if session.HasEnded() && !session.HasAnyFailedCards() {
 		// if this is the last card in session, we want the DB update to happen before redirect
 		// to show consistent view to the user
 		c.store.Update(card.ToRecord())
 		c.view.GoToHome()
 	} else {
+		c.view.UpdateClientSession(session.ToDTO())
 		c.view.GoToQuest()
 		go c.store.Update(card.ToRecord())
 	}
