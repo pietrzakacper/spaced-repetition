@@ -59,6 +59,7 @@
       <script>
       const $btns = document.querySelectorAll('input[type="submit"]');
 
+
       const indexToBtn = {}
       Array.from($btns).forEach(($btn, index) => {
         indexToBtn[index + 1] = $btn
@@ -71,6 +72,23 @@
       document.addEventListener('keypress', (e) => {
         e.preventDefault()
         if(e.key in indexToBtn) indexToBtn[e.key].click()
+      })
+
+      const $forms = document.querySelectorAll('form')
+      const $answerUI = document.querySelector('.quest-content');
+
+      Array.from($forms).forEach(($form, index) => {
+        $form.addEventListener('submit', () => {
+
+          $answerUI.classList.add('card-loading')
+       
+          Object.entries(indexToBtn)
+            .filter(([key]) => +key != index + 1)
+            .forEach(([,$btn]) => {
+              $btn.setAttribute('disabled', 'true')
+              $btn.parentNode.removeChild($btn.parentNode.querySelector('.keyboard-nav'))
+            })
+        })
       })
     </script>
   </body>
