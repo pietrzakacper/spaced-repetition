@@ -3,6 +3,5 @@ flashcards.csv
 web/*.csv
 web/badger-db
 *.pem
-.*
-.*
 .vscode/launch.json
+.*
