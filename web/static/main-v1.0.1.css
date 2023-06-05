@@ -267,6 +267,10 @@ header.top {
   .answer-buttons-container .button {
     width: 150px;
   }
+
+  .keyboard-nav {
+    display: none;
+  }
 }
 
 
@@ -729,6 +733,7 @@ input:disabled {
   right: 7px;
   opacity: 0.7;
   font-size: 18px;
+  pointer-events: none;
 }
 
 @keyframes tilt-n-move-shaking {
