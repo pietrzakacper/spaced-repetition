@@ -179,37 +179,38 @@ func (c *FlashcardsController) ShowCards() {
 }
 
 func (c *FlashcardsController) DeleteCard(cardId string) error {
-	card, err := c.store.Find(cardId)
+	go func() {
+		card, err := c.store.Find(cardId)
 
-	if err != nil {
-		fmt.Println(err)
-		return err
-	}
+		if err != nil {
+			fmt.Println(err)
+		}
 
-	card.Deleted = true
+		card.Deleted = true
 
-	c.store.Update(&card)
-
+		c.store.Update(&card)
+	}()
 	return nil
 }
 
 func (c *FlashcardsController) EditCard(cardId, front, back string) error {
-	card, err := c.store.Find(cardId)
+	go func() {
+		card, err := c.store.Find(cardId)
 
-	if err != nil {
-		fmt.Println(err)
-		return err
-	}
+		if err != nil {
+			fmt.Println(err)
+		}
 
-	if len(front) > 0 {
-		card.Front = front
-	}
+		if len(front) > 0 {
+			card.Front = front
+		}
 
-	if len(back) > 0 {
-		card.Back = back
-	}
+		if len(back) > 0 {
+			card.Back = back
+		}
 
-	c.store.Update(&card)
+		c.store.Update(&card)
+	}()
 
 	return nil
 }
