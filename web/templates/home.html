@@ -21,29 +21,33 @@
               <form action="/review" method="POST">
                 <div class="memorize-column">
                   <span><b>Cards to review</b>: {{ .DueToReviewCount }}</span>
-                  <input
-                    {{if eq .DueToReviewCount 0}}disabled{{end}}
-                    class="button"
-                    type="submit"
-                    value="review"
-                   />
+                  <div class="loader-container">
+                    <input
+                      {{if eq .DueToReviewCount 0}}disabled{{end}}
+                      class="button"
+                      type="submit"
+                      value="review"
+                    />
+                   </div>
                 </div>
               </form>
               <form action="/learnNew" method="POST">
                 <div class="memorize-column">
                   <span><b>New cards</b>: {{ .NewCardsCount }}</span>
-                    <input
-                      {{if eq .NewCardsCount 0}}disabled{{end}}
-                      class="button secondary {{ if and (ne .AllCardsCount 0) (eq .AllCardsCount .NewCardsCount) }}glow-animation{{end}}"
-                      type="submit"
-                      value="memorize"
-                    />
+                  <div class="loader-container">
+                      <input
+                        {{if eq .NewCardsCount 0}}disabled{{end}}
+                        class="button secondary {{ if and (ne .AllCardsCount 0) (eq .AllCardsCount .NewCardsCount) }}glow-animation{{end}}"
+                        type="submit"
+                        value="memorize"
+                      />
+                    </div>
                 </div>
               </form>
             </section>
           <section class="memorize-section-mobile box {{if and (ne .AllCardsCount 0) (eq .DueToReviewCount 0) (eq .NewCardsCount 0)}}inactive{{end}}">
               <form action="/review" method="POST">
-                <div class="memorize-column">
+                <div class="memorize-column loader-container">
                   <input
                     {{if eq .DueToReviewCount 0}}disabled{{end}}
                     class="button"
@@ -53,7 +57,7 @@
                 </div>
               </form>
               <form action="/learnNew" method="POST">
-                <div class="memorize-column">
+                <div class="memorize-column loader-container">
                     <input
                       {{if eq .NewCardsCount 0}}disabled{{end}}
                       class="button secondary {{ if and (ne .AllCardsCount 0) (eq .AllCardsCount .NewCardsCount) }}glow-animation{{end}}"
@@ -101,7 +105,9 @@
                       autocomplete="off"
                     />
                   </div>
-                  <input class="button accent2" type="submit" value="add" />
+                  <div class="loader-container">
+                    <input class="button accent2" type="submit" value="add" />
+                  </div>
                 </div>
               </form>
             </section>
@@ -117,7 +123,9 @@
                       <span class='button'>Choose</span>
                       <span class='label' data-js-label>No file selected</label>
                     </div>
-                    <input class="button accent2" type="submit" value="import"/>
+                    <div class="loader-container">
+                      <input class="button accent2" type="submit" value="import"/>
+                    </div>
                   </div>
                 </form>
                 <script>
@@ -149,6 +157,19 @@
       <script>
         // autorefresh every 1h
         setInterval(() => window.location.reload(), 60 * 60 * 1000)
+      </script>
+      <script>
+        const findParentForm = (node) => node.tagName === 'FORM' ? node : node.parentNode && findParentForm(node.parentNode)
+        const $loaderContainers = document.querySelectorAll('.loader-container')
+
+        $loaderContainers.forEach(l => {
+          findParentForm(l)?.addEventListener('submit', () => {
+              const $loader = document.createElement('div')
+              $loader.classList.add('loader')
+              l.appendChild($loader)
+              l.querySelector('input').value = ''
+          })
+        })
       </script>
   </body>
 </html>
