@@ -33,8 +33,12 @@ func (v *HttpView) GoToCards() {
 func (v *HttpView) UpdateClientSession(session *flashcard.MemorizingSessionDTO) {
 	cookies := EncodeMemorizingSessionToCookies(session)
 	for cookieName, cookieValue := range cookies {
-		v.w.Header().Add("Set-Cookie", cookieName+"="+cookieValue+" Max-Age=1800")
+		v.w.Header().Add("Set-Cookie", cookieName+"="+cookieValue+" Max-Age=1800 Path=/")
 	}
+}
+
+func (v *HttpView) OnSessionFinished() {
+	v.w.Header().Add("Set-Cookie", "sessionFinished=true Path=/")
 }
 
 func (v *HttpView) GoToQuest() {

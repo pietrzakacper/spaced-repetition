@@ -108,6 +108,7 @@ func (c *FlashcardsController) ShowQuest(sessionDTO *flashcard.MemorizingSession
 			session.ReviewFailedCardsAgain()
 			c.view.UpdateClientSession(session.ToDTO())
 		} else {
+			c.view.OnSessionFinished()
 			c.view.GoToHome()
 			return
 		}
@@ -154,6 +155,7 @@ func (c *FlashcardsController) SubmitAnswer(sessionDTO *flashcard.MemorizingSess
 		// if this is the last card in session, we want the DB update to happen before redirect
 		// to show consistent view to the user
 		c.store.Update(card.ToRecord())
+		c.view.OnSessionFinished()
 		c.view.GoToHome()
 	} else {
 		c.view.UpdateClientSession(session.ToDTO())

@@ -24,6 +24,7 @@ type View interface {
 	GoToHome()
 	GoToAnswer()
 	GoToQuest()
+	OnSessionFinished()
 	GoToCards()
 	RenderHome(cards []flashcard.DTO, newCardsCount int, dueToReviewCount int)
 	RenderCardQuestion(card *flashcard.DTO, cardNumber int, totalCardsInSession int, extraRound bool)

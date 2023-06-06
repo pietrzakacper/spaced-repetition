@@ -171,5 +171,60 @@
           })
         })
       </script>
+      <script src="https://cdn.jsdelivr.net/npm/tsparticles-confetti@2.9.3/tsparticles.confetti.bundle.min.js"></script>
+      <script>
+        const count = 200;
+        const defaults = {
+          origin: { y: 0.5 },
+        };
+
+        function fire(particleRatio, opts) {
+          confetti(
+            Object.assign({}, defaults, opts, {
+              particleCount: Math.floor(count * particleRatio),
+            })
+          );
+        }
+
+        function runConfetti() {
+          fire(0.25, {
+            spread: 26,
+            startVelocity: 55,
+          });
+
+          fire(0.2, {
+            spread: 60,
+          });
+
+          fire(0.35, {
+            spread: 100,
+            decay: 0.91,
+            scalar: 0.8,
+          });
+
+          fire(0.1, {
+            spread: 120,
+            startVelocity: 25,
+            decay: 0.92,
+            scalar: 1.2,
+          });
+
+          fire(0.1, {
+            spread: 120,
+            startVelocity: 45,
+          });
+        }
+
+        function delete_cookie(name) {
+          document.cookie = name +'=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+        }
+
+         {{if and (ne .AllCardsCount 0) (eq .DueToReviewCount 0) (eq .NewCardsCount 0)}}            
+            if(document.cookie.includes('sessionFinished=true')) {
+              setTimeout(() => { runConfetti() }, 1000)
+              delete_cookie('sessionFinished')
+            }
+          {{end}}
+      </script>
   </body>
 </html>
