@@ -666,6 +666,20 @@ input:disabled {
 }
 
 @media only screen and (max-width: 1000px) {
+  .login-main-container {
+    height: 95vh;
+    width: 95vw;
+  }
+
+  .login-main-content {
+    width: unset;
+    padding: 30px;
+  }
+
+  .all-memorized-msg {
+    font-size: 18px;
+  }
+
   .card-container {
     margin-top: 1rem;
   }
