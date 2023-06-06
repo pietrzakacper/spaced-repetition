@@ -34,5 +34,15 @@
         </main>
       </div>
     </div>
+      <script>
+          const standalone = window.navigator.standalone;
+          const userAgent = window.navigator.userAgent.toLowerCase();
+          const safari = /safari/.test(userAgent);
+          const ios = /iphone|ipod|ipad/.test(userAgent);
+  
+            if (ios && !standalone && !safari) {
+                document.querySelector('.login-home').innerHTML = '<div style="font-size: 14px">Oops 💩 Please login using proper browser like Chrome or Safari.</div>'
+            }
+      </script>
   </body>
 </html>
