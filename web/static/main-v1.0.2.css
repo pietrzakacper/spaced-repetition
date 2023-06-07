@@ -609,6 +609,7 @@ input:disabled {
   color: #717171;
   position: absolute;
   top: 0;
+  left: 0;
   transform: translateY(calc(-100% - 4px));
   font-size: 20px;
   font-weight: 500;
