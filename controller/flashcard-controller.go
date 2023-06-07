@@ -1,11 +1,12 @@
 package controller
 
 import (
-	"csv"
+	"encoding/csv"
 	"flashcard"
 	"fmt"
 	"io"
 	"strings"
+	"sync"
 )
 
 type FlashcardsController struct {
@@ -64,23 +65,59 @@ func (c *FlashcardsController) AddCard(front string, back string) {
 	c.view.GoToHome()
 }
 
+func normalizeColumn(col string) string {
+	return strings.ToLower(strings.Trim(col, " "))
+}
+
 func (c *FlashcardsController) ImportCards(csvStream io.Reader) {
 	defer c.view.GoToHome()
-	entriesChan, err := csv.ParseCSVStream(csvStream, []string{"front", "back"})
+	r := csv.NewReader(csvStream)
+	r.FieldsPerRecord = 2
+	columns, err := r.Read()
 
 	if err != nil {
 		fmt.Println("Error importing cards:", err)
 		return
 	}
 
-	for entry := range entriesChan {
-		fmt.Println(entry)
-		card := (&flashcard.DTO{Front: strings.Trim(entry[0], " "), Back: strings.Trim(entry[1], " ")}).ToCard()
-
-		record := card.ToRecord()
-
-		c.store.Add(record)
+	frontIndex := -1
+	backIndex := -1
+	for colIndex := range columns {
+		if normalizeColumn(columns[colIndex]) == "front" {
+			frontIndex = colIndex
+		} else if normalizeColumn(columns[colIndex]) == "back" {
+			backIndex = colIndex
+		}
 	}
+
+	if frontIndex < 0 || backIndex < 0 {
+		fmt.Println("Incorrect columns in CSV:", columns)
+		return
+	}
+
+	var wg sync.WaitGroup
+
+	for {
+		line, err := r.Read()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			fmt.Println("Error reading CSV line", err)
+		}
+
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			card := (&flashcard.DTO{Front: strings.Trim(line[frontIndex], " "), Back: strings.Trim(line[backIndex], " ")}).ToCard()
+
+			record := card.ToRecord()
+
+			c.store.Add(record)
+		}()
+	}
+
+	wg.Wait()
 }
 
 func (c *FlashcardsController) CreateMemorizingSession() {

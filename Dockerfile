@@ -1,7 +1,6 @@
 FROM golang:1.19
 
 COPY ./controller /app/controller
-COPY ./csv /app/csv
 COPY ./flashcard /app/flashcard
 COPY ./persistance /app/persistance
 COPY ./user /app/user
