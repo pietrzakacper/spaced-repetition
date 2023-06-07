@@ -104,6 +104,7 @@ func (c *FlashcardsController) ImportCards(csvStream io.Reader) {
 		}
 		if err != nil {
 			fmt.Println("Error reading CSV line", err)
+			continue
 		}
 
 		wg.Add(1)
