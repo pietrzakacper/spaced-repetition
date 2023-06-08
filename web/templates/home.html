@@ -112,9 +112,25 @@
                     />
                   </div>
                   <div class="loader-container">
-                    <input class="button accent2" type="submit" value="add" />
+                    <input class="button accent2" type="submit" value="add" disabled />
                   </div>
                 </div>
+                <script>
+                  const $addBtn = document.querySelector('input[value="add"]')
+                  const $frontInput = document.querySelector('input[name="front"]')
+                  const $backInput = document.querySelector('input[name="back"]')
+
+                  const onInputChange = (event) => {
+                      if($frontInput.value?.length > 0 && $backInput.value?.length > 0) {
+                        $addBtn.removeAttribute('disabled')
+                      } else {
+                        $addBtn.setAttribute('disabled', 'true')
+                      }
+                  }
+
+                  $frontInput.addEventListener('input', onInputChange)
+                  $backInput.addEventListener('input', onInputChange)
+                </script>
               </form>
             </section>
 
@@ -130,7 +146,7 @@
                       <span class='label' data-js-label>No file selected</label>
                     </div>
                     <div class="loader-container">
-                      <input class="button accent2" type="submit" value="import"/>
+                      <input class="button accent2" type="submit" value="import" disabled/>
                     </div>
                   </div>
                 </form>
@@ -141,14 +157,20 @@
                   customInput(inputs[i])
                   }
 
+                  const $importBtn = document.querySelector('input[value="import"]')
+
                   function customInput (el) {
                   const fileInput = el.querySelector('[type="file"]')
                   const label = el.querySelector('[data-js-label]')
                   
                   fileInput.onchange =
                   fileInput.onmouseout = function () {
-                    if (!fileInput.value) return
+                    if (!fileInput.value) {
+                        $addBtn.setAttribute('disabled', 'true')
+                        return
+                    }
                     
+                    $importBtn.removeAttribute('disabled')
                     var value = fileInput.value.replace(/^.*[\\\/]/, '')
                     el.className += ' -chosen'
                     label.innerText = value
