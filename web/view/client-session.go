@@ -40,12 +40,12 @@ func DecodeCookiesToMemorizingSession(r *http.Request) *flashcard.MemorizingSess
 		cookies[str.Name] = str.Value
 	}
 
-	noOfPagesCookie := strings.Split(cookies[cookie_prefix+"-len"], " ")[0]
+	noOfPagesCookie := strings.Split(cookies[cookie_prefix+"-len"], "; ")[0]
 	noOfPages, _ := strconv.ParseInt(noOfPagesCookie, 10, 64)
 
 	memorizingSessionEncoded := ""
 	for i := 0; i < int(noOfPages); i++ {
-		memorizingSessionEncoded += strings.Split(cookies[cookie_prefix+"-p-"+fmt.Sprint(i)], " ")[0]
+		memorizingSessionEncoded += strings.Split(cookies[cookie_prefix+"-p-"+fmt.Sprint(i)], "; ")[0]
 	}
 
 	memorizingSessionCookieJson, _ := base64.StdEncoding.DecodeString(memorizingSessionEncoded)

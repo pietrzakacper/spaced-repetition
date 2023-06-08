@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"strings"
 	"sync"
 	"user"
 	"web/view"
@@ -80,7 +81,8 @@ func (i HttpInteractor) authenticateUser(w http.ResponseWriter, r *http.Request,
 	cookieMap := make(map[string]string, 1)
 
 	for _, str := range cookies {
-		cookieMap[str.Name] = str.Value
+		// ignore cookie attributes
+		cookieMap[str.Name] = strings.Split(str.Value, "; ")[0]
 	}
 
 	authToken := cookieMap["sessionToken"]
@@ -163,7 +165,8 @@ func (i HttpInteractor) Start() {
 		_, err := verifyIdToken(token)
 
 		if err == nil {
-			w.Header().Add("Set-Cookie", "sessionToken="+token)
+			// keep logged in for 90 days
+			w.Header().Add("Set-Cookie", "sessionToken="+token+"; Max-Age=7776000; Path=/; SameSite=Strict; HttpOnly; Secure;")
 		}
 
 		w.Header().Add("Location", "/")
