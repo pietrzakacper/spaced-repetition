@@ -88,6 +88,7 @@
       const $cards = document.querySelectorAll("#small-card-container");
 
       Array.from($cards).forEach(($card) => {
+        let requestInProgress = false
         const cardId = $card.getAttribute("cardId");
 
         const showEditForm = () => {
@@ -127,6 +128,8 @@
         $card
           .querySelector("#approve-button")
           .addEventListener("click", async () => {
+            if(requestInProgress) return
+            requestInProgress = true
             const $frontInput = $card.querySelector("input[name=Front]");
             const $backInput = $card.querySelector("input[name=Back]");
 
@@ -141,6 +144,8 @@
               }),
             });
 
+            requestInProgress = false
+
             const $smallCardFront = $card.querySelector("#small-card-front");
             const $smallCardBack = $card.querySelector("#small-card-back");
 
@@ -154,9 +159,12 @@
         $card
           .querySelector("#delete-button")
           .addEventListener("click", async () => {
+            if(requestInProgress) return
+            requestInProgress = true
             const res = await fetch(`/delete-card?id=${cardId}`, {
               method: "POST",
             });
+            requestInProgress = false
 
             if (res.status === 200) {
               $card.parentElement.removeChild($card);

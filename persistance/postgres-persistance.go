@@ -7,7 +7,6 @@ import (
 	"log"
 	"os"
 	"sort"
-	"time"
 
 	_ "github.com/jackc/pgx/v4/stdlib"
 )
@@ -67,12 +66,14 @@ func (p *PostgresStore) ReadAll() []flashcard.Record {
 	return records
 }
 
+const cards_limit_per_user = 20000
+
 func (p *PostgresStore) Add(r *flashcard.Record) {
 	_, err := p.db.Exec(`
 		INSERT into flashcards
 		(id, creation_date, user_id, front, back, repetition_count, next_review_offset, ef, deleted, last_review_date)
-		VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7, $8, $9)`,
-		time.Now(),
+		SELECT gen_random_uuid(), CURRENT_TIMESTAMP, $1, $2, $3, $4, $5, $6, $7, $8
+		WHERE (SELECT COUNT(*) FROM flashcards WHERE user_id=$1) < $9`,
 		p.userId,
 		r.Front,
 		r.Back,
@@ -81,10 +82,11 @@ func (p *PostgresStore) Add(r *flashcard.Record) {
 		r.EF,
 		r.Deleted,
 		r.LastReviewDate,
+		cards_limit_per_user,
 	)
 
 	if err != nil {
-		log.Fatalln(err)
+		log.Println(err)
 	}
 }
 
@@ -104,7 +106,7 @@ func (p *PostgresStore) Update(r *flashcard.Record) {
 	)
 
 	if err != nil {
-		log.Fatalln(err)
+		log.Println(err)
 	}
 }
 
@@ -119,7 +121,7 @@ func (p *PostgresStore) Find(cardId string) (flashcard.Record, error) {
 	defer rows.Close()
 
 	if err != nil || !rows.Next() {
-		log.Fatalln(err)
+		log.Println(err)
 	}
 
 	r := flashcard.Record{}

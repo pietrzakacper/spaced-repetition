@@ -110,7 +110,7 @@ func (c *FlashcardsController) ImportCards(csvStream io.Reader) {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
-			card := (&flashcard.DTO{Front: strings.Trim(line[frontIndex], " "), Back: strings.Trim(line[backIndex], " ")}).ToCard()
+			card := (&flashcard.DTO{Front: line[frontIndex], Back: line[backIndex]}).ToCard()
 
 			record := card.ToRecord()
 

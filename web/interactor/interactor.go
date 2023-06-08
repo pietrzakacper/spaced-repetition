@@ -18,17 +18,22 @@ type Interactor interface {
 	Start()
 }
 
+type UserSessionWithLock struct {
+	session *user.UserSession
+	lock    *sync.Mutex
+}
+
 type HttpInteractor struct {
 	sessionFactory *user.UserSessionFactory
 
-	sessions     map[string]*user.UserSession
-	sessionsLock sync.Mutex
+	sessions           map[string]*UserSessionWithLock
+	sessionsCommonLock sync.Mutex
 }
 
 func CreateHttpInteractor(sessionFactory *user.UserSessionFactory) HttpInteractor {
 	return HttpInteractor{
 		sessionFactory,
-		map[string]*user.UserSession{},
+		map[string]*UserSessionWithLock{},
 		sync.Mutex{},
 	}
 }
@@ -53,18 +58,21 @@ func verifyIdToken(idToken string) (*oauth2.Tokeninfo, error) {
 func (i HttpInteractor) authenticateUser(w http.ResponseWriter, r *http.Request, keepLocationOnAuthFail ...bool) (*user.UserSession, error) {
 	if os.Getenv("LOCAL_DEV") == "true" {
 		if c := i.sessions["LOCAL"]; c != nil {
-			c.SetRequestContext(w)
-			return c, nil
+			c.session.SetRequestContext(w)
+			return c.session, nil
 		}
-		c := i.sessionFactory.Create(user.UserContext{
-			Id: "123", Email: "kacpietrzak@gmail.com",
-		})
+		c := &UserSessionWithLock{
+			session: i.sessionFactory.Create(user.UserContext{
+				Id: "123", Email: "kacpietrzak@gmail.com",
+			}),
+			lock: &sync.Mutex{},
+		}
 
 		i.sessions["LOCAL"] = c
 
-		c.SetRequestContext(w)
+		c.session.SetRequestContext(w)
 
-		return c, nil
+		return c.session, nil
 	}
 
 	cookies := r.Cookies()
@@ -78,18 +86,6 @@ func (i HttpInteractor) authenticateUser(w http.ResponseWriter, r *http.Request,
 	authToken := cookieMap["sessionToken"]
 	w.Header().Add("Referrer-Policy", "no-referrer-when-downgrade")
 
-	i.sessionsLock.Lock()
-
-	c := i.sessions[authToken]
-
-	defer i.sessionsLock.Unlock()
-
-	if c != nil {
-		c.SetRequestContext(w)
-		return c, nil
-	}
-
-	// @TODO investigate double call
 	if authToken == "" {
 		fmt.Printf("/login error: No sessionToken")
 
@@ -99,6 +95,26 @@ func (i HttpInteractor) authenticateUser(w http.ResponseWriter, r *http.Request,
 		}
 
 		return nil, errors.New("Unauthorized")
+	}
+
+	i.sessionsCommonLock.Lock()
+	sl := i.sessions[authToken]
+
+	if sl == nil {
+		sl = &UserSessionWithLock{
+			session: nil,
+			lock:    &sync.Mutex{},
+		}
+		i.sessions[authToken] = sl
+	}
+	i.sessionsCommonLock.Unlock()
+
+	sl.lock.Lock()
+	defer sl.lock.Unlock()
+
+	if sl.session != nil {
+		sl.session.SetRequestContext(w)
+		return sl.session, nil
 	}
 
 	tokenInfo, err := verifyIdToken(authToken)
@@ -114,14 +130,13 @@ func (i HttpInteractor) authenticateUser(w http.ResponseWriter, r *http.Request,
 		return nil, errors.New("Unauthorized")
 	}
 
-	c = i.sessionFactory.Create(user.UserContext{
+	sl.session = i.sessionFactory.Create(user.UserContext{
 		Id: tokenInfo.UserId, Email: tokenInfo.Email,
 	})
-	i.sessions[authToken] = c
 
-	c.SetRequestContext(w)
+	sl.session.SetRequestContext(w)
 
-	return c, nil
+	return sl.session, nil
 }
 
 func (i HttpInteractor) Start() {
@@ -143,6 +158,8 @@ func (i HttpInteractor) Start() {
 	})
 
 	http.HandleFunc("/login", func(w http.ResponseWriter, r *http.Request) {
+		const max_request_size = 4096
+		r.Body = http.MaxBytesReader(w, r.Body, max_request_size)
 		r.ParseForm()
 		token := r.Form.Get("credential")
 		_, err := verifyIdToken(token)
@@ -157,10 +174,14 @@ func (i HttpInteractor) Start() {
 
 	http.HandleFunc("/add", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "POST" {
+			w.Header().Add("Location", "/")
+			w.WriteHeader(303)
 			return
 		}
 
 		if c, err := i.authenticateUser(w, r); err == nil {
+			const max_request_size = 1024
+			r.Body = http.MaxBytesReader(w, r.Body, max_request_size)
 			r.ParseForm()
 
 			front, back := r.Form.Get("front"), r.Form.Get("back")
@@ -176,10 +197,14 @@ func (i HttpInteractor) Start() {
 
 	http.HandleFunc("/import", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "POST" {
+			w.Header().Add("Location", "/")
+			w.WriteHeader(303)
 			return
 		}
 
 		if c, err := i.authenticateUser(w, r); err == nil {
+			const max_request_size = 2 * 1024 * 1024
+			r.Body = http.MaxBytesReader(w, r.Body, max_request_size)
 			r.ParseMultipartForm(10 << 20)
 
 			file, _, err := r.FormFile("fileToUpload")
@@ -195,6 +220,8 @@ func (i HttpInteractor) Start() {
 
 	http.HandleFunc("/learnNew", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "POST" {
+			w.Header().Add("Location", "/")
+			w.WriteHeader(303)
 			return
 		}
 
@@ -205,6 +232,8 @@ func (i HttpInteractor) Start() {
 
 	http.HandleFunc("/review", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "POST" {
+			w.Header().Add("Location", "/")
+			w.WriteHeader(303)
 			return
 		}
 
@@ -229,6 +258,8 @@ func (i HttpInteractor) Start() {
 
 	http.HandleFunc("/submitAnswer", func(w http.ResponseWriter, r *http.Request) {
 		if c, err := i.authenticateUser(w, r); err == nil {
+			const max_request_size = 1024
+			r.Body = http.MaxBytesReader(w, r.Body, max_request_size)
 			r.ParseForm()
 			answerStr := r.Form.Get("answerFeedback")
 
@@ -246,6 +277,8 @@ func (i HttpInteractor) Start() {
 
 	http.HandleFunc("/delete-card", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "POST" {
+			w.Header().Add("Location", "/")
+			w.WriteHeader(303)
 			return
 		}
 
@@ -263,10 +296,14 @@ func (i HttpInteractor) Start() {
 
 	http.HandleFunc("/edit-card", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "POST" {
+			w.Header().Add("Location", "/")
+			w.WriteHeader(303)
 			return
 		}
 
 		if c, err := i.authenticateUser(w, r); err == nil {
+			const max_request_size = 1024
+			r.Body = http.MaxBytesReader(w, r.Body, max_request_size)
 			cardId := r.URL.Query().Get("id")
 
 			payload := EditCardPayload{}

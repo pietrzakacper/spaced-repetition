@@ -247,12 +247,12 @@
           document.cookie = name +'=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
         }
 
-         {{if and (ne .AllCardsCount 0) (eq .DueToReviewCount 0) (eq .NewCardsCount 0)}}            
-            if(document.cookie.includes('sessionFinished=true')) {
-              setTimeout(() => { runConfetti() }, 500)
+          if(document.cookie.includes('sessionFinished=true')) {
               delete_cookie('sessionFinished')
+              {{if and (ne .AllCardsCount 0) (eq .DueToReviewCount 0) (eq .NewCardsCount 0)}}            
+                    setTimeout(() => { runConfetti() }, 500)
+                {{end}}
             }
-          {{end}}
       </script>
   </body>
 </html>

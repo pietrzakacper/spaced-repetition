@@ -1,6 +1,7 @@
 package flashcard
 
 import (
+	"strings"
 	"time"
 )
 
@@ -31,10 +32,20 @@ type Record struct {
 	Deleted          bool
 }
 
+const card_front_back_size_limit = 300
+
+func withSizeLimit(s string) string {
+	if len(s) > card_front_back_size_limit {
+		return s[:card_front_back_size_limit]
+	}
+
+	return s
+}
+
 func (dto *DTO) ToCard() *flashcard {
 	return &flashcard{
-		front:        dto.Front,
-		back:         dto.Back,
+		front:        withSizeLimit(strings.Trim(dto.Front, " ")),
+		back:         withSizeLimit(strings.Trim(dto.Back, " ")),
 		creationDate: time.Now(),
 		supermemo:    InitSupermemo(),
 	}
