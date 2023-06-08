@@ -87,8 +87,6 @@ func (i HttpInteractor) authenticateUser(w http.ResponseWriter, r *http.Request,
 	w.Header().Add("Referrer-Policy", "no-referrer-when-downgrade")
 
 	if authToken == "" {
-		fmt.Printf("/login error: No sessionToken")
-
 		if len(keepLocationOnAuthFail) == 0 || !keepLocationOnAuthFail[0] {
 			w.Header().Add("Location", "/")
 			w.WriteHeader(303)
