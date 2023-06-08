@@ -659,11 +659,10 @@ input:disabled {
   75% { transform: translate(-5px, 5px) rotate(-2deg); }
   100% { transform: translate(0, 0) rotate(0deg); }
 }
-.card-loading {
+.card-loading-bad {
   --speed: 0.7s;
   --easing: ease-out;
   animation: tilt-n-move-shaking  var(--speed) var(--easing) infinite;
-  pointer-events: none;
   animation-delay: 300ms;
 }
 @keyframes spin {
@@ -673,6 +672,21 @@ input:disabled {
   100% {
     transform: rotate(360deg);
   }
+}
+
+@keyframes jump {
+  0%   {transform: translate3d(0,0%,0); }
+  40%  {transform: translate3d(0,-2%,0); }
+  100% {transform: translate3d(0,-10%,0);}
+}
+.card-loading-good {
+  transform-origin: 50% 50%;
+  animation: jump .4s linear alternate infinite;
+  animation-delay: 300ms;
+}
+
+.no-touching {
+  pointer-events: none;
 }
 
 .loader-container {

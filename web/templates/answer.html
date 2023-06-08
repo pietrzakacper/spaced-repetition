@@ -1,7 +1,7 @@
 <html>
   <head>
     <link rel="stylesheet" href="/static/satoshi.css" />
-    <link rel="stylesheet" href="/static/main-v1.1.0.css" />
+    <link rel="stylesheet" href="/static/main-v1.1.1.css" />
     <link rel="icon" href="/static/favicon.ico"/>
     <link
       href="https://fonts.googleapis.com/css?family=Poppins:300,300i,500,500i,700"
@@ -74,13 +74,20 @@
       })
 
       const $forms = document.querySelectorAll('form')
+      const $card = document.querySelector('.card');
       const $answerUI = document.querySelector('.quest-content');
 
       Array.from($forms).forEach(($form, index) => {
         $form.addEventListener('submit', () => {
 
-          $answerUI.classList.add('card-loading')
-       
+          if(index < 2) {
+            $card.classList.add('card-loading-bad')
+          } else {
+            $card.classList.add('card-loading-good')
+          }
+
+          $answerUI.classList.add('no-touching')
+
           Object.entries(indexToBtn)
             .filter(([key]) => +key != index + 1)
             .forEach(([,$btn]) => {

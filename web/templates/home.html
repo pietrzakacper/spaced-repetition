@@ -1,7 +1,7 @@
 <html>
   <head>
     <link rel="stylesheet" href="/static/satoshi.css" />
-    <link rel="stylesheet" href="/static/main-v1.1.0.css" />
+    <link rel="stylesheet" href="/static/main-v1.1.1.css" />
     <link rel="icon" href="/static/favicon.ico"/>
     <meta name="viewport" content="width=device-width initial-scale=1">
     <title>spaced repetition</title>
@@ -227,7 +227,7 @@
 
          {{if and (ne .AllCardsCount 0) (eq .DueToReviewCount 0) (eq .NewCardsCount 0)}}            
             if(document.cookie.includes('sessionFinished=true')) {
-              setTimeout(() => { runConfetti() }, 1000)
+              setTimeout(() => { runConfetti() }, 500)
               delete_cookie('sessionFinished')
             }
           {{end}}
