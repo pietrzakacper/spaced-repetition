@@ -633,12 +633,18 @@ input:disabled {
 .import-label {
   line-height: 24px;
   vertical-align: middle;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.import-video-icon {
+  transform: translateY(2px);
 }
 
 .import-instruction {
   font-size: 20px;
   opacity: 0.5;
-  margin-left: 8px;
   color: #717171;
   opacity: 0;
   transition: opacity 500ms linear;
