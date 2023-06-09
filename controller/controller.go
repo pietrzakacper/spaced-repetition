@@ -33,7 +33,7 @@ type View interface {
 }
 
 type Persistance interface {
-	Create(name string, userId string) Store
+	Create(userId string) Store
 }
 
 type Store interface {
@@ -41,4 +41,7 @@ type Store interface {
 	Add(record *flashcard.Record)
 	Update(record *flashcard.Record)
 	Find(cardId string) (flashcard.Record, error)
+
+	FindUserIdByToken(token string) (string, error)
+	UpsertSession(token string, userId string)
 }

@@ -15,12 +15,11 @@ type UserSession struct {
 }
 
 type UserContext struct {
-	Id    string
 	Email string
 }
 
 func (u *UserSessionFactory) Create(userContext UserContext) *UserSession {
-	store := u.Persistance.Create("db", userContext.Email)
+	store := u.Persistance.Create(userContext.Email)
 	view := view.CreateHttpView(userContext.Email)
 
 	return &UserSession{

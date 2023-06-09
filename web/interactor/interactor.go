@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"persistance"
 	"strconv"
 	"strings"
 	"sync"
@@ -56,7 +57,7 @@ func verifyIdToken(idToken string) (*oauth2.Tokeninfo, error) {
 }
 
 // @TODO think about making a server middleware
-func (i HttpInteractor) authenticateUser(w http.ResponseWriter, r *http.Request, keepLocationOnAuthFail ...bool) (*user.UserSession, error) {
+func (i HttpInteractor) authenticateUser(w http.ResponseWriter, r *http.Request) (*user.UserSession, error) {
 	if os.Getenv("LOCAL_DEV") == "true" {
 		if c := i.sessions["LOCAL"]; c != nil {
 			c.session.SetRequestContext(w)
@@ -64,7 +65,7 @@ func (i HttpInteractor) authenticateUser(w http.ResponseWriter, r *http.Request,
 		}
 		c := &UserSessionWithLock{
 			session: i.sessionFactory.Create(user.UserContext{
-				Id: "123", Email: "kacpietrzak@gmail.com",
+				Email: "kacpietrzak@gmail.com",
 			}),
 			lock: &sync.Mutex{},
 		}
@@ -89,10 +90,10 @@ func (i HttpInteractor) authenticateUser(w http.ResponseWriter, r *http.Request,
 	w.Header().Add("Referrer-Policy", "no-referrer-when-downgrade")
 
 	if authToken == "" {
-		if len(keepLocationOnAuthFail) == 0 || !keepLocationOnAuthFail[0] {
-			w.Header().Add("Location", "/")
-			w.WriteHeader(303)
-		}
+		// user logged out
+		anonymousView := view.CreateHttpView("")
+		anonymousView.SetRequestContext(w)
+		anonymousView.RenderLogin()
 
 		return nil, errors.New("Unauthorized")
 	}
@@ -112,27 +113,44 @@ func (i HttpInteractor) authenticateUser(w http.ResponseWriter, r *http.Request,
 	sl.lock.Lock()
 	defer sl.lock.Unlock()
 
+	// try finding session in the memory
 	if sl.session != nil {
 		sl.session.SetRequestContext(w)
 		return sl.session, nil
 	}
 
+	// try finding the session in DB
+	db := (&persistance.PostgresPersistance{}).Create("anonymous@spaced.sh")
+	userIdFromDb, err := db.FindUserIdByToken(authToken)
+
+	if err == nil {
+		sl.session = i.sessionFactory.Create(user.UserContext{
+			Email: userIdFromDb,
+		})
+		sl.session.SetRequestContext(w)
+
+		return sl.session, nil
+	}
+
+	// if there was no saved session for the user, we need to verify the token and save it
 	tokenInfo, err := verifyIdToken(authToken)
 
 	if err != nil {
 		fmt.Printf("/login error: %v\n", err)
 
-		if len(keepLocationOnAuthFail) == 0 || !keepLocationOnAuthFail[0] {
-			w.Header().Add("Location", "/")
-			w.WriteHeader(303)
-		}
+		// user logged out
+		anonymousView := view.CreateHttpView("")
+		anonymousView.SetRequestContext(w)
+		anonymousView.RenderLogin()
 
 		return nil, errors.New("Unauthorized")
 	}
 
 	sl.session = i.sessionFactory.Create(user.UserContext{
-		Id: tokenInfo.UserId, Email: tokenInfo.Email,
+		Email: tokenInfo.Email,
 	})
+
+	db.UpsertSession(authToken, tokenInfo.Email)
 
 	sl.session.SetRequestContext(w)
 
@@ -145,16 +163,11 @@ func (i HttpInteractor) Start() {
 	http.Handle("/static/", http.StripPrefix("/static", fs))
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		if c, err := i.authenticateUser(w, r, true); err == nil {
+		if c, err := i.authenticateUser(w, r); err == nil {
 			// user logged in
 			c.ShowHome()
 			return
 		}
-
-		// user logged out
-		anonymousView := view.CreateHttpView("")
-		anonymousView.SetRequestContext(w)
-		anonymousView.RenderLogin()
 	})
 
 	http.HandleFunc("/login", func(w http.ResponseWriter, r *http.Request) {

@@ -3,6 +3,7 @@ package persistance
 import (
 	"controller"
 	"database/sql"
+	"errors"
 	"flashcard"
 	"log"
 	"os"
@@ -21,7 +22,7 @@ type PostgresStore struct {
 
 var db *sql.DB
 
-func (p *PostgresPersistance) Create(name string, userId string) controller.Store {
+func (p *PostgresPersistance) Create(userId string) controller.Store {
 	if db == nil {
 		var err error
 		db, err = sql.Open("pgx", os.Getenv("DATABASE_URL"))
@@ -129,4 +130,42 @@ func (p *PostgresStore) Find(cardId string) (flashcard.Record, error) {
 	rows.Scan(&r.Id, &r.Front, &r.Back, &r.RepetitionCount, &r.NextReviewOffset, &r.EF, &r.Deleted, &r.CreationDate, &r.LastReviewDate)
 
 	return r, nil
+}
+
+func (p *PostgresStore) FindUserIdByToken(token string) (string, error) {
+	rows, err := p.db.Query(`SELECT user_id FROM sessions WHERE token=$1`, token)
+	defer rows.Close()
+
+	if err != nil {
+		log.Println(err)
+		return "", errors.New("Unknown error")
+	}
+
+	if !rows.Next() {
+		return "", errors.New("No token found")
+	}
+
+	var userId string
+	rows.Scan(&userId)
+
+	if len(userId) > 0 {
+		return userId, nil
+	}
+
+	return "", errors.New("user_id empty")
+}
+
+func (p *PostgresStore) UpsertSession(token string, userId string) {
+	_, err := p.db.Exec(`
+		INSERT INTO sessions (token, user_id)
+		VALUES($1, $2) 
+		ON CONFLICT (user_id) 
+		DO 
+		UPDATE SET token = $1;
+	`, token, userId)
+
+	if err != nil {
+		log.Println(err)
+		return
+	}
 }
