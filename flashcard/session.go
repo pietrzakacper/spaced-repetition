@@ -168,6 +168,16 @@ func (m *MemorizingSession) SubmitAnswer(answer int) *flashcard {
 	return card
 }
 
+func (m *MemorizingSession) IsValid() bool {
+	return m.cardsToMemorize != nil &&
+		m.failedCards != nil &&
+		m.answers != nil &&
+		len(m.cardsToMemorize) > 0 &&
+		m.memorizedCount >= 0 &&
+		m.memorizedCount <= len(m.cardsToMemorize) &&
+		len(m.failedCards) <= len(m.cardsToMemorize)
+}
+
 func (m *MemorizingSession) CurrentCard() *flashcard {
 	return m.cardsToMemorize[m.memorizedCount]
 }

@@ -72,7 +72,6 @@ func normalizeColumn(col string) string {
 func (c *FlashcardsController) ImportCards(csvStream io.Reader) {
 	defer c.view.GoToHome()
 	r := csv.NewReader(csvStream)
-	r.FieldsPerRecord = 2
 	columns, err := r.Read()
 
 	if err != nil {
@@ -141,6 +140,12 @@ func (c *FlashcardsController) CreateReviewSession() {
 
 func (c *FlashcardsController) ShowQuest(sessionDTO *flashcard.MemorizingSessionDTO) {
 	session := sessionDTO.ToMemorizingSession()
+
+	if !session.IsValid() {
+		c.view.GoToHome()
+		return
+	}
+
 	if session.HasEnded() {
 		if session.HasAnyFailedCards() {
 			session.ReviewFailedCardsAgain()
@@ -165,8 +170,14 @@ func (c *FlashcardsController) ShowQuest(sessionDTO *flashcard.MemorizingSession
 func (c *FlashcardsController) ShowAnswer(sessionDTO *flashcard.MemorizingSessionDTO) {
 	session := sessionDTO.ToMemorizingSession()
 
+	if !session.IsValid() {
+		c.view.GoToHome()
+		return
+	}
+
 	if session.HasEnded() {
 		c.view.GoToQuest()
+		return
 	}
 
 	card := session.CurrentCard()
@@ -181,6 +192,11 @@ func (c *FlashcardsController) ShowAnswer(sessionDTO *flashcard.MemorizingSessio
 
 func (c *FlashcardsController) SubmitAnswer(sessionDTO *flashcard.MemorizingSessionDTO, answer int) {
 	session := sessionDTO.ToMemorizingSession()
+
+	if !session.IsValid() {
+		c.view.GoToHome()
+		return
+	}
 
 	if session.HasEnded() {
 		c.view.GoToQuest()
