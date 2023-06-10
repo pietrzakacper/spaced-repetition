@@ -157,10 +157,16 @@ func (i HttpInteractor) authenticateUser(w http.ResponseWriter, r *http.Request)
 	return sl.session, nil
 }
 
+func withCache(h http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Add("Cache-Control", "max-age=7776000;")
+		h.ServeHTTP(w, r)
+	})
+}
+
 func (i HttpInteractor) Start() {
-	// @TODO invalidate cache on deployment
 	fs := http.FileServer(http.Dir("./static"))
-	http.Handle("/static/", http.StripPrefix("/static", fs))
+	http.Handle("/static/", withCache(http.StripPrefix("/static", fs)))
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		if c, err := i.authenticateUser(w, r); err == nil {
