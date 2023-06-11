@@ -3,8 +3,8 @@ package controller
 import (
 	"encoding/csv"
 	"flashcard"
-	"fmt"
 	"io"
+	"log"
 	"strings"
 	"sync"
 )
@@ -75,7 +75,7 @@ func (c *FlashcardsController) ImportCards(csvStream io.Reader) {
 	columns, err := r.Read()
 
 	if err != nil {
-		fmt.Println("Error importing cards:", err)
+		log.Println("Error importing cards:", err)
 		return
 	}
 
@@ -90,7 +90,7 @@ func (c *FlashcardsController) ImportCards(csvStream io.Reader) {
 	}
 
 	if frontIndex < 0 || backIndex < 0 {
-		fmt.Println("Incorrect columns in CSV:", columns)
+		log.Println("Incorrect columns in CSV:", columns)
 		return
 	}
 
@@ -102,7 +102,7 @@ func (c *FlashcardsController) ImportCards(csvStream io.Reader) {
 			break
 		}
 		if err != nil {
-			fmt.Println("Error reading CSV line", err)
+			log.Println("Error reading CSV line", err)
 			continue
 		}
 
@@ -239,7 +239,7 @@ func (c *FlashcardsController) DeleteCard(cardId string) error {
 		card, err := c.store.Find(cardId)
 
 		if err != nil {
-			fmt.Println(err)
+			log.Println(err)
 		}
 
 		card.Deleted = true
@@ -254,7 +254,7 @@ func (c *FlashcardsController) EditCard(cardId, front, back string) error {
 		card, err := c.store.Find(cardId)
 
 		if err != nil {
-			fmt.Println(err)
+			log.Println(err)
 		}
 
 		if len(front) > 0 {

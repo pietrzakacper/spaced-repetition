@@ -3,7 +3,7 @@ package interactor
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
+	"log"
 	"net/http"
 	"os"
 	"persistance"
@@ -136,7 +136,7 @@ func (i HttpInteractor) authenticateUser(w http.ResponseWriter, r *http.Request)
 	tokenInfo, err := verifyIdToken(authToken)
 
 	if err != nil {
-		fmt.Printf("/login error: %v\n", err)
+		log.Printf("/login error: %v\n", err)
 
 		// user logged out
 		anonymousView := view.CreateHttpView("")
@@ -349,6 +349,6 @@ func (i HttpInteractor) Start() {
 		port = "3000"
 	}
 
-	fmt.Println("Listening on port: " + port)
+	log.Println("Listening on port: " + port)
 	http.ListenAndServe(":"+port, nil)
 }

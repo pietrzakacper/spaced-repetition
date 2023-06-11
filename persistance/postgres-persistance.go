@@ -29,27 +29,39 @@ func (p *PostgresPersistance) Create(userId string) controller.Store {
 		if err != nil {
 			log.Fatal(err)
 		}
-		config.MaxConns = 100
+		config.MaxConns = 30
 		config.MinConns = 3
-		// in short fly postgres uses HAProxy with 60 second TCP timeout
-		config.MaxConnLifetime = 55 * time.Second
-		config.MaxConnIdleTime = 30 * time.Second
+		config.MaxConnLifetime = 10 * time.Minute
+		config.MaxConnIdleTime = 55 * time.Second
 
 		pool, err := pgxpool.ConnectConfig(context.Background(), config)
-
-		db = pool
 
 		if err != nil {
 			log.Fatal(err)
 		}
+
+		db = pool
+		go func() {
+			for {
+				// in short fly postgres uses HAProxy with 60 second TCP timeout
+				time.Sleep(40 * time.Second)
+				// let's make sure we keep the connections warm
+				err := pool.Ping(context.Background())
+				log.Printf(
+					"ping err: %v, acq conns: %v, idle conns: %v, total conns: %v",
+					err,
+					pool.Stat().AcquiredConns(),
+					pool.Stat().IdleConns(),
+					pool.Stat().TotalConns(),
+				)
+			}
+		}()
 	}
 
 	return &PostgresStore{db, userId}
 }
 
-func (p *PostgresStore) ReadAll() []flashcard.Record {
-	defer timeTrack(time.Now(), "postgres.ReadAll: "+p.userId)
-
+func (p *PostgresStore) readAllImpl() ([]flashcard.Record, error) {
 	records := make([]flashcard.Record, 0)
 
 	rows, err := p.db.Query(context.Background(), `
@@ -62,7 +74,7 @@ func (p *PostgresStore) ReadAll() []flashcard.Record {
 	defer rows.Close()
 
 	if err != nil {
-		log.Println(err)
+		return nil, err
 	}
 
 	for rows.Next() {
@@ -70,25 +82,51 @@ func (p *PostgresStore) ReadAll() []flashcard.Record {
 
 		err = rows.Scan(&r.Id, &r.Front, &r.Back, &r.RepetitionCount, &r.NextReviewOffset, &r.EF, &r.Deleted, &r.CreationDate, &r.LastReviewDate)
 		if err != nil {
-			log.Println()
 			break
 		}
 		records = append(records, r)
 	}
 
 	if rows.Err() != nil {
-		if rows.Err().Error() == "unexpected EOF" {
-			return p.ReadAll()
-		} else {
-			log.Println(err)
-		}
+		return nil, rows.Err()
 	}
 
 	sort.Slice(records, func(i, j int) bool {
 		return records[i].CreationDate.UnixMicro() < records[j].CreationDate.UnixMicro()
 	})
 
-	return records
+	return records, nil
+}
+
+func (p *PostgresStore) ReadAll() []flashcard.Record {
+	defer timeTrack(time.Now(), "postgres.ReadAll: "+p.userId)
+
+	tries := 0
+	for {
+		if tries >= 3 {
+			break
+		}
+
+		tries++
+		records, err := p.readAllImpl()
+
+		if err != nil && err.Error() == "unexpected EOF" {
+			log.Printf("=== EOF ===\n")
+			time.Sleep(50 * time.Millisecond)
+			continue
+		}
+
+		if err != nil {
+			log.Printf("Error in ReadAll: %v", err)
+			break
+		}
+
+		return records
+	}
+
+	log.Println("ReadAll failed...")
+
+	return make([]flashcard.Record, 0)
 }
 
 const cards_limit_per_user = 20000

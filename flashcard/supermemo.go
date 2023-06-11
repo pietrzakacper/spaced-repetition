@@ -1,7 +1,7 @@
 package flashcard
 
 import (
-	"fmt"
+	"log"
 	"math"
 	"time"
 )
@@ -57,7 +57,7 @@ func startOfDay(t time.Time) time.Time {
 
 func calculateNextReviewOffset(repetitionCount int, EF float64) float64 {
 	if repetitionCount < 1 {
-		fmt.Println("Error: repetitionCount cannot be less than 1")
+		log.Println("Error: repetitionCount cannot be less than 1")
 		return 0
 	}
 
@@ -74,7 +74,7 @@ func calculateNextReviewOffset(repetitionCount int, EF float64) float64 {
 
 func calculateNextEF(oldEF float64, qualityOfResponse int) float64 {
 	if qualityOfResponse < 0 || qualityOfResponse > 5 {
-		fmt.Println("Error: qualityOfResponse cannot must be within 0 and 5")
+		log.Println("Error: qualityOfResponse cannot must be within 0 and 5")
 		return 0
 	}
 
