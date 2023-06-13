@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./satoshi.css" />
+    <link rel="icon" href="./favicon.ico" />
+</head>
+
+<body>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            background: var(--backgroundColor);
+            --backgroundColor: #fdf6e3;
+
+            flex-direction: row;
+
+            font-family: "Satoshi", sans-serif;
+            font-weight: 500;
+            font-size: 24px;
+            padding-top: 20px;
+            box-sizing: border-box;
+        }
+
+        .top {
+            position: absolute;
+            top: 0;
+            width: 80%;
+            margin-top: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+
+        .logo {
+            font-size: 20px;
+            text-transform: lowercase;
+            font-weight: 900;
+            color: #511660;
+            border: 0px dashed #511660;
+            border-bottom-width: 3px;
+            width: 180px;
+            text-align: center;
+            padding: 10px;
+            text-decoration: none;
+        }
+
+        #hero-section {
+            margin-top: 50px;
+        }
+
+        #hero-text {
+            color: #4a1557;
+            font-size: 32px;
+            margin: 0;
+            margin-bottom: 8px;
+        }
+
+        ul {
+            color: #4a1557c7;
+            font-weight: 400;
+            font-size: 22px;
+            margin-bottom: 0;
+        }
+
+        #demo {
+            max-width: 640px;
+            border: 4px dashed rgba(10, 10, 10, 0.164);
+            box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
+        }
+
+        .button {
+            --primaryColor: hsl(221deg, 88%, 60%);
+            --primaryShade4: #0288d1;
+            --btnLabelColor: #fff;
+            --textColor: #111132;
+            --buttonBorderColor: var(--textColor);
+            --secondaryColor: #673ab7;
+            --secondaryShade4: #512da8;
+
+            outline: none;
+            width: 100%;
+            text-align: center;
+            display: inline-block;
+            border: none;
+            font-size: 20px;
+            padding: 20px;
+            cursor: pointer;
+            border-radius: 2px;
+            background: var(--primaryColor);
+            color: var(--btnLabelColor);
+            position: relative;
+            top: 0;
+            transition: 0.2s ease transform;
+            width: 200px;
+            border: 2px solid var(--buttonBorderColor);
+            font-weight: 600;
+        }
+
+        .button.mobile {
+                display: none;
+         }
+
+         .button.desktop {
+                display: block;
+         }
+
+
+        .button:hover {
+            background: var(--primaryShade4);
+        }
+
+        .button.secondary {
+            background: var(--secondaryColor);
+        }
+
+        .button.secondary:hover {
+            background: var(--secondaryShade4);
+        }
+
+        @media only screen and (max-width: 1000px) {
+            body {
+                flex-direction: column;
+            }
+
+            .logo {
+                width: 140px;
+            }
+
+            #hero-section {
+                width: 80%;
+            }
+
+            #hero-text {
+                font-size: 32px;
+            }
+
+            .logo {
+                font-size: 16px;
+            }
+
+            #demo {
+                width: 80%;
+            }
+
+            .button.desktop {
+                display: none;
+            }
+
+            .button.mobile {
+                display: block;
+            }
+        }
+    </style>
+    <header class="top">
+        <a href="/" class="logo">Spaced Repetition</a>
+        <button class="button desktop">open the app</button>
+    </header>
+
+    <section id="hero-section">
+        <h1 id="hero-text">the flashcards app without distractions </h1>
+        <ul>
+            <li>free forever 💜</li>
+            <li>works on mobile devices</li>
+            <li>open source</li>
+            <li>multi device sync</li>
+            <li>keyboard shortcuts</li>
+        </ul>
+    </section>
+
+    <img id="demo" src="./demo.gif" />
+
+    <button class="button mobile">open the app</button>
+</body>
+
+</html>
