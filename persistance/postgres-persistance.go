@@ -47,13 +47,15 @@ func (p *PostgresPersistance) Create(userId string) controller.Store {
 				time.Sleep(40 * time.Second)
 				// let's make sure we keep the connections warm
 				err := pool.Ping(context.Background())
-				log.Printf(
-					"ping err: %v, acq conns: %v, idle conns: %v, total conns: %v",
-					err,
-					pool.Stat().AcquiredConns(),
-					pool.Stat().IdleConns(),
-					pool.Stat().TotalConns(),
-				)
+				if err != nil {
+					log.Printf(
+						"ping err: %v, acq conns: %v, idle conns: %v, total conns: %v",
+						err,
+						pool.Stat().AcquiredConns(),
+						pool.Stat().IdleConns(),
+						pool.Stat().TotalConns(),
+					)
+				}
 			}
 		}()
 	}
