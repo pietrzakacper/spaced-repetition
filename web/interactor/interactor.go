@@ -32,8 +32,8 @@ type HttpInteractor struct {
 	sessionsCommonLock sync.Mutex
 }
 
-func CreateHttpInteractor(sessionFactory *user.UserSessionFactory) HttpInteractor {
-	return HttpInteractor{
+func CreateHttpInteractor(sessionFactory *user.UserSessionFactory) *HttpInteractor {
+	return &HttpInteractor{
 		sessionFactory,
 		map[string]*UserSessionWithLock{},
 		sync.Mutex{},
@@ -57,7 +57,7 @@ func verifyIdToken(idToken string) (*oauth2.Tokeninfo, error) {
 }
 
 // @TODO think about making a server middleware
-func (i HttpInteractor) authenticateUser(w http.ResponseWriter, r *http.Request) (*user.UserSession, error) {
+func (i *HttpInteractor) authenticateUser(w http.ResponseWriter, r *http.Request) (*user.UserSession, error) {
 	if os.Getenv("LOCAL_DEV") == "true" {
 		if c := i.sessions["LOCAL"]; c != nil {
 			c.session.SetRequestContext(w)
@@ -164,7 +164,7 @@ func withCache(h http.Handler) http.Handler {
 	})
 }
 
-func (i HttpInteractor) Start() {
+func (i *HttpInteractor) Start() {
 	fs := http.FileServer(http.Dir("./static"))
 	http.Handle("/static/", withCache(http.StripPrefix("/static", fs)))
 
