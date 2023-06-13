@@ -150,7 +150,7 @@ func (i *HttpInteractor) authenticateUser(w http.ResponseWriter, r *http.Request
 		Email: tokenInfo.Email,
 	})
 
-	go db.UpsertSession(authToken, tokenInfo.Email)
+	go db.SaveSession(authToken, tokenInfo.Email)
 
 	sl.session.SetRequestContext(w)
 

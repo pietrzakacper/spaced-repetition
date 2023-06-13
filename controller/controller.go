@@ -43,5 +43,5 @@ type Store interface {
 	Find(cardId string) (flashcard.Record, error)
 
 	FindUserIdByToken(token string) (string, error)
-	UpsertSession(token string, userId string)
+	SaveSession(token string, userId string)
 }

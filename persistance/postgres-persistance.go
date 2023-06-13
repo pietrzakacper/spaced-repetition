@@ -205,7 +205,9 @@ func (p *PostgresStore) Find(cardId string) (flashcard.Record, error) {
 }
 
 func (p *PostgresStore) FindUserIdByToken(token string) (string, error) {
-	rows, err := p.db.Query(context.Background(), `SELECT user_id FROM sessions WHERE token=$1`, token)
+	defer timeTrack(time.Now(), "postgres.FindUserId")
+
+	rows, err := p.db.Query(context.Background(), `SELECT user_id FROM multi_sessions WHERE token=$1`, token)
 	defer rows.Close()
 
 	if err != nil {
@@ -227,14 +229,11 @@ func (p *PostgresStore) FindUserIdByToken(token string) (string, error) {
 	return "", errors.New("user_id empty")
 }
 
-func (p *PostgresStore) UpsertSession(token string, userId string) {
-	_, err := p.db.Exec(context.Background(), `
-		INSERT INTO sessions (token, user_id)
-		VALUES($1, $2) 
-		ON CONFLICT (user_id) 
-		DO 
-		UPDATE SET token = $1;
-	`, token, userId)
+func (p *PostgresStore) SaveSession(token string, userId string) {
+	defer timeTrack(time.Now(), "postgres.InsertSession: "+userId)
+
+	_, err := p.db.Exec(context.Background(),
+		`INSERT INTO multi_sessions (token, user_id) VALUES($1, $2)`, token, userId)
 
 	if err != nil {
 		log.Println(err)
