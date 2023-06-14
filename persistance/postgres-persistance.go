@@ -31,8 +31,8 @@ func (p *PostgresPersistance) Create(userId string) controller.Store {
 		}
 		config.MaxConns = 30
 		config.MinConns = 3
-		config.MaxConnLifetime = 10 * time.Minute
-		config.MaxConnIdleTime = 55 * time.Second
+		config.MaxConnLifetime = 55 * time.Second
+		config.MaxConnIdleTime = 30 * time.Second
 
 		pool, err := pgxpool.ConnectConfig(context.Background(), config)
 
