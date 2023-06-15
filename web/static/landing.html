@@ -55,7 +55,7 @@
         }
 
         #hero-section {
-            margin-top: 50px;
+            padding: 0px 32px;
         }
 
         #hero-text {
@@ -104,6 +104,7 @@
             width: 200px;
             border: 2px solid var(--buttonBorderColor);
             font-weight: 600;
+            scale: 0.8;
         }
 
         .button.mobile {
@@ -113,7 +114,6 @@
          .button.desktop {
                 display: block;
          }
-
 
         .button:hover {
             background: var(--primaryShade4);
@@ -127,6 +127,19 @@
             background: var(--secondaryShade4);
         }
 
+        footer {
+            position: absolute;
+            bottom: 16px;
+            right: 16px;
+            font-size: 14px;
+            
+        }
+
+        footer a {
+            color: #4a1557b4;
+            text-decoration: none;
+        }
+
         @media only screen and (max-width: 1000px) {
             body {
                 flex-direction: column;
@@ -137,6 +150,7 @@
             }
 
             #hero-section {
+                margin-top: 50px;
                 width: 80%;
             }
 
@@ -180,6 +194,8 @@
     <img id="demo" src="./demo.gif" />
 
     <button class="button mobile">open the app</button>
+
+    <footer><a href="/privacy-policy.html" target="_blank">privacy policy</a></footer>
 </body>
 
 </html>
