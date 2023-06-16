@@ -87,6 +87,12 @@
                         <div class="small-card-back bg-{{ .Kind }}">{{ .Back }}</div>
                   </div>
               {{ end }}
+              {{if (eq .AllCardsCount 0) }}
+                    <div class="small-card">
+                        <div class="small-card-front bg-0">Add some cards to memorize!</div>
+                        <div class="small-card-back bg-0">Dodaj kartki żeby je zapamiętać!</div>
+                  </div>
+              {{end}}
               </div> 
           </div>
 
