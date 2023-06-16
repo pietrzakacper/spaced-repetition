@@ -165,9 +165,6 @@ func withCache(h http.Handler) http.Handler {
 }
 
 func (i *HttpInteractor) Start() {
-	landingFs := http.FileServer(http.Dir("./landing"))
-	http.Handle("/landing/", withCache(http.StripPrefix("/landing", landingFs)))
-
 	fs := http.FileServer(http.Dir("./static"))
 	http.Handle("/static/", withCache(http.StripPrefix("/static", fs)))
 
