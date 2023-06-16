@@ -11,6 +11,7 @@
 <body>
     <style>
         body {
+            position: relative;
             margin: 0;
             padding: 0;
             width: 100vw;
@@ -104,6 +105,7 @@
             border: 2px solid var(--buttonBorderColor);
             font-weight: 600;
             scale: 0.8;
+            padding: 0;
         }
 
         .button a {
@@ -123,6 +125,8 @@
             font-weight: 600;
             padding: 20px;  
             display: block;
+            width: 100%;
+            box-sizing: border-box;
         }
 
         .link-button {
@@ -194,10 +198,6 @@
 
             .button.mobile {
                 display: block;
-            }
-
-            footer {
-                bottom: 8px;
             }
         }
     </style>
