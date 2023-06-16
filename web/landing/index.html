@@ -17,7 +17,7 @@
             height: 100vh;
             display: flex;
             align-items: center;
-            justify-content: space-around;
+            justify-content: space-evenly;
             background: var(--backgroundColor);
             --backgroundColor: #fdf6e3;
 
@@ -107,6 +107,27 @@
             scale: 0.8;
         }
 
+        .button a {
+          --primaryColor: hsl(221deg, 88%, 60%);
+            --primaryShade4: #0288d1;
+            --btnLabelColor: #fff;
+            --textColor: #111132;
+            --buttonBorderColor: var(--textColor);
+            --secondaryColor: #673ab7;
+            --secondaryShade4: #512da8;
+
+            outline: none;
+            text-align: center;
+            border: none;
+            font-size: 20px;
+            color: var(--btnLabelColor);
+            font-weight: 600;
+        }
+
+        .link-button {
+            text-decoration: none;
+        }
+
         .button.mobile {
                 display: none;
          }
@@ -173,11 +194,15 @@
             .button.mobile {
                 display: block;
             }
+
+            footer {
+                bottom: 8px;
+            }
         }
     </style>
     <header class="top">
         <a href="/" class="logo">Spaced Repetition</a>
-        <button class="button desktop">open the app</button>
+        <button class="button desktop"> <a href="https://app.spaced.sh" class="link-button">open the app</a></button>
     </header>
 
     <section id="hero-section">
@@ -193,9 +218,9 @@
 
     <img id="demo" src="./demo.gif" />
 
-    <button class="button mobile">open the app</button>
+    <button class="button mobile"><a href="https://app.spaced.sh" class="link-button">open the app</a></button>
 
-    <footer><a href="/privacy-policy.html" target="_blank">privacy policy</a></footer>
+    <footer><a href="./privacy-policy.html" target="_blank">privacy policy</a></footer>
 </body>
 
 </html>
