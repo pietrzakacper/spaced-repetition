@@ -52,10 +52,11 @@ func (v *HttpView) GoToAnswer() {
 }
 
 type HomeData struct {
-	DueToReviewCount int
-	NewCardsCount    int
-	AllCardsCount    int
-	Cards            []cardView
+	DueToReviewCount      int
+	NewCardsCount         int
+	AllCardsCount         int
+	Cards                 []cardView
+	ShowSpreadOverTimeBtn bool
 }
 
 type cardView struct {
@@ -80,10 +81,11 @@ func (v *HttpView) RenderHome(cards []flashcard.DTO, newCardsCount int, dueToRev
 	}
 
 	data := HomeData{
-		DueToReviewCount: dueToReviewCount,
-		NewCardsCount:    newCardsCount,
-		AllCardsCount:    len(cards),
-		Cards:            recentCards,
+		DueToReviewCount:      dueToReviewCount,
+		NewCardsCount:         newCardsCount,
+		AllCardsCount:         len(cards),
+		Cards:                 recentCards,
+		ShowSpreadOverTimeBtn: dueToReviewCount >= 100,
 	}
 
 	template.Execute(v.w, data)

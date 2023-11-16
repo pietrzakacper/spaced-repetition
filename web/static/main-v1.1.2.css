@@ -114,6 +114,27 @@ body {
   background: var(--accent2Shade4);
 }
 
+.spread-button {
+  position: absolute;
+  left: -40px;
+  width: 33px;
+  height: 66px;
+  top: 50%;
+  transform: translateY(-50%);
+  border-radius: var(--borderRadius);
+  background: var(--primaryColor);
+  color: var(--btnLabelColor);
+  border: 2px solid var(--buttonBorderColor);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.spread-button:hover {
+  background: var(--primaryShade4);
+}
+
 header img {
   margin-top: 2rem;
   width: 300px;
@@ -827,8 +848,6 @@ input:disabled {
     -webkit-appearance: none;
     appearance: none;
   }
-
-  
 
   .all-cards-container {
     justify-content: space-around;

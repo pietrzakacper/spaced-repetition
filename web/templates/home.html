@@ -28,6 +28,11 @@
                 <div class="memorize-column">
                   <span><b>Cards to review</b>: {{ .DueToReviewCount }}</span>
                   <div class="loader-container">
+                    {{if .ShowSpreadOverTimeBtn }}
+                      <button class="spread-button" id="spread-button">
+                        <img src="/static/calendar.svg" />  
+                      </button>
+                    {{end}}
                     <input
                       {{if eq .DueToReviewCount 0}}disabled{{end}}
                       class="button"
@@ -259,6 +264,16 @@
                     setTimeout(() => { runConfetti() }, 500)
                 {{end}}
             }
+      </script>
+      <script>
+        document.querySelector('#spread-button')?.addEventListener('click', (e) => {
+          e.preventDefault()
+          const $form = document.createElement('form')
+          $form.method = 'POST'
+          $form.action = 'spread-cards-in-time'
+          document.body.appendChild($form)
+          $form.submit()
+        })
       </script>
   </body>
 </html>

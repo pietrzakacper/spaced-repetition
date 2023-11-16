@@ -343,6 +343,26 @@ func (i *HttpInteractor) Start() {
 		}
 	})
 
+	http.HandleFunc("/spread-cards-in-time", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != "POST" {
+			w.Header().Add("Location", "/")
+			w.WriteHeader(303)
+			return
+		}
+
+		if c, err := i.authenticateUser(w, r); err == nil {
+			err = c.SpreadCardsInTime()
+
+			if err != nil {
+				w.WriteHeader(http.StatusBadRequest)
+				return
+			}
+
+			c.GoToHome()
+		}
+
+	})
+
 	port := os.Getenv("PORT")
 
 	if port == "" {

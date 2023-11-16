@@ -270,3 +270,30 @@ func (c *FlashcardsController) EditCard(cardId, front, back string) error {
 
 	return nil
 }
+
+func (c *FlashcardsController) SpreadCardsInTime() error {
+	records := c.getAllCards()
+
+	counter := 0
+	const cardsPerDay = 10
+
+	var wg sync.WaitGroup
+	for _, r := range records {
+		card := r.ToCard()
+
+		if card.IsDueToReview() {
+			postponeByDays := counter / cardsPerDay
+			card.PostponeReview(postponeByDays)
+			counter++
+
+			wg.Add(1)
+			go func() {
+				c.store.Update(card.ToRecord())
+				wg.Done()
+			}()
+		}
+	}
+
+	wg.Wait()
+	return nil
+}

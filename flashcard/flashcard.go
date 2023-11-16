@@ -90,3 +90,8 @@ func (card *flashcard) IsNew() bool {
 func (card *flashcard) IsDueToReview() bool {
 	return card.supermemo.IsDueToReview()
 }
+
+func (card *flashcard) PostponeReview(byDays int) {
+	card.supermemo.LastReviewDate = time.Now()
+	card.supermemo.NextReviewOffset = byDays
+}
