@@ -1,0 +1,14 @@
+github.com/google/uuid v1.6.0 h1:NIvaJDMOsjHA8n1jAhLSgzrAzy1Hgr+hNrb57e+94F0=
+github.com/google/uuid v1.6.0/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
+github.com/gorilla/websocket v1.5.1 h1:gmztn0JnHVt9JZquRuzLw3g4wouNVzKL15iLr/zn/QY=
+github.com/gorilla/websocket v1.5.1/go.mod h1:x3kM2JMyaluk02fnUJpQuwD2dCS5NDG2ZHL0uE0tcaY=
+github.com/pietrzakacper/tracethat.dev/reporters/golang/tt v0.0.0-20240316223808-b2afe7b31e08 h1:R9VJknULbENTSxTZrw01i8y0IM5VOdUHOzQo6ZyCudQ=
+github.com/pietrzakacper/tracethat.dev/reporters/golang/tt v0.0.0-20240316223808-b2afe7b31e08/go.mod h1:AOck/jmu9D8xP4Z04+o1e6WIRLBrjb1MmZh9gCbUR9M=
+github.com/pietrzakacper/tracethat.dev/reporters/golang/tt v0.0.0-20240316232452-b776f682ed32 h1:5F5/PvtVqKXYXa6sqNxk+1ReQJ+aSdx7qOqsGSlRIbU=
+github.com/pietrzakacper/tracethat.dev/reporters/golang/tt v0.0.0-20240316232452-b776f682ed32/go.mod h1:AOck/jmu9D8xP4Z04+o1e6WIRLBrjb1MmZh9gCbUR9M=
+github.com/pietrzakacper/tracethat.dev/reporters/golang/tt v0.0.0-20240316232843-8ba26253aed8 h1:BGdLM8AlR9qn1ZPtgk+fk8xgKjanLzLrxGibLzNVvX4=
+github.com/pietrzakacper/tracethat.dev/reporters/golang/tt v0.0.0-20240316232843-8ba26253aed8/go.mod h1:AOck/jmu9D8xP4Z04+o1e6WIRLBrjb1MmZh9gCbUR9M=
+golang.org/x/net v0.17.0 h1:pVaXccu2ozPjCXewfr1S7xza/zcXTity9cCdXQYSjIM=
+golang.org/x/net v0.17.0/go.mod h1:NxSsAGuq816PNPmqtQdLE42eU2Fs7NoRIZrHJAlaCOE=
+golang.org/x/net v0.22.0 h1:9sGLhx7iRIHEiX0oAJ3MRZMUCElJgy7Br1nO+AMN3Tc=
+golang.org/x/net v0.22.0/go.mod h1:JKghWKKOSdJwpW2GEx0Ja7fmaKnMsbu+MWVZTokSYmg=

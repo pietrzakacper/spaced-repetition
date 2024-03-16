@@ -7,6 +7,8 @@ import (
 	"log"
 	"strings"
 	"sync"
+
+	"github.com/pietrzakacper/tracethat.dev/reporters/golang/tt"
 )
 
 type FlashcardsController struct {
@@ -19,6 +21,7 @@ func CreateFlashcardsController(view View, store Store) *FlashcardsController {
 }
 
 func (c *FlashcardsController) getAllCards() []flashcard.Record {
+	defer tt.LogWithTime("get all cards")()
 	notDeletedCards := make([]flashcard.Record, 0)
 
 	for _, card := range c.store.ReadAll() {
@@ -34,6 +37,7 @@ func (c *FlashcardsController) ShowHome() {
 	records := c.getAllCards()
 
 	flashcardDTOs := make([]flashcard.DTO, len(records))
+	defer tt.LogWithTime("show-home", flashcardDTOs)()
 
 	newCardsCount := 0
 	dueToReviewCount := 0
