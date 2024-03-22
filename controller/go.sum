@@ -8,6 +8,10 @@ github.com/pietrzakacper/tracethat.dev/reporters/golang/tt v0.0.0-20240316232452
 github.com/pietrzakacper/tracethat.dev/reporters/golang/tt v0.0.0-20240316232452-b776f682ed32/go.mod h1:AOck/jmu9D8xP4Z04+o1e6WIRLBrjb1MmZh9gCbUR9M=
 github.com/pietrzakacper/tracethat.dev/reporters/golang/tt v0.0.0-20240316232843-8ba26253aed8 h1:BGdLM8AlR9qn1ZPtgk+fk8xgKjanLzLrxGibLzNVvX4=
 github.com/pietrzakacper/tracethat.dev/reporters/golang/tt v0.0.0-20240316232843-8ba26253aed8/go.mod h1:AOck/jmu9D8xP4Z04+o1e6WIRLBrjb1MmZh9gCbUR9M=
+github.com/pietrzakacper/tracethat.dev/reporters/golang/tt v0.0.0-20240317110321-d5d09f0144a1 h1:TCk8ZEHr6JZCqAwGNFMI19REVcluCFI77ls/5fuHFXk=
+github.com/pietrzakacper/tracethat.dev/reporters/golang/tt v0.0.0-20240317110321-d5d09f0144a1/go.mod h1:AOck/jmu9D8xP4Z04+o1e6WIRLBrjb1MmZh9gCbUR9M=
+github.com/pietrzakacper/tracethat.dev/reporters/golang/tt v0.0.0-20240322081132-59a22578f9af h1:LDPuoVsdqjPVkXrp/4GS9ldAtaZ4ts615VT/dJ6rv48=
+github.com/pietrzakacper/tracethat.dev/reporters/golang/tt v0.0.0-20240322081132-59a22578f9af/go.mod h1:AOck/jmu9D8xP4Z04+o1e6WIRLBrjb1MmZh9gCbUR9M=
 golang.org/x/net v0.17.0 h1:pVaXccu2ozPjCXewfr1S7xza/zcXTity9cCdXQYSjIM=
 golang.org/x/net v0.17.0/go.mod h1:NxSsAGuq816PNPmqtQdLE42eU2Fs7NoRIZrHJAlaCOE=
 golang.org/x/net v0.22.0 h1:9sGLhx7iRIHEiX0oAJ3MRZMUCElJgy7Br1nO+AMN3Tc=
