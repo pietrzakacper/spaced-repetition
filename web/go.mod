@@ -2,7 +2,10 @@ module web
 
 go 1.21.7
 
-require google.golang.org/api v0.111.0
+require (
+	github.com/pietrzakacper/tracethat.dev/reporters/golang/tt v0.0.0-20240325164611-8b0e77de6124
+	google.golang.org/api v0.111.0
+)
 
 require (
 	cloud.google.com/go/compute v1.18.0 // indirect
@@ -13,7 +16,6 @@ require (
 	github.com/googleapis/enterprise-certificate-proxy v0.2.3 // indirect
 	github.com/googleapis/gax-go/v2 v2.7.0 // indirect
 	github.com/gorilla/websocket v1.5.1 // indirect
-	github.com/pietrzakacper/tracethat.dev/reporters/golang/tt v0.0.0-20240322081132-59a22578f9af // indirect
 	go.opencensus.io v0.24.0 // indirect
 	golang.org/x/net v0.22.0 // indirect
 	golang.org/x/oauth2 v0.5.0 // indirect

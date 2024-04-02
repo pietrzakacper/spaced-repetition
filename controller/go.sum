@@ -12,6 +12,14 @@ github.com/pietrzakacper/tracethat.dev/reporters/golang/tt v0.0.0-20240317110321
 github.com/pietrzakacper/tracethat.dev/reporters/golang/tt v0.0.0-20240317110321-d5d09f0144a1/go.mod h1:AOck/jmu9D8xP4Z04+o1e6WIRLBrjb1MmZh9gCbUR9M=
 github.com/pietrzakacper/tracethat.dev/reporters/golang/tt v0.0.0-20240322081132-59a22578f9af h1:LDPuoVsdqjPVkXrp/4GS9ldAtaZ4ts615VT/dJ6rv48=
 github.com/pietrzakacper/tracethat.dev/reporters/golang/tt v0.0.0-20240322081132-59a22578f9af/go.mod h1:AOck/jmu9D8xP4Z04+o1e6WIRLBrjb1MmZh9gCbUR9M=
+github.com/pietrzakacper/tracethat.dev/reporters/golang/tt v0.0.0-20240322084956-a152583554ed h1:jNBjOi+UFbb7MnuETpMCxlsHcqiwL3HAJgMpndMSdwE=
+github.com/pietrzakacper/tracethat.dev/reporters/golang/tt v0.0.0-20240322084956-a152583554ed/go.mod h1:AOck/jmu9D8xP4Z04+o1e6WIRLBrjb1MmZh9gCbUR9M=
+github.com/pietrzakacper/tracethat.dev/reporters/golang/tt v0.0.0-20240322101056-7f1ece3dfc1c h1:b0g2PS8TP7ikDQWEYe0r4MJcZILWGWcYcRrkKgfaJo4=
+github.com/pietrzakacper/tracethat.dev/reporters/golang/tt v0.0.0-20240322101056-7f1ece3dfc1c/go.mod h1:AOck/jmu9D8xP4Z04+o1e6WIRLBrjb1MmZh9gCbUR9M=
+github.com/pietrzakacper/tracethat.dev/reporters/golang/tt v0.0.0-20240324181448-b3f826549115 h1:8Im8U47PQiZRIfLewJ1jCchbrLZ6bOcNzmEPqOOUfFQ=
+github.com/pietrzakacper/tracethat.dev/reporters/golang/tt v0.0.0-20240324181448-b3f826549115/go.mod h1:AOck/jmu9D8xP4Z04+o1e6WIRLBrjb1MmZh9gCbUR9M=
+github.com/pietrzakacper/tracethat.dev/reporters/golang/tt v0.0.0-20240325164611-8b0e77de6124 h1:elw8Rkpt4aGD8xlLZFuFO8AuNizlu3RQN2homHPR50I=
+github.com/pietrzakacper/tracethat.dev/reporters/golang/tt v0.0.0-20240325164611-8b0e77de6124/go.mod h1:AOck/jmu9D8xP4Z04+o1e6WIRLBrjb1MmZh9gCbUR9M=
 golang.org/x/net v0.17.0 h1:pVaXccu2ozPjCXewfr1S7xza/zcXTity9cCdXQYSjIM=
 golang.org/x/net v0.17.0/go.mod h1:NxSsAGuq816PNPmqtQdLE42eU2Fs7NoRIZrHJAlaCOE=
 golang.org/x/net v0.22.0 h1:9sGLhx7iRIHEiX0oAJ3MRZMUCElJgy7Br1nO+AMN3Tc=
