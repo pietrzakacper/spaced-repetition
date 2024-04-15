@@ -5,6 +5,7 @@ COPY ./flashcard /app/flashcard
 COPY ./persistance /app/persistance
 COPY ./user /app/user
 COPY ./web /app/web
+COPY ./zoom_sync /app/zoom_sync
 COPY go.work /app
 COPY go.work.sum /app
 

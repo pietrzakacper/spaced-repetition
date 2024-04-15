@@ -3,6 +3,7 @@ package interactor
 import (
 	"encoding/json"
 	"errors"
+	"io"
 	"log"
 	"net/http"
 	"os"
@@ -13,6 +14,7 @@ import (
 	"user"
 	"web/view"
 
+	"github.com/pietrzakacper/tracethat.dev/reporters/golang/tt"
 	"google.golang.org/api/oauth2/v1"
 )
 
@@ -223,11 +225,18 @@ func (i *HttpInteractor) Start() {
 		}
 
 		if c, err := i.authenticateUser(w, r); err == nil {
+			var file io.Reader
+
 			const max_request_size = 2 * 1024 * 1024
 			r.Body = http.MaxBytesReader(w, r.Body, max_request_size)
-			r.ParseMultipartForm(10 << 20)
 
-			file, _, err := r.FormFile("fileToUpload")
+			if r.Header.Get("Content-Type") == "text/csv" {
+				tt.Log("csv-file-incoming", r)
+				file = r.Body
+			} else {
+				r.ParseMultipartForm(10 << 20)
+				file, _, err = r.FormFile("fileToUpload")
+			}
 
 			if err != nil {
 				c.GoToHome()
