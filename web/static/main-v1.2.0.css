@@ -765,6 +765,41 @@ input:disabled {
   z-index: 2;
 }
 
+.flag-button-action {
+  position: absolute;
+  right: 1.5rem;
+  transform: scale(1.5);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  
+  transition: transform linear 100ms;
+  }
+
+
+.flag-button-action:hover {
+  transform: scale(1.5) translateY(-2px);
+}
+
+.divider {
+  width: 100%;
+  border: 0px solid rgb(108, 108, 108);
+  border-bottom-width: 2px;
+  padding: 0.5rem;
+}
+
+.flagged-divider {
+  display: flex;
+  align-items: center;
+}
+
+.flagged-divider img {
+  transform: scale(1.5);
+  margin-right: 0.5rem;
+}
+
+
+
 @media only screen and (max-width: 1000px) {
   .login-main-container {
     height: 95vh;

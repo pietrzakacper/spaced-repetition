@@ -17,7 +17,81 @@
             <a href="/"><img src="/static/back.svg" /></a>
           </div>
           <div class="cards">
-            <div class="all-cards-container">
+            {{ if .HasFlagged }}
+              <div class="divider flagged-divider">
+                <img src="/static/flag-filled.svg" />
+                Flagged
+              </div>
+              <div class="all-cards-container" id="flagged-cards">
+                {{ range .FlaggedCards }}
+                <div id="small-card-container" cardId="{{ .Id }}">
+                  <div class="small-card" id="small-card">
+                    <div
+                      class="small-card-front bg-{{ .Kind }}"
+                      id="small-card-front"
+                    >
+                      {{ .Front }}
+                    </div>
+                    <div
+                      class="small-card-back bg-{{ .Kind }}"
+                      id="small-card-back"
+                    >
+                      {{ .Back }}
+                    </div>
+                  </div>
+                  <div class="small-card hidden" id="small-card-edit-form">
+                    <div class="small-card-front bg-{{ .Kind }}">
+                      <div class="edit-card-container">
+                        <input
+                          class="edit-card-text-input"
+                          type="text"
+                          name="Front"
+                          value="{{ .Front }}"
+                          placeholder="front..."
+                          autocomplete="off"
+                        />
+                        <input
+                          class="edit-card-text-input"
+                          type="text"
+                          name="Back"
+                          value="{{ .Back }}"
+                          placeholder="back..."
+                          autocomplete="off"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  <div class="edit-buttons-container" id="edit-buttons-container">
+                    <button class="edit-button" id="unflag-button">
+                      <img src="/static/flag-filled.svg" />
+                    </button>
+                    
+                    <button class="edit-button" id="edit-button">
+                      <img src="/static/edit.svg" />
+                    </button>
+
+                    <button class="edit-button" id="delete-button">
+                      <img src="/static/delete.svg" />
+                    </button>
+                  </div>
+                  <div
+                    class="edit-buttons-container hidden"
+                    id="edit-actions-container"
+                  >
+                    <button class="edit-button" id="cancel-button">
+                      <img src="/static/close.svg" />
+                    </button>
+
+                    <button class="edit-button" id="approve-button">
+                      <img src="/static/check.svg" />
+                    </button>
+                  </div>
+                </div>
+                {{ end }}
+              </div>
+              <div class="divider"></div>
+            {{ end }}
+            <div class="all-cards-container" id="all-cards">
               {{ range .Cards }}
               <div id="small-card-container" cardId="{{ .Id }}">
                 <div class="small-card" id="small-card">
@@ -168,6 +242,29 @@
 
             if (res.status === 200) {
               $card.parentElement.removeChild($card);
+            }
+          });
+
+          $card
+          .querySelector("#unflag-button")
+          ?.addEventListener("click", async () => {
+            if(requestInProgress) return
+            requestInProgress = true
+            const res = await fetch(`/flag-card?flagged=false&id=${cardId}`, {
+              method: "POST",
+            });
+            requestInProgress = false
+
+            if (res.status === 200) {
+              $card.parentElement.removeChild($card);
+              document.querySelector('#all-cards').appendChild($card)
+
+              if(document.querySelector('#flagged-cards').children.length === 0) {
+                [...document.querySelectorAll('.divider'), document.querySelector('#flagged-cards')]
+                .forEach($el => {
+                  $el.parentElement.removeChild($el);
+                })
+              }
             }
           });
       });

@@ -18,6 +18,7 @@ type FlashcardInSessionDTO struct {
 	Id               string
 	Front            string
 	Back             string
+	Flagged          bool
 	CreationDate     time.Time
 	RepetitionCount  int
 	LastReviewDate   time.Time
@@ -37,6 +38,7 @@ func (f *flashcard) ToMemorizingSessionDTO() *FlashcardInSessionDTO {
 		Id:               f.id,
 		Front:            f.front,
 		Back:             f.back,
+		Flagged:          f.flagged,
 		CreationDate:     f.creationDate,
 		RepetitionCount:  f.supermemo.RepetitionCount,
 		LastReviewDate:   f.supermemo.LastReviewDate,
@@ -50,6 +52,7 @@ func (f *FlashcardInSessionDTO) ToFlashcard() *flashcard {
 		id:           f.Id,
 		front:        f.Front,
 		back:         f.Back,
+		flagged:      f.Flagged,
 		creationDate: f.CreationDate,
 		supermemo: &supermemo{
 			RepetitionCount:  f.RepetitionCount,

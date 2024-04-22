@@ -9,21 +9,24 @@ type flashcard struct {
 	id           string
 	front        string
 	back         string
+	flagged      bool
 	creationDate time.Time
 
 	supermemo *supermemo
 }
 
 type DTO struct {
-	Id    string
-	Front string
-	Back  string
+	Id      string
+	Front   string
+	Back    string
+	Flagged bool
 }
 
 type Record struct {
 	Id               string
 	Front            string
 	Back             string
+	Flagged          bool
 	CreationDate     time.Time
 	LastReviewDate   time.Time
 	NextReviewOffset int
@@ -46,13 +49,14 @@ func (dto *DTO) ToCard() *flashcard {
 	return &flashcard{
 		front:        withSizeLimit(strings.Trim(dto.Front, " ")),
 		back:         withSizeLimit(strings.Trim(dto.Back, " ")),
+		flagged:      dto.Flagged,
 		creationDate: time.Now(),
 		supermemo:    InitSupermemo(),
 	}
 }
 
 func (card *flashcard) ToDTO() *DTO {
-	return &DTO{Id: card.id, Front: card.front, Back: card.back}
+	return &DTO{Id: card.id, Front: card.front, Back: card.back, Flagged: card.flagged}
 }
 
 func (record *Record) ToCard() *flashcard {
@@ -60,6 +64,7 @@ func (record *Record) ToCard() *flashcard {
 		id:           record.Id,
 		front:        record.Front,
 		back:         record.Back,
+		flagged:      record.Flagged,
 		creationDate: record.CreationDate,
 		supermemo: &supermemo{
 			RepetitionCount:  record.RepetitionCount,
@@ -75,6 +80,7 @@ func (card *flashcard) ToRecord() *Record {
 		Id:               card.id,
 		Front:            card.front,
 		Back:             card.back,
+		Flagged:          card.flagged,
 		CreationDate:     card.creationDate,
 		LastReviewDate:   card.supermemo.LastReviewDate,
 		NextReviewOffset: card.supermemo.NextReviewOffset,
@@ -94,4 +100,8 @@ func (card *flashcard) IsDueToReview() bool {
 func (card *flashcard) PostponeReview(byDays int) {
 	card.supermemo.LastReviewDate = time.Now()
 	card.supermemo.NextReviewOffset = byDays
+}
+
+func (card *flashcard) Flag(flagged bool) {
+	card.flagged = flagged
 }

@@ -301,3 +301,29 @@ func (c *FlashcardsController) SpreadCardsInTime() error {
 	wg.Wait()
 	return nil
 }
+
+func (c *FlashcardsController) FlagCard(
+	cardId string,
+	flagged bool,
+	memorizingSession *flashcard.MemorizingSessionDTO) error {
+	// if is in the middle of memorizing session
+	if len(memorizingSession.CardsToMemorize) > 0 {
+		session := memorizingSession.ToMemorizingSession()
+		session.CurrentCard().Flag(flagged)
+		c.view.UpdateClientSession(session.ToDTO())
+	}
+
+	go func() {
+		card, err := c.store.Find(cardId)
+
+		if err != nil {
+			log.Println(err)
+		}
+
+		card.Flagged = flagged
+
+		c.store.Update(&card)
+	}()
+
+	return nil
+}

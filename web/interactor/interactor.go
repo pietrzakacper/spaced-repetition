@@ -372,6 +372,29 @@ func (i *HttpInteractor) Start() {
 
 	})
 
+	http.HandleFunc("/flag-card", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != "POST" {
+			w.Header().Add("Location", "/")
+			w.WriteHeader(303)
+			return
+		}
+
+		if c, err := i.authenticateUser(w, r); err == nil {
+			cardId := r.URL.Query().Get("id")
+			flagged := r.URL.Query().Get("flagged") == "true"
+
+			err = c.FlagCard(
+				cardId,
+				flagged,
+				view.DecodeCookiesToMemorizingSession(r))
+
+			if err != nil {
+				w.WriteHeader(http.StatusBadRequest)
+				return
+			}
+		}
+	})
+
 	port := os.Getenv("PORT")
 
 	if port == "" {

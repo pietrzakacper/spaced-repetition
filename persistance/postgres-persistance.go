@@ -68,7 +68,7 @@ func (p *PostgresStore) readAllImpl() ([]flashcard.Record, error) {
 
 	rows, err := p.db.Query(context.Background(), `
 		SELECT
-		id, front, back, repetition_count, next_review_offset, ef, deleted, creation_date, last_review_date
+		id, front, back, repetition_count, next_review_offset, ef, deleted, creation_date, last_review_date, flagged
 		FROM flashcards
 		WHERE user_id=$1`,
 		p.userId,
@@ -82,7 +82,7 @@ func (p *PostgresStore) readAllImpl() ([]flashcard.Record, error) {
 	for rows.Next() {
 		r := flashcard.Record{}
 
-		err = rows.Scan(&r.Id, &r.Front, &r.Back, &r.RepetitionCount, &r.NextReviewOffset, &r.EF, &r.Deleted, &r.CreationDate, &r.LastReviewDate)
+		err = rows.Scan(&r.Id, &r.Front, &r.Back, &r.RepetitionCount, &r.NextReviewOffset, &r.EF, &r.Deleted, &r.CreationDate, &r.LastReviewDate, &r.Flagged)
 		if err != nil {
 			break
 		}
@@ -166,8 +166,8 @@ func (p *PostgresStore) Update(r *flashcard.Record) {
 	defer timeTrack(time.Now(), "postgres.Update: "+r.Front)
 	_, err := p.db.Exec(context.Background(), `
 		UPDATE flashcards
-		SET front=$1, back=$2, repetition_count=$3, next_review_offset=$4, ef=$5, deleted=$6, last_review_date=$7
-		WHERE id=$8`,
+		SET front=$1, back=$2, repetition_count=$3, next_review_offset=$4, ef=$5, deleted=$6, last_review_date=$7, flagged=$8
+		WHERE id=$9`,
 		r.Front,
 		r.Back,
 		r.RepetitionCount,
@@ -175,6 +175,7 @@ func (p *PostgresStore) Update(r *flashcard.Record) {
 		r.EF,
 		r.Deleted,
 		r.LastReviewDate,
+		r.Flagged,
 		r.Id,
 	)
 
@@ -186,7 +187,7 @@ func (p *PostgresStore) Update(r *flashcard.Record) {
 func (p *PostgresStore) Find(cardId string) (flashcard.Record, error) {
 	rows, err := p.db.Query(context.Background(), `
 		SELECT
-		id, front, back, repetition_count, next_review_offset, ef, deleted, creation_date, last_review_date
+		id, front, back, repetition_count, next_review_offset, ef, deleted, creation_date, last_review_date, flagged
 		FROM flashcards
 		WHERE id=$1`,
 		cardId,
@@ -199,7 +200,7 @@ func (p *PostgresStore) Find(cardId string) (flashcard.Record, error) {
 
 	r := flashcard.Record{}
 
-	rows.Scan(&r.Id, &r.Front, &r.Back, &r.RepetitionCount, &r.NextReviewOffset, &r.EF, &r.Deleted, &r.CreationDate, &r.LastReviewDate)
+	rows.Scan(&r.Id, &r.Front, &r.Back, &r.RepetitionCount, &r.NextReviewOffset, &r.EF, &r.Deleted, &r.CreationDate, &r.LastReviewDate, &r.Flagged)
 
 	return r, nil
 }

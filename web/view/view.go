@@ -132,6 +132,8 @@ type AnswerData struct {
 	Back                string
 	Answers             []Answer
 	Kind                byte
+	CardId              string
+	Flagged             bool
 }
 
 func (v *HttpView) RenderCardAnswer(card *flashcard.DTO, cardNumber int, totalCardsInSession int, answerOptions []int) {
@@ -149,27 +151,42 @@ func (v *HttpView) RenderCardAnswer(card *flashcard.DTO, cardNumber int, totalCa
 		Back:                card.Back,
 		Answers:             Answers,
 		Kind:                getCardKind(card.Id),
+		CardId:              card.Id,
+		Flagged:             card.Flagged,
 	}
 
 	template.Execute(v.w, data)
 }
 
 type CardsData struct {
-	Cards []cardView
+	Cards        []cardView
+	FlaggedCards []cardView
+	HasFlagged   bool
 }
 
 func (v *HttpView) RenderCards(cards []flashcard.DTO) {
 	template := t.Must(t.ParseFiles("templates/cards.html"))
 
-	cardViews := make([]cardView, len(cards))
+	cardViews := make([]cardView, 0)
+	flaggedCardViews := make([]cardView, 0)
 
-	for index, dto := range cards {
-		cardViews[index] = cardView{
+	for _, dto := range cards {
+		cv := cardView{
 			Id: dto.Id, Front: dto.Front, Back: dto.Back, Kind: getCardKind(dto.Id),
+		}
+
+		if !dto.Flagged {
+			cardViews = append(cardViews, cv)
+		} else {
+			flaggedCardViews = append(flaggedCardViews, cv)
 		}
 	}
 
-	template.Execute(v.w, CardsData{Cards: cardViews})
+	template.Execute(v.w, CardsData{
+		Cards:        cardViews,
+		FlaggedCards: flaggedCardViews,
+		HasFlagged:   len(flaggedCardViews) > 0,
+	})
 }
 
 func getCardKind(cardId string) byte {

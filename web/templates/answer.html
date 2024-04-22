@@ -22,6 +22,9 @@
           </div>
           <div class="quest-content">
             <div class="card-top">
+              <button class="flag-button-action" flagged="{{ .Flagged }}">
+                <img src="{{ if .Flagged }} /static/flag-filled.svg {{ else }} /static/flag-outline.svg {{ end }}" />
+              </button>
               <div class="card-number-indicator">
                 {{ .CardNumber }} / {{ .TotalCardsInSession }}
               </div>
@@ -95,6 +98,18 @@
               $btn.parentNode.removeChild($btn.parentNode.querySelector('.keyboard-nav'))
             })
         })
+      })
+
+      const cardId = '{{ .CardId }}';
+      const $flagButton = document.querySelector('.flag-button-action');
+      $flagButton.addEventListener('click', async () => {
+        const flagged = $flagButton.getAttribute('flagged') === 'true'
+        $flagButton.querySelector('img').src = flagged ? '/static/flag-outline.svg' : '/static/flag-filled.svg'
+        
+        $flagButton.setAttribute('flagged', String(!flagged))
+        await fetch(`/flag-card?flagged=${!flagged}&id=${cardId}`, {
+          method: "POST",
+        });
       })
     </script>
   </body>
