@@ -1,7 +1,7 @@
 <html>
   <head>
     <link rel="stylesheet" href="/static/satoshi.css" />
-    <link rel="stylesheet" href="/static/main-v1.2.0.css" />
+    <link rel="stylesheet" href="/static/main-v1.3.0.css" />
     <link rel="icon" href="/static/favicon.ico"/>
     <title>spaced repetition</title>
     <meta name="viewport" content="width=device-width initial-scale=1">
@@ -242,12 +242,13 @@
 
             if (res.status === 200) {
               $card.parentElement.removeChild($card);
+              syncUI()
             }
           });
 
           $card
           .querySelector("#unflag-button")
-          ?.addEventListener("click", async () => {
+          ?.addEventListener("click", async (event) => {
             if(requestInProgress) return
             requestInProgress = true
             const res = await fetch(`/flag-card?flagged=false&id=${cardId}`, {
@@ -258,16 +259,21 @@
             if (res.status === 200) {
               $card.parentElement.removeChild($card);
               document.querySelector('#all-cards').appendChild($card)
+              event.target.parentElement.removeChild(event.target);
 
-              if(document.querySelector('#flagged-cards').children.length === 0) {
-                [...document.querySelectorAll('.divider'), document.querySelector('#flagged-cards')]
-                .forEach($el => {
-                  $el.parentElement.removeChild($el);
-                })
-              }
+              syncUI()
             }
           });
       });
+
+      function syncUI() {
+        if(document.querySelector('#flagged-cards').children.length === 0) {
+          [...document.querySelectorAll('.divider'), document.querySelector('#flagged-cards')]
+          .forEach($el => {
+            $el.parentElement.removeChild($el);
+          })
+        }
+      }
     </script>
   </body>
 </html>
