@@ -5,7 +5,7 @@ processes = []
 primary_region = "waw"
 
 [env]
-  APP_URL = "https://app.spaced.sh"
+  APP_URL = "https://app.spacedrep.com"
 
 [experimental]
   auto_rollback = true

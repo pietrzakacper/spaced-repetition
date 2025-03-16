@@ -122,7 +122,7 @@ func (i *HttpInteractor) authenticateUser(w http.ResponseWriter, r *http.Request
 	}
 
 	// try finding the session in DB
-	db := (&persistance.PostgresPersistance{}).Create("anonymous@spaced.sh")
+	db := (&persistance.PostgresPersistance{}).Create("anonymous@spacedrep.com")
 	userIdFromDb, err := db.FindUserIdByToken(authToken)
 
 	if err == nil {
